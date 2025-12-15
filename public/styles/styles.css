@@ -1,0 +1,391 @@
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans%7Cfamily=Roboto+Slab&display=swap');
+
+:root {
+	--header-font: 'Open Sans', sans-serif;
+	--main-font: 'Roboto Slab', sans-serif;
+	--main-fonts: Helvetica, sans-serif;
+}
+
+html,
+body {
+	font-family: var(--main-font);
+	max-width: 100%;
+	overflow-x: hidden;
+	margin: auto;
+	color: #373a3c;
+	background-color: var(--layout-bg-color);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+	opacity: 0.6;
+	color: #000;
+}
+
+@media only screen and (max-width: 600px) {
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5 {
+		text-align: center;
+	}
+}
+
+a {
+	text-decoration: none;
+}
+
+p {
+	font-size: 18px;
+	margin: 0px 0px 16px;
+}
+
+.main-container {
+	min-height: 70vh;
+	display: block;
+	padding: 2rem 5%;
+}
+
+.Btn {
+	display: block;
+	cursor: pointer;
+	background: var(--primary-color);
+	color: white;
+	border: none;
+	text-decoration: none;
+	font-size: 14px;
+	width: fit-content;
+}
+
+.Btn:hover {
+	opacity: 0.85;
+}
+
+.Btn.Large {
+	padding: 14px 50px;
+	min-width: auto;
+	font-size: 18px;
+	font-weight: 700;
+	border-radius: 3px;
+	width: fit-content;
+}
+
+.Btn.Large.Landing {
+	width: 220px;
+}
+
+.Btn.Medium {
+	margin: 20px 0 20px;
+	padding: 10px 40px;
+	font-weight: 700;
+	border-radius: 6px;
+	max-width: 220px;
+	font-size: 16px;
+}
+
+.Btn.Small {
+	margin: 20px 0 20px;
+	padding: 10px 20px;
+	min-width: auto;
+	font-weight: 400;
+	border-radius: 6px;
+	max-width: 220px;
+}
+
+.Btn.Dialog {
+	margin: 20px 0 20px;
+	padding: 10px 20px;
+	min-width: auto;
+	font-weight: 400;
+	border-radius: 6px;
+	width: 100%;
+}
+
+.Btn.Close {
+	position: absolute;
+	font-size: 30px;
+	right: 0;
+	padding-top: 10px;
+}
+
+.Btn.Tiny {
+	margin: 0;
+	padding: 5px 5px;
+	font-size: 11px;
+	min-width: auto;
+	font-weight: 400;
+	border-radius: 6px;
+	max-width: 175px;
+}
+
+.Btn.Header {
+	margin: 0;
+}
+
+.Btn.Inline {
+	display: inline-block;
+	margin-left: 10px;
+}
+
+.Btn.Yellow {
+	background: var(--btn-yellow);
+	color: black;
+}
+
+.Btn.Yellow:hover {
+	background: var(--btn-yellow-hov);
+}
+
+.Btn:disabled {
+	background: #555;
+}
+
+.Errors {
+	color: rgb(209, 3, 3);
+	opacity: 0.8;
+	transition: 1s;
+}
+
+.Errors.Hidden {
+	display: none;
+}
+
+a.link {
+	color: var(--link-light-blue) !important;
+	text-decoration: none;
+	transition: 0.2s;
+}
+
+a.link:hover {
+	opacity: 0.7;
+}
+
+.ui.label.visible .data {
+	display: inline-block;
+}
+
+.clickable {
+	cursor: pointer;
+}
+
+.alert {
+	display: none;
+}
+
+@keyframes cssAnimation {
+	to {
+		/* width:0;
+				height:0;
+				overflow:hidden; */
+		opacity: 0;
+	}
+}
+
+@-webkit-keyframes cssAnimation {
+	to {
+		opacity: 0;
+		/* width:0;
+				height:0;
+				visibility:hidden; */
+	}
+}
+
+
+section.layout {
+	flex-direction: column;
+	align-items: flex-start;
+	display: flex;
+	gap: 16px;
+}
+
+@media screen and (max-width: 600px) {
+	section.layout {
+		flex-direction: column;
+		align-items: center;
+		display: flex;
+		gap: 16px;
+	}
+
+	.Btn.Medium,
+	.Btn.Large {
+		width: 100%;
+		max-width: none;
+	}
+}
+
+/* card.css */
+/* .card-container {
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: column;
+}
+
+
+.card {
+	flex: 0 1 calc(33.33% - 20px);
+	margin: 1% 0;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	padding: 10px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	background-color: #fff;
+}
+
+.card-title {
+	font-size: 1.2rem;
+	font-weight: bold;
+}
+
+.card-text {
+	font-size: 1rem;
+	margin-top: 10px;
+}
+
+.card-buttons {
+
+	display: flex;
+	justify-content: space-between;
+	margin-top: 10px;
+} */
+
+.card-container {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	/* space between cards instead of margin-bottom */
+}
+
+/* Default: small screens → full width */
+.card {
+	flex: 1 1 100%;
+	max-width: 100%;
+}
+
+/* Large screens: max 2 columns */
+@media (min-width: 768px) {
+	.card {
+		flex: 1 1 calc(50% - 5rem);
+		/* 2 columns */
+		max-width: calc(50% - 2.5rem);
+	}
+}
+
+.card {
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	padding: 1.25rem;
+	margin-bottom: 10px;
+	background-color: #fff;
+	color: inherit;
+	text-decoration: none;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	transition: box-shadow 0.2s ease, transform 0.2s ease;
+	cursor: pointer;
+}
+
+.card:hover {
+	background-color: rgb(243 244 246);
+}
+
+.card-title {
+	font-size: 1.2rem;
+	font-weight: bold;
+	margin-bottom: 0.5rem;
+}
+
+.card-text {
+	font-size: 1rem;
+	color: #555;
+}
+
+.btn {
+	padding: 10px 40px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.btn-primary {
+	background-color: var(--primary-color);
+	color: #fff;
+}
+
+.btn-secondary {
+	background-color: var(--secondary-color);
+	color: #fff;
+}
+
+.container {
+	margin: 2% 5%;
+}
+
+/* public presentation */
+.options-container {
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	flex-wrap: wrap;
+	background-color: #000 !important;
+}
+
+.option-card {
+	background-color: red !important;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0px 0px 5px 0px #0000001a;
+	width: 45%;
+	text-align: center;
+	margin: 10px 0;
+}
+
+.or {
+	display: inline-block;
+	margin: 0 20px;
+}
+
+@media (max-width: 768px) {
+
+	.option-card,
+	.or {
+		width: 100%;
+	}
+
+	.or {
+		margin: 20px 0;
+		text-align: center;
+	}
+}
+
+#qrDialog {
+	padding: 0px;
+}
+
+#userPinTextElement {
+	text-align: center;
+	margin-bottom: 5px;
+	font-size: 18px;
+}
+
+.dialog-header {
+	display: flex !important;
+	background: var(--primary-color);
+	flex-direction: row;
+	justify-content: center;
+}
+
+.dialog-header h4 {
+	margin-top: 15px;
+	margin-bottom: 15px;
+	padding-left: 30px;
+	padding-right: 30px;
+	color: white;
+	opacity: 1;
+}
+
+.dialog-body {
+	padding: 30px;
+}

@@ -1,0 +1,37 @@
+div.footer
+	span.left.content
+		#services
+			h3.header #{locale.footer.services}
+			ul
+				li
+					span.fa.fa-code &nbsp;
+					a(href='https://wwwallet.github.io/wallet-docs/') #{locale.footer.documentation}
+				//- li
+				//- 	span.fa.fa-check-circle &nbsp;
+				//- 	a(href='/verifier-panel') #{locale.footer.adminLogin}
+		#contact
+			h3.header #{locale.footer.contact}
+			ul
+				li
+					span.strong.subheader
+					span.fa.fa-globe &nbsp;
+						|&nbsp;
+					a(href='https://www.gunet.gr' target='_blank' rel='noopener noreferrer') https://www.gunet.gr
+				li
+					span.strong.subheader
+					span.fa.fa-briefcase &nbsp;
+						|&nbsp;
+					a(href='mailto:info@gunet.gr') info@gunet.gr
+				li
+					.copyright-area
+						img#footerLogo(src='/images/gunet.svg' alt='GUnet Logo')
+						#copyright-tag
+							small
+								span.fa.fa-copyright
+								|  &nbsp;
+								span#current-year
+								|  | GUnet
+
+	link(rel="stylesheet" href="/styles/footer.css")
+	script.
+		document.getElementById('current-year').textContent = new Date().getFullYear();

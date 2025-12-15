@@ -1,0 +1,12 @@
+.env
+.git
+.gitattributes
+.gitignore
+.npmrc
+.npmrc.template
+npm-debug.log
+node_modules
+combined.log
+error.log
+*.gz
+./dist

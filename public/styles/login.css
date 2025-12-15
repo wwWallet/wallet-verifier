@@ -1,0 +1,112 @@
+#Login .login-flex {
+	display: flex;
+	flex-wrap: nowrap;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+	text-align: center;
+}
+
+#Login .login-box {
+	width: 40%;
+	padding: 30px;
+	min-width: 300px;
+	border-radius: 4.2px;
+	box-shadow: 0px 3px 10px -2px rgba(0, 0, 0, 0.2);
+}
+
+#Login .item {
+	background-color: white;
+	flex: 0 0 auto;
+	margin: 10px;
+}
+
+#Login .input-wrap {
+	border-bottom: 2px solid #adadad;
+}
+
+#Login .input-wrap.invalid {
+	border-bottom: 2px solid var(--error-red);
+}
+
+#Login p.invalid-feedback {
+	display: none;
+	color: var(--error-red);
+}
+
+#Login p.invalid-feedback-show {
+	display: block;
+	color: var(--error-red);
+}
+
+#Login .input-wrap:focus-within {
+	border-bottom: 2px solid transparent;
+	border-image: linear-gradient(300deg, var(--secondary-light-color) 20%, var(--primary-color));
+	border-image-slice: 1;
+}
+
+#Login input {
+	border: none;
+	outline: none;
+	font-size: 20px;
+}
+
+.or-container {
+	align-items: center;
+	justify-content: center;
+	margin-top: 25px;
+	margin-bottom: 5px;
+}
+
+.or-container .line {
+	flex-grow: 1;
+	height: 1px;
+	background-color: #ccc;
+	margin: 0 10px;
+}
+
+.or-container span {
+	padding: 0 3px;
+	background: #fff;
+	position: relative;
+	z-index: 1;
+}
+
+.login-select-flex{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 2px;
+	padding-top: 15px;
+}
+
+.login-select-flex span{
+	opacity: .85;
+	font-size: .9rem;
+}
+
+.select2-container {
+	border-radius: 5px;
+	width: 150px !important;
+	text-align: left;
+	font-size: 14px;
+}
+
+button[disabled] {
+	background-color: #adadad;
+	cursor: not-allowed;
+}
+
+.select2-container .select2-selection--single{
+	height: 35px!important;
+	padding: 3px 0px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+	height: 35px!important;
+}
+
+#Login a, #Login a:visited {
+	color: var(--link-light-blue);
+}

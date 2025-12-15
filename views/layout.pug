@@ -1,0 +1,13 @@
+html
+	head
+		include head.pug
+		style.
+			:root {
+				--primary-color: #{supportedCredentialType ? supportedCredentialType.display[0].background_color : '#1B263B'};
+			}
+	body
+		block header
+			include header.pug
+		block layout-content
+
+		link(rel="stylesheet" href="/styles/main.css")

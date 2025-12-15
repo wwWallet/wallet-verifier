@@ -1,0 +1,13 @@
+extends layout.pug
+block layout-content
+
+	#Error
+		.container
+			h1 Error
+			p #{msg}
+			.navigation
+				i.fa.fa-angle-left.next-icon(aria-hidden="true")
+				button.Back(onclick=`window.location.href = '${redirect ? redirect : '/'}'`) #{locale.ReturnToMainPage}
+
+	link(rel="stylesheet" href="/styles/styles.css")
+	link(rel="stylesheet" href="/styles/error.css")
