@@ -1,8 +1,6 @@
-import { injectable } from "inversify";
 import { OpenidForPresentationsConfiguration } from "../types/OpenidForPresentationsConfiguration.type";
 import { config } from "../../config";
 import { VerifierConfigurationInterface } from "./interfaces";
-import "reflect-metadata";
 
 
 export type DcqlClaim = {
@@ -332,7 +330,6 @@ const minimalPidAndBachelorDcqlQuery: DcqlQuery = {
   ],
 };
 
-@injectable()
 export class VerifierConfigurationService implements VerifierConfigurationInterface {
   getPresentationRequests(): any[] {
     return [

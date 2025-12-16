@@ -7,22 +7,22 @@ import cors from 'cors';
 import { LanguageMiddleware } from './middlewares/language.middleware';
 import { initDataSource } from './AppDataSource';
 import createHttpError, { HttpError } from 'http-errors';
-import { appContainer } from './services/inversify.config';
 import { ExpressAppService } from './services/ExpressAppService';
 import session from 'express-session';
+import { OpenidForPresentationsReceivingService } from './services/OpenidForPresentationReceivingService';
+import { VerifierConfigurationService } from './services/VerifierConfigurationService';
 
-import locale from './configuration/locale';
-import titles from './configuration/titles';
+import locale from './runtime-config/locale';
+import titles from './runtime-config/titles';
 
 import { verifierRouter } from './verifierRouter';
 import _ from 'lodash';
-import { configurationExecution } from './configuration/main';
 
 async function main() {
 	const app: Express = express();
 
 	initDataSource().then(() => {
-		configurationExecution();
+		console.log("Data source initialized");
 	});
 
 
@@ -52,7 +52,12 @@ async function main() {
 	// public is located at "/path/to/dist/src"
 	app.set('views', path.join(__dirname, '../../views'));
 
-	await appContainer.resolve(ExpressAppService).configure(app);
+	// Instantiate dependencies
+	const verifierConfigurationService = new VerifierConfigurationService();
+	const openidForPresentationReceivingService = new OpenidForPresentationsReceivingService(verifierConfigurationService);
+	const expressAppService = new ExpressAppService(openidForPresentationReceivingService);
+
+	await expressAppService.configure(app);
 	app.use(LanguageMiddleware);
 	app.use('/verifier', verifierRouter);
 

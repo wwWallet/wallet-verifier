@@ -1,4 +1,4 @@
-import { Language } from "./language.type";
+import { Language } from "./Language.type";
 
 declare global {
 	namespace Express {

@@ -1,11 +1,9 @@
-import { inject, injectable } from "inversify";
 import { Request, Response } from 'express'
 import { OpenidForPresentationsReceivingInterface, VerifierConfigurationInterface, PresentationInfo } from "./interfaces";
 import { VerifiableCredentialFormat } from "wallet-common/dist/types";
 import { compactDecrypt, CompactDecryptResult, exportJWK, generateKeyPair, importJWK, importPKCS8, SignJWT } from "jose";
 import { randomUUID } from "crypto";
 import base64url from "base64url";
-import 'reflect-metadata';
 import { Repository } from "typeorm";
 import AppDataSource from "../AppDataSource";
 import { config } from "../../config";
@@ -19,7 +17,6 @@ import { TransactionData } from "../util/transactionData";
 import { serializeDcqlQuery } from "../util/serializeDcqlQuery";
 import { DcqlPresentationResult } from 'dcql';
 import { pemToBase64 } from "../util/pemToBase64";
-import { SERVICE_TYPES } from "../types/service.type";
 
 const privateKeyPem = fs.readFileSync(path.join(__dirname, "../../../keys/pem.key"), 'utf-8').toString();
 const leafCert = fs.readFileSync(path.join(__dirname, "../../../keys/pem.crt"), 'utf-8').toString();
@@ -43,12 +40,11 @@ const ResponseModeSchema = z.nativeEnum(ResponseMode);
 // @ts-ignore
 const response_mode: ResponseMode = config?.presentationFlow?.response_mode ? ResponseModeSchema.parse(config?.presentationFlow?.response_mode) : ResponseMode.DIRECT_POST_JWT;
 
-@injectable()
 export class OpenidForPresentationsReceivingService implements OpenidForPresentationsReceivingInterface {
 	private rpStateRepository: Repository<RelyingPartyState> = AppDataSource.getRepository(RelyingPartyState);
 
 	constructor(
-		@inject(SERVICE_TYPES.VerifierConfigurationServiceInterface) private configurationService: VerifierConfigurationInterface,
+		private configurationService: VerifierConfigurationInterface,
 	) { }
 
 	public async getSignedRequestObject(ctx: { req: Request, res: Response }): Promise<any> {

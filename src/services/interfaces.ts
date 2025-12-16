@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { OpenidForPresentationsConfiguration } from "../types/OpenidForPresentationsConfiguration.type";
-import 'reflect-metadata';
 import { PresentationClaims, RelyingPartyState } from "../entities/RelyingPartyState.entity";
 
 export type PresentationInfo = {
