@@ -1,10 +1,10 @@
 
 export const config = {
-	url: "http://wallet-enterprise-acme-verifier:8005",
+	url: "http://localhost:8005",
 	port: "8005",
 	appSecret: "dsfkwfkwfwdfdsfSaSe2e34r4frwr42rAFdsf2lfmfsmklfwmer",
 	db: {
-		host: "wallet-db",
+		host: "127.0.0.1",
 		port: "3307",
 		username: "root",
 		password: "root",
