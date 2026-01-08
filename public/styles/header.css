@@ -42,38 +42,6 @@
 	background: linear-gradient(358.5deg, var(--secondary-light-color) .09%, var(--primary-color));
 }
 
-/* Ribbon css */
-.ribbon {
-	display: none;
-	width: 150px;
-	height: 100%;
-	height: -moz-available;
-	height: -webkit-fill-available;
-	height: fill-available;
-	overflow: hidden;
-	position: absolute;
-	top: 0;
-	right: 0;
-	pointer-events: none;
-}
-
-.ribbonText {
-	position: absolute;
-	display: block;
-	width: 225px;
-	padding: 15px 0;
-	background-color: var(--secondary-color);
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-	color: #fff;
-	font: 700 18px/1 "Lato", sans-serif;
-	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-	text-transform: uppercase;
-	text-align: center;
-	left: -15px;
-	top: 20px;
-	transform: rotate(45deg);
-}
-
 /* Menu */
 
 .menu-area {
