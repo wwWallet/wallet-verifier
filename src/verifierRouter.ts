@@ -1,13 +1,11 @@
 import { Router } from "express";
-import { OpenidForPresentationsReceivingInterface, VerifierConfigurationInterface } from "./services/interfaces";
-import { appContainer } from "./services/inversify.config";
-import { SERVICE_TYPES } from "./types/service.type";
-import locale from "./configuration/locale";
+import locale from "./runtime-config/locale";
 import * as qrcode from 'qrcode';
 import { config } from "./../config";
-
+import { OpenidForPresentationsReceivingService } from "./services/OpenidForPresentationReceivingService";
+import { VerifierConfigurationService } from "./services/VerifierConfigurationService";
 import { generateRandomIdentifier } from "./util/generateRandomIdentifier";
-import { addSessionIdCookieToResponse } from "./configuration/sessionIdCookieConfig";
+import { addSessionIdCookieToResponse } from "./runtime-config/sessionIdCookieConfig";
 import AppDataSource from "./AppDataSource";
 import { RelyingPartyState } from "./entities/RelyingPartyState.entity";
 import { initializeCredentialEngine } from "./util/initializeCredentialEngine";
@@ -88,8 +86,8 @@ export const sanitizeInput = (input: string): string =>
 const MAX_CERT_LENGTH = 5000;
 
 const verifierRouter = Router();
-const verifierConfiguration = appContainer.get<VerifierConfigurationInterface>(SERVICE_TYPES.VerifierConfigurationServiceInterface);
-const openidForPresentationReceivingService = appContainer.get<OpenidForPresentationsReceivingInterface>(SERVICE_TYPES.OpenidForPresentationsReceivingService);
+const verifierConfiguration = new VerifierConfigurationService();
+const openidForPresentationReceivingService = new OpenidForPresentationsReceivingService(verifierConfiguration);
 
 verifierRouter.get('/certificates', async (req, res) => {
 	return res.render('certificates.pug', {
