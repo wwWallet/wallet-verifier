@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { Language } from "../types/Language.type";
+import { Language } from "../types/language.type";
 import locale from "../runtime-config/locale";
 
 
