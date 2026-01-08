@@ -12,16 +12,3 @@
 	--btn-yellow: #F9CA1A;
 	--btn-yellow-hov: #caa418;
 }
-
-.menu-area {
-	display: block;
-	font-size: 1.2em;
-}
-
-/* -------- end -------- */
-
-/* overwrite Style */
-.img-logo {
-	height: 60px;
-}
-/* -------- end -------- */
