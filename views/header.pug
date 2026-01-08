@@ -3,9 +3,7 @@
 		.header-content
 			a.logo-area(href="/")
 				img.img-logo(src="/images/logo.png" alt="Logo")
-				if supportedCredentialType
-					span.logo-text #{supportedCredentialType.display[0].name}
-				else if locale.header.title
+				if locale.header.title
 					span.logo-text #{locale.header.title}
 			.menu-area
 				.mobile-menu-toggle
