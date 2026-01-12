@@ -1,10 +1,26 @@
 (() => {
 	"use strict";
 
+	// -------------------------
+	// Active nav item
+	// -------------------------
+	const path = (window.location.pathname || "/").replace(/\/$/, "") || "/";
+	const links = document.querySelectorAll("#Header .menu-item a");
+
+	for (const link of links) {
+		const href = (link.getAttribute("href") || "").replace(/\/$/, "") || "/";
+		if (href === path) {
+			link.classList.add("is-active");
+			link.setAttribute("aria-current", "page");
+		}
+	}
+
+	// -------------------------
+	// Mobile menu toggle
+	// -------------------------
 	const toggleBtn = document.getElementById("menu-toggle-button");
 	const menu = document.getElementById("main-menu");
 
-	// Header might not exist on some pages
 	if (!toggleBtn || !menu) return;
 
 	const setOpen = (open) => {
@@ -14,22 +30,18 @@
 
 	const isOpen = () => menu.classList.contains("show-menu");
 
-	// Toggle on click
 	toggleBtn.addEventListener("click", () => setOpen(!isOpen()));
 
-	// Close when clicking outside
 	document.addEventListener("click", (e) => {
 		if (!isOpen()) return;
 		if (toggleBtn.contains(e.target) || menu.contains(e.target)) return;
 		setOpen(false);
 	});
 
-	// Close on Escape
 	document.addEventListener("keydown", (e) => {
 		if (e.key === "Escape" && isOpen()) setOpen(false);
 	});
 
-	// If screen becomes desktop, ensure the dropdown isn't stuck open
 	const mq = window.matchMedia("(min-width: 1069px)");
 	const onChange = () => {
 		if (mq.matches) setOpen(false);
