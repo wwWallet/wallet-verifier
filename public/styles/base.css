@@ -3,7 +3,7 @@ body {
 	font-family: var(--main-font);
 	margin: auto;
 	color: #373a3c;
-	background-color: color-mix(in srgb, var(--primary-lighter-color) 20%, transparent);
+	background-color: color-mix(in srgb, var(--primary-lighter-color) 10%, transparent);
 	line-height: 1.5;
 }
 
@@ -93,6 +93,14 @@ p {
 }
 
 /* ==============================
+   Links
+============================== */
+
+a {
+	text-decoration: none;
+}
+
+/* ==============================
    Buttons
 ============================== */
 
@@ -149,4 +157,48 @@ p {
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
+}
+
+/* ==============================
+   Button Sizes
+============================== */
+
+.Btn--xs {
+	min-height: 28px;
+	padding: 0.25rem 0.6rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+	border-radius: 4px;
+}
+
+.Btn--sm {
+	min-height: 36px;
+	padding: 0.45rem 0.9rem;
+	font-size: 0.85rem;
+	font-weight: 600;
+	border-radius: 5px;
+}
+
+.Btn--md {
+	/* default size (same as .Btn) */
+	min-height: 44px;
+	padding: 0.75rem 1.5rem;
+	font-size: 1rem;
+	font-weight: 700;
+}
+
+.Btn--lg {
+	min-height: 52px;
+	padding: 0.9rem 2.25rem;
+	font-size: 1.1rem;
+	font-weight: 700;
+	border-radius: 8px;
+}
+
+.Btn--xl {
+	min-height: 60px;
+	padding: 1.1rem 3rem;
+	font-size: 1.25rem;
+	font-weight: 800;
+	border-radius: 10px;
 }
