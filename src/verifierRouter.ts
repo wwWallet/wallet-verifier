@@ -88,17 +88,7 @@ const verifierRouter = Router();
 const verifierConfiguration = new VerifierConfigurationService();
 const openidForPresentationReceivingService = new OpenidForPresentationsReceivingService(verifierConfiguration);
 
-verifierRouter.get('/certificates', async (_req, res) => {
-	return res.render('certificates.pug', {
-		trustedRootCertificates: config.trustedRootCertificates
-	});
-})
-
-verifierRouter.get('/import-certificate', async (_req, res) => {
-	return res.render('import-certificate.pug')
-});
-
-verifierRouter.post('/import-certificate', async (req, res) => {
+verifierRouter.post('/public/manage-certificates', async (req, res) => {
 	const { certificate } = req.body;
 	try {
 		if (!certificate) {
@@ -117,9 +107,10 @@ verifierRouter.post('/import-certificate', async (req, res) => {
 
 		const normalizedPem = pem.replace(/\r\n/g, '\n');
 		(config.trustedRootCertificates as string[]).push(normalizedPem.trim());
-		res.redirect('/verifier/import-certificate');
+		res.redirect('/verifier/public/manage-certificates');
 	} catch (error) {
-		res.render('import-certificate.pug', {
+		res.render('manage-certificates.pug', {
+			trustedRootCertificates: config.trustedRootCertificates,
 			error: {
 				errorMessage: 'error adding x509 certificate'
 			}
@@ -128,7 +119,9 @@ verifierRouter.post('/import-certificate', async (req, res) => {
 });
 
 verifierRouter.get('/public/manage-certificates', async (_req, res) => {
-	return res.render('manage-certificates.pug');
+	return res.render('manage-certificates.pug',{
+		trustedRootCertificates: config.trustedRootCertificates
+	});
 })
 
 verifierRouter.get('/public/definitions', async (_req, res) => {
