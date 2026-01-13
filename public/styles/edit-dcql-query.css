@@ -109,6 +109,10 @@
 	pointer-events: none;
 }
 
+.jsoneditor-menu {
+	display: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
 	.edit-dcql {

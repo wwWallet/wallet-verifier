@@ -1,29 +1,27 @@
-
-/* CSS for the spinner */
+/* Fullscreen overlay */
 #spinner-container {
 	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
+	inset: 0;
 	z-index: 9999;
-	/* Ensure the spinner is on top of other content */
+
+	display: grid;
+	place-items: center;
+
+	/* subtle dim background */
+	background: rgba(255, 255, 255, 0.4);
+	backdrop-filter: blur(1px);
 }
 
+/* Spinner */
 .spinner {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 80px;
-	height: 80px;
-	border: 10px solid #333;
-	/* Border color of the spinner */
-	border-top: 10px solid var(--primary-color);
-	/* Border color of the spinner top */
+	width: 64px;
+	height: 64px;
+
 	border-radius: 50%;
-	animation: spin 4s linear infinite;
-	/* Spin animation for 2 seconds */
+	border: 6px solid rgba(0, 0, 0, 0.15);
+	border-top-color: var(--primary-main-color);
+
+	animation: spin 3s linear infinite;
 }
 
 .spinner-circle {
@@ -31,13 +29,9 @@
 	height: 100%;
 }
 
-/* Keyframes for the spin animation */
+/* Spin animation */
 @keyframes spin {
-	0% {
-		transform: translate(-50%, -50%) rotate(0deg);
-	}
-
-	100% {
-		transform: translate(-50%, -50%) rotate(360deg);
+	to {
+		transform: rotate(360deg);
 	}
 }
