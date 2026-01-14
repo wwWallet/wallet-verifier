@@ -88,26 +88,7 @@ const verifierRouter = Router();
 const verifierConfiguration = new VerifierConfigurationService();
 const openidForPresentationReceivingService = new OpenidForPresentationsReceivingService(verifierConfiguration);
 
-<<<<<<< HEAD
 verifierRouter.post('/public/manage-certificates', async (req, res) => {
-=======
-verifierRouter.get('/certificates', async (req, res) => {
-	return res.render('certificates.pug', {
-		lang: req.lang,
-		locale: locale["en"],
-		trustedRootCertificates: config.trustedRootCertificates
-	})
-})
-
-verifierRouter.get('/import-certificate', async (req, res) => {
-	return res.render('import-certificate.pug', {
-		lang: req.lang,
-		locale: locale["en"]
-	})
-})
-
-verifierRouter.post('/import-certificate', async (req, res) => {
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 	const { certificate } = req.body;
 	try {
 		if (!certificate) {
@@ -128,14 +109,8 @@ verifierRouter.post('/import-certificate', async (req, res) => {
 		(config.trustedRootCertificates as string[]).push(normalizedPem.trim());
 		res.redirect('/verifier/public/manage-certificates');
 	} catch (error) {
-<<<<<<< HEAD
 		res.render('manage-certificates.pug', {
 			trustedRootCertificates: config.trustedRootCertificates,
-=======
-		res.render('import-certificate.pug', {
-			lang: req.lang,
-			locale: locale["en"],
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 			error: {
 				errorMessage: 'error adding x509 certificate'
 			}
@@ -143,29 +118,16 @@ verifierRouter.post('/import-certificate', async (req, res) => {
 	}
 });
 
-<<<<<<< HEAD
 verifierRouter.get('/public/manage-certificates', async (_req, res) => {
 	return res.render('manage-certificates.pug',{
 		trustedRootCertificates: config.trustedRootCertificates
 	});
-=======
-verifierRouter.get('/public/manage-certificates', async (req, res) => {
-	return res.render('manage-certificates.pug', {
-		lang: req.lang,
-		locale: locale["en"]
-	})
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 })
 
 verifierRouter.get('/public/definitions', async (_req, res) => {
 	return res.render('public-definitions.pug', {
 		presentationRequests: verifierConfiguration.getPresentationRequests(),
-<<<<<<< HEAD
 	});
-=======
-		locale: locale["en"]
-	})
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 })
 
 
@@ -181,16 +143,8 @@ verifierRouter.get('/callback/status', async (req, res) => { // response with th
 })
 
 
-<<<<<<< HEAD
 verifierRouter.get('/callback', async (_req, res) => {
 	res.render('handle-response-code');
-=======
-verifierRouter.get('/callback', async (req, res) => {
-	res.render('handle-response-code', {
-		lang: req.lang,
-		locale: locale["en"],
-	})
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 })
 
 verifierRouter.post('/callback', async (req, res) => {
@@ -219,13 +173,7 @@ verifierRouter.post('/callback', async (req, res) => {
 		return res.render('error.pug', {
 			msg: result.status == false ? result.error.message : "Unknown error",
 			code: 0,
-<<<<<<< HEAD
 		});
-=======
-			lang: req.lang,
-			locale: locale["en"],
-		})
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 	}
 
 	const { claims, date_created } = result.rpState;
@@ -252,11 +200,6 @@ verifierRouter.post('/callback', async (req, res) => {
 
 	console.log("Presentation messages: ", result.presentationInfo);
 	return res.render('success.pug', {
-<<<<<<< HEAD
-=======
-		lang: req.lang,
-		locale: locale["en"],
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 		status: status,
 		verificationTimestamp: date_created.toISOString(),
 		presentationClaims: claims,
@@ -272,11 +215,6 @@ verifierRouter.use('/public/definitions/configurable-presentation-request/:prese
 		return res.render('error', {
 			msg: "No presentation request was selected",
 			code: 0,
-<<<<<<< HEAD
-=======
-			lang: req.lang,
-			locale: locale["en"]
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 		});
 	}
 	const presentationRequest = verifierConfiguration.getPresentationRequests().filter(pd => pd.id == presentation_request_id)[0];
@@ -284,11 +222,6 @@ verifierRouter.use('/public/definitions/configurable-presentation-request/:prese
 		return res.render('error', {
 			msg: "No presentation request was found",
 			code: 0,
-<<<<<<< HEAD
-=======
-			lang: req.lang,
-			locale: locale["en"]
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 		});
 	}
 	const selectableFields = presentationRequest.dcql_query.credentials
@@ -301,21 +234,11 @@ verifierRouter.use('/public/definitions/configurable-presentation-request/:prese
 		presentationRequestId: presentationRequest.id,
 		dcqlQuery: presentationRequest.dcql_query,
 		selectableFields,
-<<<<<<< HEAD
-=======
-		lang: req.lang,
-		locale: locale["en"],
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 	});
 })
 
 verifierRouter.get('/public/definitions/edit-dcql-query', async (_req, res) => {
 	return res.render('edit-dcql-query', {
-<<<<<<< HEAD
-=======
-		lang: req.lang,
-		locale: locale["en"],
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 		schema: dcqlQuerySchema
 	});
 })
@@ -338,11 +261,6 @@ verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 			return res.render('error.pug', {
 				msg: "Invalid DCQL query format",
 				code: 0,
-<<<<<<< HEAD
-=======
-				lang: req.lang,
-				locale: locale["en"],
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 			});
 		}
 		presentationRequest = {
@@ -354,13 +272,7 @@ verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 		return res.render('error.pug', {
 			msg: "Error while parsing the DCQL query",
 			code: 0,
-<<<<<<< HEAD
 		});
-=======
-			lang: req.lang,
-			locale: locale["en"],
-		})
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 	}
 	const scheme = req.body.scheme
 
@@ -386,13 +298,7 @@ verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 		authorizationRequestQR,
 		presentationRequest: JSON.stringify(JSON.parse(req.body.dcqlQuery)),
 		state: url.searchParams.get('state'),
-<<<<<<< HEAD
 	});
-=======
-		lang: req.lang,
-		locale: locale["en"],
-	})
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 })
 
 verifierRouter.get('/public/definitions/presentation-request/status/:presentation_request_id', async (req, res) => {
@@ -417,11 +323,6 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 		return res.render('error', {
 			msg: "No presentation request was selected",
 			code: 0,
-<<<<<<< HEAD
-=======
-			lang: req.lang,
-			locale: locale["en"]
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 		});
 	}
 
@@ -437,11 +338,6 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 		return res.render('error', {
 			msg: "No presentation request was found",
 			code: 0,
-<<<<<<< HEAD
-=======
-			lang: req.lang,
-			locale: locale["en"]
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 		});
 	}
 
@@ -481,15 +377,7 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 		authorizationRequestQR,
 		presentationRequest: JSON.stringify(presentationRequest.dcql_query),
 		state: url.searchParams.get('state'),
-<<<<<<< HEAD
 	});
-=======
-		lang: req.lang,
-		locale: locale["en"],
-	})
-
-
->>>>>>> 34ecd609679f9851f8635a523ab56178ffea5ad2
 })
 
 export { verifierRouter };
