@@ -12,8 +12,8 @@ import session from 'express-session';
 import { OpenidForPresentationsReceivingService } from './services/OpenidForPresentationReceivingService';
 import { VerifierConfigurationService } from './services/VerifierConfigurationService';
 
-import locale from './runtime-config/locale';
-import titles from './runtime-config/titles';
+import locale from '../config/locale';
+import titles from '../config/titles';
 
 import { verifierRouter } from './verifierRouter';
 import _ from 'lodash';

@@ -1,11 +1,11 @@
 import { Router } from "express";
-import locale from "./runtime-config/locale";
+import locale from "../config/locale";
 import * as qrcode from 'qrcode';
 import { config } from "./../config";
 import { OpenidForPresentationsReceivingService } from "./services/OpenidForPresentationReceivingService";
 import { VerifierConfigurationService } from "./services/VerifierConfigurationService";
 import { generateRandomIdentifier } from "./util/generateRandomIdentifier";
-import { addSessionIdCookieToResponse } from "./runtime-config/sessionIdCookieConfig";
+import { addSessionIdCookieToResponse } from "../config/sessionIdCookieConfig";
 import AppDataSource from "./AppDataSource";
 import { RelyingPartyState } from "./entities/RelyingPartyState.entity";
 import { initializeCredentialEngine } from "./util/initializeCredentialEngine";
