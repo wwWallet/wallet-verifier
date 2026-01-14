@@ -1,34 +1,28 @@
 #Header
 	.header
-		.ribbon
-			a.ribbonText DEMO
 		.header-content
 			a.logo-area(href="/")
 				img.img-logo(src="/images/logo.png" alt="Logo")
-				if supportedCredentialType
-					span.logo-text #{supportedCredentialType.display[0].name}
-				else if locale.header.title
+				if locale && locale.header && locale.header.title
 					span.logo-text #{locale.header.title}
+
 			.menu-area
 				.mobile-menu-toggle
-					button#menu-toggle-button
+					button#menu-toggle-button(
+						type="button"
+						aria-expanded="false"
+						aria-controls="main-menu"
+					)
 						span.menu-icon ☰
-				ul.menu
+
+				ul#main-menu.menu
 					li.menu-item
 						a(href="/") Home
 					li.menu-item
 						a(href="/verifier/public/definitions") Request Credentials
 					li.menu-item
 						a(href="/verifier/public/manage-certificates") Manage Certificates
+
 		.header-border
 
-	script.
-		document.addEventListener('DOMContentLoaded', function () {
-			const menuToggle = document.getElementById('menu-toggle-button');
-			const menu = document.querySelector('.menu');
-
-			menuToggle.addEventListener('click', function () {
-				menu.classList.toggle('show-menu');
-			});
-		});
-	script(src="/js/header.js")
+script(src="/js/header.js" defer)

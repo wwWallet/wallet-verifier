@@ -1,31 +1,51 @@
+(() => {
+	"use strict";
 
-document.addEventListener("DOMContentLoaded", function() {
-	const ribbon = document.querySelector('.ribbon');
-	const menuArea = document.querySelector('.menu-area');
+	// -------------------------
+	// Active nav item
+	// -------------------------
+	const path = (window.location.pathname || "/").replace(/\/$/, "") || "/";
+	const links = document.querySelectorAll("#Header .menu-item a");
 
-	// Check if ribbon is displayed as block
-	if (window.getComputedStyle(ribbon).display === "block") {
-			// Set menu-area margin-right to 20% if ribbon is visible
-			menuArea.style.marginRight = "30%";
-	} else {
-			// Otherwise, keep it at 10%
-			menuArea.style.marginRight = "10%";
-	}
-});
-
-// change language cookie (eg lang=en)
-// refresh window
-
-
-if (document.getElementById('lang-el'))
-	document.getElementById('lang-el').onclick = function (event) {
-		document.cookie = 'lang=el; path=/'
-		window.location.reload();
+	for (const link of links) {
+		const href = (link.getAttribute("href") || "").replace(/\/$/, "") || "/";
+		if (href === path) {
+			link.classList.add("is-active");
+			link.setAttribute("aria-current", "page");
+		}
 	}
 
+	// -------------------------
+	// Mobile menu toggle
+	// -------------------------
+	const toggleBtn = document.getElementById("menu-toggle-button");
+	const menu = document.getElementById("main-menu");
 
-if (document.getElementById('lang-en'))
-	document.getElementById('lang-en').onclick = function (event) {
-		document.cookie = 'lang=en; path=/';
-		window.location.reload();
-	}
+	if (!toggleBtn || !menu) return;
+
+	const setOpen = (open) => {
+		menu.classList.toggle("show-menu", open);
+		toggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
+	};
+
+	const isOpen = () => menu.classList.contains("show-menu");
+
+	toggleBtn.addEventListener("click", () => setOpen(!isOpen()));
+
+	document.addEventListener("click", (e) => {
+		if (!isOpen()) return;
+		if (toggleBtn.contains(e.target) || menu.contains(e.target)) return;
+		setOpen(false);
+	});
+
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape" && isOpen()) setOpen(false);
+	});
+
+	const mq = window.matchMedia("(min-width: 1069px)");
+	const onChange = () => {
+		if (mq.matches) setOpen(false);
+	};
+
+	mq.addEventListener?.("change", onChange) ?? mq.addListener(onChange);
+})();

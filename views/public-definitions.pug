@@ -1,25 +1,26 @@
-extends ./layout.pug
+extends layout.pug
+
+block head-styles
+	link(rel="stylesheet" href="/styles/public-definitions.css")
 
 block layout-content
-	.container2.container-positions
-		h1 Present your Verifiable Credentials
-		.card-container
-			for definition in presentationRequests
-				if definition._selectable === true
-					a.card(href=`/verifier/public/definitions/configurable-presentation-request/${definition.id}`)
-						.card-title #{definition.title}
-						p.card-text #{definition.description}
-				else
-					a.card(href=`/verifier/public/definitions/presentation-request/${definition.id}`)
-						.card-title #{definition.title}
-						p.card-text #{definition.description}
+	section
+		.definitions__container.container
+			header
+				h1 Present your Verifiable Credentials
+				p.definitions__subtitle Choose a predefined request or create a custom one.
 
-			a.card(href="/verifier/public/definitions/edit-dcql-query")
-				.card-title Custom Request
-				p.card-text Import the DCQL query of your choice.
+			nav.definitions__grid(aria-label="Presentation request definitions")
+				for definition in presentationRequests
+					if definition._selectable === true
+						a.card.def-card(href=`/verifier/public/definitions/configurable-presentation-request/${definition.id}`)
+							.card-title #{definition.title}
+							p.card-text #{definition.description}
+					else
+						a.card.def-card(href=`/verifier/public/definitions/presentation-request/${definition.id}`)
+							.card-title #{definition.title}
+							p.card-text #{definition.description}
 
-	block footer
-		include ./footer.pug
-
-	link(rel="stylesheet" href="/styles/index.css")
-	script(src="/js/index.js")
+				a.card.def-card.def-card--accent(href="/verifier/public/definitions/edit-dcql-query")
+					.card-title Custom Request
+					p.card-text Import the DCQL query of your choice.

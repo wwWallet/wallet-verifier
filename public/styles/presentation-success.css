@@ -1,0 +1,199 @@
+.presentation-status {
+	padding: 2rem 0;
+}
+
+.presentation-status__container {
+	padding: 2rem 0;
+}
+
+.presentation-status__header {
+	text-align: center;
+}
+
+.presentation-status__subtitle {
+	margin: 0.5rem 0 0;
+	color: #4b5563;
+}
+
+/* Page wrapper */
+
+.presentation-success__header {
+	text-align: center;
+	margin-bottom: 1.25rem;
+}
+
+.presentation-success__subtitle {
+	margin: 0.5rem 0 0;
+	color: #4b5563;
+	line-height: 1.5;
+}
+
+.presentation-success__meta {
+	text-align: center;
+	margin: 0.75rem 0 1rem;
+	color: #4b5563;
+}
+
+/* Reuse your card style */
+.presentation-card {
+	background: #fff;
+	border-radius: 12px;
+	padding: 1.25rem;
+	width: 100%;
+	max-width: 920px;
+	margin: 0 auto;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.presentation-card + .presentation-card {
+	margin-top: 1rem;
+}
+
+.presentation-success__sectionTitle {
+	margin: 0 0 0.75rem;
+	font-size: 1rem;
+	font-weight: 800;
+	color: #111;
+	opacity: 0.9;
+}
+
+/* Credential image grid */
+.inline-box-container {
+	display: flex;
+	gap: 1rem;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.credential-box {
+	border-radius: 12px;
+	overflow: hidden;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	background: #fff;
+}
+
+.credential-image {
+	width: 240px;
+	height: 150px;
+	object-fit: cover;
+	display: block;
+}
+
+/* Claims */
+.claims-tables {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.claims-title {
+	margin: 0 0 0.5rem;
+	font-size: 0.95rem;
+	font-weight: 800;
+	color: #111;
+}
+
+.table-container {
+	overflow-x: auto;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	border-radius: 10px;
+	background: #fff;
+}
+
+.claims-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.875rem;
+}
+
+.claims-table th,
+.claims-table td {
+	padding: 0.6rem 0.75rem;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+	vertical-align: top;
+}
+
+.claims-table th {
+	text-align: left;
+	font-weight: 800;
+	color: #ffffff;
+	background-color: var(--primary-main-color)!important;
+}
+
+.additional-info {
+	margin-top: 0.75rem;
+}
+
+/* JSON header + copy */
+.presentation-json__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	margin-bottom: 0.75rem;
+}
+
+.presentation-json__checkmark {
+	margin-left: 0.5rem;
+	opacity: 0;
+	transition: opacity 0.15s ease;
+}
+
+.presentation-json__checkmark.visible {
+	opacity: 1;
+}
+
+/* JSONEditor wrapper (border/radius) */
+.jsoneditor-host {
+	height: 520px;
+	border: 1px solid rgba(0, 0, 0, 0.18);
+	border-radius: 10px;
+	overflow: hidden;
+	background: #fff;
+}
+
+.presentation-json__copy {
+	display: inline-flex;
+	align-items: center;
+}
+
+.copy-state {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.copy-success {
+	display: none;
+}
+
+.presentation-json__copy.is-copied .copy-default {
+	display: none;
+}
+
+.presentation-json__copy.is-copied .copy-success {
+	display: inline-flex;
+}
+
+.jsoneditor-menu{
+	background-color: var(--primary-main-color)!important;
+}
+
+@media (max-width: 768px) {
+
+	.presentation-card {
+		padding: 1rem;
+	}
+
+	.credential-image {
+		width: 50%;
+		height: auto;
+	}
+
+	.presentation-json__header {
+		flex-direction: column;
+		align-items: stretch;
+	}
+}

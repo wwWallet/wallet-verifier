@@ -59,17 +59,21 @@ async function main() {
 
 	await expressAppService.configure(app);
 	app.use(LanguageMiddleware);
+
+	app.use((req, res, next) => {
+		res.locals.lang = req.lang;
+		res.locals.locale = locale[req.lang];
+		next();
+	});
+
 	app.use('/verifier', verifierRouter);
 
 
-	app.get('/', async (req: Request, res: Response) => {
+	app.get('/', async (_req: Request, res: Response) => {
 		return res.render("index", {
 			title: titles.index,
-			lang: req.lang,
-			locale: locale[req.lang],
-		})
-	})
-
+		});
+	});
 
 	app.post('/', async (req, res) => {
 		if (req.body.verifier == "true") {
@@ -119,10 +123,7 @@ async function main() {
 		res.locals.error = req.app.get('env') === 'development' ? err : {};
 		// render the error page
 		res.status(err.status || 500);
-		res.render('error', {
-			lang: req.lang,
-			locale: locale[req.lang]
-		});
+		res.render('error');
 	});
 
 	app.listen(config.port, () => {

@@ -1,17 +1,42 @@
 extends ./layout.pug
 
+block head-styles
+	link(rel="stylesheet" href="/styles/manage-certificates.css")
+
 block layout-content
-	.container2.container-positions
-		h1 Manage Certificates
-		.card-container
-			a.card(href="/verifier/certificates")
-				.card-title Root Certificates
-			a.card(href="/verifier/import-certificate")
-				.card-title Import Certificate
+	section
+		.container.certs-page
+			header.certs-page__header
+				h1 Certificates
+				p.certs-page__subtitle View trusted root certificates and add new ones.
 
-	block footer
-		include ./footer.pug
+			if error
+				p.certs-page__error= error.errorMessage
 
-	link(rel="stylesheet" href="/styles/index.css")
-	link(rel="stylesheet" href="/styles/certificates.css")
-	script(src="/js/index.js")
+			// Add certificate
+			.presentation-card
+				h2.certs-page__sectionTitle Add Certificate
+				form.certs-form(method="POST" action="/verifier/public/manage-certificates")
+					.field
+						label.config-pres__label(for="certificate") X.509 Certificate (PEM or Base64)
+						textarea#certificate(name="certificate" rows="10" placeholder="-----BEGIN CERTIFICATE----- ...")
+						p.config-pres__hint Paste the full PEM block or Base64 content.
+
+					button.Btn.Btn--block(type="submit") Add X.509 Certificate
+
+			// Trusted roots list
+			.presentation-card
+				h2.certs-page__sectionTitle Trusted Root Certificates
+
+				if !trustedRootCertificates || trustedRootCertificates.length === 0
+					p.config-pres__hint No trusted root certificates found.
+				else
+					.cert-container
+						details(open)
+							summary X.509 Certificate PEM
+							pre !{trustedRootCertificates.join('\n\n')}
+
+						details
+							summary X.509 Certificate Base64
+							- const base64Certs = trustedRootCertificates.map((cert) => cert.replace('-----BEGIN CERTIFICATE-----', '').replace('-----END CERTIFICATE-----', '').replace(/\n/g, '')).join('\n\n')
+							pre !{base64Certs}
