@@ -21,7 +21,7 @@ export function csrfMiddlewareCheck(req: Request, res: Response, next: NextFunct
 			code: 3006,
 			msg: "CSRF token error",
 			lang: req.lang,
-			locale: locale[req.lang]
+			locale: locale["en"]
 		})
 		return;
 	}

@@ -92,7 +92,7 @@ const openidForPresentationReceivingService = new OpenidForPresentationsReceivin
 verifierRouter.get('/certificates', async (req, res) => {
 	return res.render('certificates.pug', {
 		lang: req.lang,
-		locale: locale[req.lang],
+		locale: locale["en"],
 		trustedRootCertificates: config.trustedRootCertificates
 	})
 })
@@ -100,7 +100,7 @@ verifierRouter.get('/certificates', async (req, res) => {
 verifierRouter.get('/import-certificate', async (req, res) => {
 	return res.render('import-certificate.pug', {
 		lang: req.lang,
-		locale: locale[req.lang]
+		locale: locale["en"]
 	})
 })
 
@@ -127,7 +127,7 @@ verifierRouter.post('/import-certificate', async (req, res) => {
 	} catch (error) {
 		res.render('import-certificate.pug', {
 			lang: req.lang,
-			locale: locale[req.lang],
+			locale: locale["en"],
 			error: {
 				errorMessage: 'error adding x509 certificate'
 			}
@@ -138,7 +138,7 @@ verifierRouter.post('/import-certificate', async (req, res) => {
 verifierRouter.get('/public/manage-certificates', async (req, res) => {
 	return res.render('manage-certificates.pug', {
 		lang: req.lang,
-		locale: locale[req.lang]
+		locale: locale["en"]
 	})
 })
 
@@ -146,7 +146,7 @@ verifierRouter.get('/public/definitions', async (req, res) => {
 	return res.render('public-definitions.pug', {
 		lang: req.lang,
 		presentationRequests: verifierConfiguration.getPresentationRequests(),
-		locale: locale[req.lang]
+		locale: locale["en"]
 	})
 })
 
@@ -166,7 +166,7 @@ verifierRouter.get('/callback/status', async (req, res) => { // response with th
 verifierRouter.get('/callback', async (req, res) => {
 	res.render('handle-response-code', {
 		lang: req.lang,
-		locale: locale[req.lang],
+		locale: locale["en"],
 	})
 })
 
@@ -197,7 +197,7 @@ verifierRouter.post('/callback', async (req, res) => {
 			msg: result.status == false ? result.error.message : "Unknown error",
 			code: 0,
 			lang: req.lang,
-			locale: locale[req.lang],
+			locale: locale["en"],
 		})
 	}
 
@@ -226,7 +226,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	console.log("Presentation messages: ", result.presentationInfo);
 	return res.render('success.pug', {
 		lang: req.lang,
-		locale: locale[req.lang],
+		locale: locale["en"],
 		status: status,
 		verificationTimestamp: date_created.toISOString(),
 		presentationClaims: claims,
@@ -243,7 +243,7 @@ verifierRouter.use('/public/definitions/configurable-presentation-request/:prese
 			msg: "No presentation request was selected",
 			code: 0,
 			lang: req.lang,
-			locale: locale[req.lang]
+			locale: locale["en"]
 		});
 	}
 	const presentationRequest = verifierConfiguration.getPresentationRequests().filter(pd => pd.id == presentation_request_id)[0];
@@ -252,7 +252,7 @@ verifierRouter.use('/public/definitions/configurable-presentation-request/:prese
 			msg: "No presentation request was found",
 			code: 0,
 			lang: req.lang,
-			locale: locale[req.lang]
+			locale: locale["en"]
 		});
 	}
 	const selectableFields = presentationRequest.dcql_query.credentials
@@ -266,14 +266,14 @@ verifierRouter.use('/public/definitions/configurable-presentation-request/:prese
 		dcqlQuery: presentationRequest.dcql_query,
 		selectableFields,
 		lang: req.lang,
-		locale: locale[req.lang],
+		locale: locale["en"],
 	});
 })
 
 verifierRouter.get('/public/definitions/edit-dcql-query', async (req, res) => {
 	return res.render('edit-dcql-query', {
 		lang: req.lang,
-		locale: locale[req.lang],
+		locale: locale["en"],
 		schema: dcqlQuerySchema
 	});
 })
@@ -297,7 +297,7 @@ verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 				msg: "Invalid DCQL query format",
 				code: 0,
 				lang: req.lang,
-				locale: locale[req.lang],
+				locale: locale["en"],
 			});
 		}
 		presentationRequest = {
@@ -310,7 +310,7 @@ verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 			msg: "Error while parsing the DCQL query",
 			code: 0,
 			lang: req.lang,
-			locale: locale[req.lang],
+			locale: locale["en"],
 		})
 	}
 	const scheme = req.body.scheme
@@ -338,7 +338,7 @@ verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 		presentationRequest: JSON.stringify(JSON.parse(req.body.dcqlQuery)),
 		state: url.searchParams.get('state'),
 		lang: req.lang,
-		locale: locale[req.lang],
+		locale: locale["en"],
 	})
 })
 
@@ -365,7 +365,7 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 			msg: "No presentation request was selected",
 			code: 0,
 			lang: req.lang,
-			locale: locale[req.lang]
+			locale: locale["en"]
 		});
 	}
 
@@ -382,7 +382,7 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 			msg: "No presentation request was found",
 			code: 0,
 			lang: req.lang,
-			locale: locale[req.lang]
+			locale: locale["en"]
 		});
 	}
 
@@ -423,7 +423,7 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 		presentationRequest: JSON.stringify(presentationRequest.dcql_query),
 		state: url.searchParams.get('state'),
 		lang: req.lang,
-		locale: locale[req.lang],
+		locale: locale["en"],
 	})
 
 

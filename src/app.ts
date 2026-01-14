@@ -66,7 +66,7 @@ async function main() {
 		return res.render("index", {
 			title: titles.index,
 			lang: req.lang,
-			locale: locale[req.lang],
+			locale: locale["en"],
 		})
 	})
 
@@ -121,7 +121,7 @@ async function main() {
 		res.status(err.status || 500);
 		res.render('error', {
 			lang: req.lang,
-			locale: locale[req.lang]
+			locale: locale["en"]
 		});
 	});
 
