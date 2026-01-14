@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Language } from "../types/language.type";
-import locale from "../runtime-config/locale";
+import locale from "../../config/locale";
 
 
 export function LanguageMiddleware(req: Request, res: Response, next: NextFunction) {

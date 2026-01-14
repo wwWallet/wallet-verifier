@@ -11,7 +11,9 @@ dump.rdb
 .npmrc
 
 keys/*
+certs/*
 .DS_Store
 ._.DS_Store
 cli/node_modules/
 .npmrc
+.env

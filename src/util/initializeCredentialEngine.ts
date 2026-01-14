@@ -22,7 +22,7 @@ export async function initializeCredentialEngine() {
 
 	if (trustedCredentialIssuerIdentifiers) {
 		const result = (await Promise.all(trustedCredentialIssuerIdentifiers.map(async (credentialIssuerIdentifier) =>
-			axios.get(`${credentialIssuerIdentifier}/.well-known/openid-credential-issuer`)
+			axios.get(`${credentialIssuerIdentifier}/openid/.well-known/openid-credential-issuer`)
 				.then((res) => res.data)
 				.catch((e) => { console.error(e); return null; })
 		))).filter((r: any) => r !== null);

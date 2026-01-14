@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { config } from "../../config";
+import { config } from ".";
 
 // @ts-ignore
 export const secure = config?.sessionIdCookieConfiguration?.secure ? config.sessionIdCookieConfiguration.secure : false;

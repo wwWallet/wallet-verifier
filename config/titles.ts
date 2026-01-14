@@ -1,5 +1,5 @@
 // titles.ts
-import { config } from "../../config";
+import { config } from ".";
 
 const titles = {
 	index: config?.siteConfig?.name || "wwWallet Verifier",
