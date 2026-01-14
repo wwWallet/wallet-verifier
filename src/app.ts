@@ -62,7 +62,7 @@ async function main() {
 
 	app.use((req, res, next) => {
 		res.locals.lang = req.lang;
-		res.locals.locale = locale[req.lang];
+		res.locals.locale = locale["en"];
 		next();
 	});
 
