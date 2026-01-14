@@ -1,7 +1,3 @@
-/* -----------------------------------
-   index layout (text + image)
------------------------------------ */
-
 .index__container {
 	display: grid;
 	grid-template-columns: 1.1fr 0.9fr;
@@ -13,12 +9,10 @@
 	min-width: 0;
 }
 
-/* Only spacing here — typography is global */
 .index__subtitle {
 	margin: 0 0 1rem;
 }
 
-/* Actions layout only */
 .index__actions {
 	margin: 1.25rem 0 0.75rem;
 	display: flex;
@@ -39,9 +33,7 @@
 	display: inline-block;
 }
 
-/* -----------------------------------
-   Table (OID4VP)
------------------------------------ */
+/* Table (OID4VP) */
 
 .oid4vp-table {
 	width: 100%;
@@ -65,27 +57,37 @@
 	color: #333;
 }
 
-/* Optional: add subtle cell borders only for this table */
 .oid4vp-table td {
 	border: 1px solid rgba(0, 0, 0, 0.06);
 }
+
 .oid4vp-table td:last-child {
 	border-right: 0;
 }
 
-/* -----------------------------------
-   SVG theming
------------------------------------ */
+/* SVG theming */
 
-.img-home .main-color { fill: var(--primary-main-color); }
-.img-home .light-color { fill: var(--primary-light-color); }
-.img-home .lighter-color { fill: var(--primary-lighter-color); }
-.img-home .dark-color { fill: var(--primary-dark-color); }
-.img-home .darker-color { fill: var(--primary-darker-color); }
+.img-home .main-color {
+	fill: var(--primary-main-color);
+}
 
-/* -----------------------------------
-   Mobile behavior
------------------------------------ */
+.img-home .light-color {
+	fill: var(--primary-light-color);
+}
+
+.img-home .lighter-color {
+	fill: var(--primary-lighter-color);
+}
+
+.img-home .dark-color {
+	fill: var(--primary-dark-color);
+}
+
+.img-home .darker-color {
+	fill: var(--primary-darker-color);
+}
+
+/* Mobile behavior */
 
 @media (max-width: 768px) {
 	.index__container {
@@ -97,7 +99,6 @@
 		align-items: stretch;
 	}
 
-	/* hide image on mobile (optional) */
 	.index__media {
 		display: none;
 	}

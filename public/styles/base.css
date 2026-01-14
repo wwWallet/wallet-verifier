@@ -38,9 +38,7 @@ main {
 	margin: 0 auto;
 }
 
-/* ==============================
-   Global Typography
-============================== */
+/* Global Typography */
 
 /* Headings */
 h1,
@@ -92,17 +90,13 @@ p {
 	opacity: 0.8;
 }
 
-/* ==============================
-   Links
-============================== */
+/* Links */
 
 a {
 	text-decoration: none;
 }
 
-/* ==============================
-   Buttons
-============================== */
+/* Buttons */
 
 .Btn {
 	display: inline-flex;
@@ -159,9 +153,7 @@ a {
 	gap: 0.75rem;
 }
 
-/* ==============================
-   Button Sizes
-============================== */
+/* Button Sizes */
 
 .Btn--xs {
 	min-height: 28px;
