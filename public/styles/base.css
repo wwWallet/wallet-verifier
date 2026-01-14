@@ -1,0 +1,196 @@
+html,
+body {
+	font-family: var(--main-font);
+	margin: auto;
+	color: #373a3c;
+	background-color: color-mix(in srgb, var(--primary-lighter-color) 10%, transparent);
+	line-height: 1.5;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+img,
+svg {
+	max-width: 100%;
+	height: auto;
+}
+
+img {
+	display: block;
+}
+
+main {
+	min-height: 70vh;
+	display: block;
+}
+
+#app {
+	padding: 2rem 5%;
+}
+
+/* Global container utility */
+.container {
+	width: min(1100px, calc(100% - 2rem));
+	margin: 0 auto;
+}
+
+/* Global Typography */
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin: 0 0 0.3em;
+	color: #2b2b2b;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+h1 {
+	font-size: clamp(28px, 2.5vw, 36px);
+}
+
+h2 {
+	font-size: 30px;
+}
+
+h3 {
+	font-size: 24px;
+}
+
+h4 {
+	font-size: 18px;
+}
+
+p {
+	margin: 0 0 1em;
+	font-size: 1rem;
+	color: #444;
+}
+
+/* Secondary / helper text */
+.text-muted {
+	color: #777;
+	font-size: 0.875rem;
+}
+
+/* Section titles */
+.section-title {
+	font-size: 1rem;
+	font-weight: 700;
+	margin: 1.5rem 0 0.75rem;
+	color: #000;
+	opacity: 0.8;
+}
+
+/* Links */
+
+a {
+	text-decoration: none;
+}
+
+/* Buttons */
+
+.Btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	min-height: 44px;
+	padding: 0.75rem 1.5rem;
+
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+
+	background: var(--primary-main-color);
+	color: #fff;
+
+	font-size: 1rem;
+	font-weight: 700;
+	text-decoration: none;
+
+	transition: background-color 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
+}
+
+.Btn:hover {
+	opacity: 0.9;
+}
+
+.Btn:active {
+	transform: translateY(1px);
+}
+
+.Btn:disabled {
+	background: #999;
+	cursor: not-allowed;
+}
+
+.Btn:focus-visible {
+	outline: 3px solid color-mix(in srgb, var(--primary-main-color) 60%, white);
+	outline-offset: 2px;
+}
+
+.Btn--block {
+	width: 100%;
+}
+
+.Btn--secondary {
+	background: var(--secondary-color);
+}
+
+/* Align buttons in stacks */
+.btn-group {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+/* Button Sizes */
+
+.Btn--xs {
+	min-height: 28px;
+	padding: 0.25rem 0.6rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+	border-radius: 4px;
+}
+
+.Btn--sm {
+	min-height: 36px;
+	padding: 0.45rem 0.9rem;
+	font-size: 0.85rem;
+	font-weight: 600;
+	border-radius: 5px;
+}
+
+.Btn--md {
+	/* default size (same as .Btn) */
+	min-height: 44px;
+	padding: 0.75rem 1.5rem;
+	font-size: 1rem;
+	font-weight: 700;
+}
+
+.Btn--lg {
+	min-height: 52px;
+	padding: 0.9rem 2.25rem;
+	font-size: 1.1rem;
+	font-weight: 700;
+	border-radius: 8px;
+}
+
+.Btn--xl {
+	min-height: 60px;
+	padding: 1.1rem 3rem;
+	font-size: 1.25rem;
+	font-weight: 800;
+	border-radius: 10px;
+}

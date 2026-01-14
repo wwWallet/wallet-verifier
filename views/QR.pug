@@ -1,42 +1,40 @@
 extends ./layout.pug
-block layout-content
 
-	.container
-		.qr-card
-			form(id="PresentationRequestForm" name="PresentationRequestForm" method="POST")
-				.CenteredLayout
-					h1 Present your Credentials
-
-					img(src=authorizationRequestQR id="qr-image")
-
-					.qr-url-block
-						p.qr-url(id="qrURLDisplay") #{authorizationRequestURL}
-
-					.buttons
-						- const modifiedURL = authorizationRequestURL.replace("openid4vp://cb", wwwalletURL)
-						button.Btn.Medium.openwithwalletbutton(type="submit" name="action" value=`${modifiedURL}`) Open with wwWallet
-						button.Btn.Medium.openwithwalletbuttonnative(type="submit" name="action" value=`${authorizationRequestURL}`) Open with a native wallet
-
-					input(type='hidden' name='state' id='state' value=state)
-					input(type='hidden' name='authorizationRequestQR' id='authorizationRequestQR' value=authorizationRequestQR)
-					input(type='hidden' name='authorizationRequestURL' id='authorizationRequestURL' value=authorizationRequestURL)
-
-		- const parsedDefinition = JSON.parse(presentationRequest)
-		- const summaryLabel = 'DCQL Query'
-
-		.dcql-query-container
-			details.details-toggle
-				summary  #{summaryLabel}
-				.dcql-query-block
-					textarea.dcql-query(readonly rows="20") !{JSON.stringify(JSON.parse(presentationRequest), null, 2)}
-
-
-
-	block footer
-		include ./footer.pug
-
-	link(rel="stylesheet" href="/styles/index.css")
-	script(src="/js/index.js")
-
-	script(src="/js/presentation-request.js")
+block head-styles
 	link(rel="stylesheet" href="/styles/scan-qr-verifier.css")
+
+block layout-content
+	section
+		.scan-qr__container.container
+			header.scan-qr__header
+				h1 Present your Credentials
+				p.scan-qr__subtitle Scan or open the request in your wallet.
+
+			.presentation-card
+				form#PresentationRequestForm.presentation-form(name="PresentationRequestForm" method="POST")
+					.CenteredLayout
+						img#qr-image(src=authorizationRequestQR alt="QR Code")
+
+						.qr-url-block
+							p#qrURLDisplay.qr-url #{authorizationRequestURL}
+
+						.buttons
+							- const modifiedURL = authorizationRequestURL.replace("openid4vp://cb", wwwalletURL)
+							button.Btn(type="submit" name="action" value=`${modifiedURL}`) Open with wwWallet
+							button.Btn(type="submit" name="action" value=`${authorizationRequestURL}`) Open with a native wallet
+
+						input(type="hidden" name="state" id="state" value=state)
+						input(type="hidden" name="authorizationRequestQR" id="authorizationRequestQR" value=authorizationRequestQR)
+						input(type="hidden" name="authorizationRequestURL" id="authorizationRequestURL" value=authorizationRequestURL)
+
+			- const parsedDefinition = JSON.parse(presentationRequest)
+			- const summaryLabel = "DCQL Query"
+
+			.scan-qr__dcql
+				details.details-toggle
+					summary #{summaryLabel}
+					.dcql-query-block
+						textarea.dcql-query(readonly rows="20") !{JSON.stringify(parsedDefinition, null, 2)}
+
+block body-scripts
+	script(src="/js/presentation-request.js" defer)

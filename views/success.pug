@@ -1,60 +1,86 @@
 extends ./layout.pug
 
+block head-styles
+	link(rel="stylesheet" href="/styles/presentation-success.css")
+	link(rel="stylesheet" href="/styles/spinner.css")
+	link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsoneditor@10.2.0/dist/jsoneditor.min.css")
+	link(rel="stylesheet" href="/styles/jsoneditor.css")
+
 block layout-content
-	// Container for the spinner (initially hidden)
-	#spinner-container
-		.spinner
-			.spinner-circle
+	section
+		// Spinner / loading
+		#spinner-container.presentation-status
+			.spinner
+				.spinner-circle
 
-	#loading-text
-		.container2
-			.centered-layout
-				h1 Loading
+		#loading-text.presentation-status
+			.container.presentation-status__container
+				.presentation-status__header
+					h1 Loading
+					p.presentation-status__subtitle Please wait while we process the result.
 
-	// Container for the success content (initially hidden)
-	#success-container(style="display: none;")
-		.container2
-			.centered-layout
-				h1 Success
+		// Success (initially hidden)
+		#success-container(style="display: none;")
+			.container.presentation-success
+				header.presentation-success__header
+					h1 Success
+					p.presentation-success__subtitle Verification completed.
 
-				// Container to hold inline boxes using Flexbox
-				.inline-box-container(style="display: flex; gap:30px; flex-direction: row; flex-wrap: wrap;justify-content: center;")
-					// Iterate over each credential and display an inline box with dynamic background color and text color
+				// Credentials images
+				.inline-box-container
 					each credential, index in credentialPayloads
-						- const branding = credential.credentialBranding || { backgroundColor: 'red', textColor: 'black' }
-						.credential-box(style=`position:relative;overflow:hidden;display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-start; position: relative; margin: 10px;border-radius:10px;`, id=`credential-box-${index}`)
-							img(style="width: 240px; height: 150px; border-radius: 10px;")(src=credentialImages[index])
+						- const branding = credential.credentialBranding || { backgroundColor: 'var(--primary-main-color)', textColor: '#fff' }
+						.credential-box(id=`credential-box-${index}`)
+							img.credential-image(src=credentialImages[index] alt=`Credential ${index + 1}`)
 
-				i Verified on #{new Date(verificationTimestamp)}
-				h3 Requested claims extracted from credentials
+				// Verified timestamp
+				p.presentation-success__meta
+					i Verified on #{new Date(verificationTimestamp)}
 
-				.claims-tables
-					each descriptorId in Object.keys(presentationClaims)
-						h4= descriptorId
-						.table-container(style="overflow-x: auto;")
-							table
-								thead
-									tr
-										th Name
-										th Value
-								tbody
-									each claim in presentationClaims[descriptorId]
-										tr
-											td= claim.name
-											td.claim-value(data-raw-value=String(claim.value))= claim.value
-						if presentationInfo[descriptorId]
-							h3 Additional info
-							each message in presentationInfo[descriptorId]
-								p #{message}
-				h3 Credentials
+				// Claims extracted
+				.presentation-card
+					h2.presentation-success__sectionTitle Requested claims extracted from credentials
 
-				// Text area to display credentials JSON format
-				div#jsoneditor.wide
-					div#copy
-						button(id="copy-button" class="Btn Tiny" type="button") Copy Object #[span#checkmark ✔]
+					.claims-tables
+						each descriptorId in Object.keys(presentationClaims)
+							.claims-block
+								h3.claims-title= descriptorId
 
-	// JavaScript to show the spinner for 2 seconds and then hide it
-	script.
+								.table-container
+									table.claims-table
+										thead
+											tr
+												th Name
+												th Value
+										tbody
+											each claim in presentationClaims[descriptorId]
+												tr
+													td= claim.name
+													td.claim-value(data-raw-value=String(claim.value))= claim.value
+
+								if presentationInfo[descriptorId]
+									.additional-info
+										h4 Additional info
+										each message in presentationInfo[descriptorId]
+											p= message
+
+				// JSON viewer
+				.presentation-card
+					.presentation-json__header
+						h2.presentation-success__sectionTitle Credentials (raw JSON)
+						button#copy-button.Btn.Btn--xs.presentation-json__copy(type="button")
+							span.copy-state.copy-default
+								span Copy
+								span.presentation-json__copyIcon(aria-hidden="true") ⧉
+							span.copy-state.copy-success
+								span Copied
+								span(aria-hidden="true") ✓
+					div#jsoneditor.jsoneditor-host.wide
+
+
+block body-scripts
+	// Show spinner for 2 seconds then show success
+	script(defer).
 		setTimeout(() => {
 			const spinnerContainer = document.getElementById('spinner-container');
 			const successContainer = document.getElementById('success-container');
@@ -65,8 +91,7 @@ block layout-content
 				successContainer.style.display = 'block';
 				loadingText.style.display = 'none';
 			}
-			//- updateLayoutForExpiredCredentials(credentialPayloads);
-		}, 2000); // Hide the spinner after 2000 milliseconds (2 seconds)
+		}, 2000);
 
 	script(src="https://cdn.jsdelivr.net/npm/jsoneditor@latest")
 	script.
@@ -83,32 +108,36 @@ block layout-content
 
 		editor.expandAll();
 
-		document.querySelector('#copy-button').addEventListener('click', () => {
+		const copyBtn = document.querySelector('#copy-button');
+
+		copyBtn.addEventListener('click', () => {
 			try {
 				const json = editor.get();
 				const text = JSON.stringify(json, null, 2);
 
-				const tempTextarea = document.createElement('textarea');
-				tempTextarea.value = text;
-				document.body.appendChild(tempTextarea);
-				tempTextarea.select();
-				document.execCommand('copy');
-				document.body.removeChild(tempTextarea);
-				document.querySelector('#copy #checkmark').classList.add("visible");
+				if (navigator.clipboard?.writeText) {
+					navigator.clipboard.writeText(text);
+				} else {
+					const tempTextarea = document.createElement('textarea');
+					tempTextarea.value = text;
+					document.body.appendChild(tempTextarea);
+					tempTextarea.select();
+					document.execCommand('copy');
+					document.body.removeChild(tempTextarea);
+				}
+
+				// Swap to "Copied ✓"
+				copyBtn.classList.add('is-copied');
+
+				// Reset back to "Copy ⧉" after 2 seconds
+				window.clearTimeout(window.__copyResetTimer);
+				window.__copyResetTimer = window.setTimeout(() => {
+					copyBtn.classList.remove('is-copied');
+				}, 2000);
 			} catch (err) {
 				console.error('Error getting JSON from editor:', err);
 			}
 		});
 
-
-	block footer
-		include ./footer.pug
-
-	link(rel="stylesheet" href="/styles/spinner.css")
-	link(rel="stylesheet" href="/styles/index.css")
-	link(rel="stylesheet" href="/styles/presentation-data.css")
-	link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsoneditor@10.2.0/dist/jsoneditor.min.css")
-	link(rel="stylesheet" href="/styles/jsoneditor.css")
-	script(src="/js/index.js")
 	script(src="/js/check-expired.js")
 	script(src="/js/truncate-long-fields.js")

@@ -1,13 +1,17 @@
 html
 	head
 		include head.pug
-		style.
-			:root {
-				--primary-color: #{supportedCredentialType ? supportedCredentialType.display[0].background_color : '#1B263B'};
-			}
+
+		block head-styles
+
 	body
 		block header
 			include header.pug
-		block layout-content
 
-		link(rel="stylesheet" href="/styles/main.css")
+		main#app
+			block layout-content
+
+		block footer
+			include footer.pug
+
+		block body-scripts

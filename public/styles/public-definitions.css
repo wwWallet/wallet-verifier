@@ -1,0 +1,115 @@
+.definitions__container {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+/* Header panel */
+
+.definitions__subtitle {
+	margin: 0.4rem 0 0;
+	color: #4b5563;
+	max-width: 70ch;
+	line-height: 1.5;
+}
+
+/* Grid */
+.definitions__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+	gap: 1.25rem;
+	align-items: stretch;
+}
+
+/* Card polish for this page only */
+.def-card {
+	position: relative;
+	padding: 1.4rem 1.4rem;
+	border-radius: 12px;
+	/* slightly rounder than base */
+	border-color: rgba(0, 0, 0, 0.12);
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+	background-color: white;
+	overflow: hidden;
+}
+
+/* left accent strip */
+.def-card::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 6px;
+	background: var(--primary-main-color);
+	opacity: 0.9;
+}
+
+/* chevron hint */
+.def-card::after {
+	content: "›";
+	position: absolute;
+	color: var(--primary-dark-color);
+	right: 15px;
+	top: 13px;
+	font-size: 40px;
+	line-height: 1;
+	opacity: 0.5;
+	transform: translateX(0);
+	transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.def-card .card-title {
+	margin: 0 0 0.45rem;
+	font-size: 1.25rem;
+	font-weight: 800;
+	color: #111;
+	padding-right: 28px;
+}
+
+.def-card .card-text {
+	margin: 0;
+	color: #4b5563;
+	font-size: 1rem;
+	line-height: 1.5;
+}
+
+/* Hover / focus */
+.def-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+}
+
+.def-card:hover::after {
+	transform: translateX(3px);
+	opacity: 0.55;
+}
+
+.def-card:focus-visible {
+	outline: 3px solid color-mix(in srgb, var(--primary-main-color) 45%, transparent);
+	outline-offset: 3px;
+}
+
+/* Accent card (Custom Request) */
+.def-card--accent {
+	border-color: color-mix(in srgb, var(--primary-main-color) 35%, #e5e7eb);
+	background: linear-gradient(135deg,
+			color-mix(in srgb, var(--primary-main-color) 10%, #fff),
+			#ffffff);
+}
+
+.def-card--accent::before {
+	background: var(--primary-dark-color);
+}
+
+.def-card--accent .card-title {
+	color: var(--primary-dark-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.definitions__grid {
+		grid-template-columns: 1fr;
+		gap: 1rem;
+	}
+}

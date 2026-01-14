@@ -1,22 +1,15 @@
-/* Page wrapper */
-.edit-dcql {
-	padding: 2rem 0;
-}
-
-/* Header */
-.edit-dcql__header {
+.certs-page__header {
 	text-align: center;
 	margin-bottom: 1.25rem;
 }
 
-.edit-dcql__subtitle {
+.certs-page__subtitle {
 	margin: 0.5rem 0 0;
 	color: #4b5563;
 	line-height: 1.5;
 }
 
-/* Error box */
-.edit-dcql__error {
+.certs-page__error {
 	margin: 0 auto 1rem;
 	max-width: 920px;
 	padding: 0.75rem 1rem;
@@ -26,7 +19,15 @@
 	color: #111;
 }
 
-/* Card (same visual language as configurable-presentation) */
+.certs-page__sectionTitle {
+	margin: 0 0 0.75rem;
+	font-size: 1rem;
+	font-weight: 800;
+	color: #111;
+	opacity: 0.9;
+}
+
+/* shared card look */
 .presentation-card {
 	background: #fff;
 	border-radius: 12px;
@@ -38,39 +39,25 @@
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
-/* Form layout */
-#edit-dcql-query {
+.presentation-card + .presentation-card {
+	margin-top: 1rem;
+}
+
+/* Add form */
+.certs-form {
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
 }
 
-.field,
-.label-wrapper {
+.field {
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
 }
 
-/* Labels + hint */
-.config-pres__label {
-	font-size: 0.95rem;
-	font-weight: 800;
-	color: #111;
-	opacity: 0.9;
-}
-
-.config-pres__hint {
-	margin: 0;
-	color: #6b7280;
-	font-size: 0.875rem;
-	line-height: 1.4;
-}
-
-/* Textarea control (scheme) */
-#scheme {
+#certificate {
 	width: 100%;
-	min-height: 96px;
 	padding: 10px 12px;
 	border: 1px solid rgba(0, 0, 0, 0.18);
 	border-radius: 10px;
@@ -82,48 +69,55 @@
 		"Liberation Mono", "Courier New", monospace;
 }
 
-/* Focus ring (more compatible than mixing with transparent) */
-#scheme:focus-visible {
+#certificate:focus-visible {
 	outline: 3px solid color-mix(in srgb, var(--primary-main-color) 40%, white);
 	outline-offset: 2px;
 }
 
-/* JSONEditor wrapper: this is where border/radius should live */
-.jsoneditor-host {
-	height: 600px;
-	border: 1px solid rgba(0, 0, 0, 0.18);
+/* Certificate blocks */
+.cert-container {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.cert-container details {
+	border: 1px solid rgba(0, 0, 0, 0.12);
 	border-radius: 10px;
 	overflow: hidden;
-	/* important for rounded corners */
 	background: #fff;
 }
 
-/* Submit button */
-.request-qr {
-	width: 100%;
+.cert-container summary {
+	cursor: pointer;
+	padding: 0.75rem 1rem;
+	font-weight: 700;
+	background: color-mix(in srgb, var(--primary-main-color) 4%, #fff);
+	user-select: none;
 }
 
-.request-qr:disabled {
-	opacity: 0.55;
-	cursor: not-allowed;
-	pointer-events: none;
+.cert-container details[open] summary {
+	border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 }
 
-.jsoneditor-menu {
-	display: none;
+.cert-container pre {
+	margin: 0;
+	padding: 0.75rem 1rem;
+	font-size: 0.85rem;
+	line-height: 1.45;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	word-break: break-all;
+	background: #fafafa;
 }
 
-/* Responsive */
+/* Mobile */
 @media (max-width: 768px) {
-	.edit-dcql {
+	.certs-page {
 		padding: 1.25rem 0;
 	}
 
 	.presentation-card {
 		padding: 1rem;
-	}
-
-	.jsoneditor-host {
-		height: 520px;
 	}
 }

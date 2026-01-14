@@ -1,7 +1,6 @@
 #Header .header {
-	height: auto;
 	width: 100%;
-	background-color: var(--primary-color);
+	background-color: var(--primary-main-color);
 	color: #fff;
 	z-index: 500;
 	display: block;
@@ -10,174 +9,123 @@
 }
 
 #Header .header-content {
-	height: 12%;
-	font-weight: 600;
-	padding-left: 5%;
-	padding-right: 5%;
+	height: 100%;
+	font-weight: 550;
+	padding: 0 50px;
+	height: 12vh;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	background-color: var(--header-bg-color);
+	background-color: #ffffff;
 }
 
-.img-logo {
-	height: 60px;
+#Header .img-logo {
+	height: 50px;
 }
 
-.logo-area {
+#Header .logo-area {
 	text-decoration: none;
 	display: flex;
 	align-items: center;
-	gap: 4px;
+	gap: 8px;
 }
 
-.logo-text {
+#Header .logo-text {
 	font-size: 24px;
-	color: var(--header-item-color);
+	color: var(--primary-main-color);
 }
 
-.header-border {
+#Header .header-border {
 	width: 100%;
-	height: 4px;
-	background: linear-gradient(358.5deg, var(--secondary-light-color) .09%, var(--primary-color));
+	height: 2px;
+	background: linear-gradient(358.5deg, var(--secondary-light-color) 0.09%, var(--primary-main-color));
 }
 
-/* Ribbon css */
-.ribbon {
-	display: none;
-	width: 150px;
-	height: 100%;
-	height: -moz-available;
-	height: -webkit-fill-available;
-	height: fill-available;
-	overflow: hidden;
-	position: absolute;
-	top: 0;
-	right: 0;
-	pointer-events: none;
+/* Menu (desktop) */
+#Header .menu-area {
+	display: flex;
+	align-items: center;
+	gap: 12px;
 }
 
-.ribbonText {
-	position: absolute;
-	display: block;
-	width: 225px;
-	padding: 15px 0;
-	background-color: var(--secondary-color);
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-	color: #fff;
-	font: 700 18px/1 "Lato", sans-serif;
-	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-	text-transform: uppercase;
-	text-align: center;
-	left: -15px;
-	top: 20px;
-	transform: rotate(45deg);
-}
-
-/* Menu */
-
-.menu-area {
-	display: none;
-	margin-right: 10%;
-}
-
-ul.menu {
+#Header ul.menu {
 	display: flex;
 	list-style: none;
-	/* Remove bullet points */
 	padding: 0;
-	/* Remove default padding */
 	margin: 0;
-	/* Remove default margin */
 }
 
-li.menu-item a {
-	color: var(--header-item-color);
+#Header li.menu-item a {
+	color: var(--primary-main-color);
 	margin-right: 20px;
-	/* Adjust the spacing between menu items */
+	text-decoration: none;
 }
 
-.mobile-menu-toggle {
+#Header li.menu-item a.is-active {
+	position: relative;
+	font-weight: 700;
+	color: var(--primary-dark-color);
+}
+
+#Header li.menu-item a.is-active::after {
+	content: "";
+	position: absolute;
+	left: 0;
+	bottom: -6px;
+	width: 100%;
+	height: 2px;
+	background-color: var(--primary-main-color);
+	border-radius: 2px;
+}
+
+/* Mobile toggle hidden on desktop */
+#Header .mobile-menu-toggle {
 	display: none;
 }
 
 @media screen and (max-width: 1068px) {
-
-	.mobile-menu-toggle {
+	#Header .mobile-menu-toggle {
 		display: block;
 	}
 
-	ul.menu {
+	#Header ul.menu {
 		display: none;
 	}
 
-	#menu-toggle-button {
+	#Header .menu li.menu-item a.is-active {
+		background-color: color-mix(in srgb, var(--primary-main-color) 12%, transparent);
+	}
+
+	#Header #menu-toggle-button {
 		background-color: transparent;
 		border: none;
 		font-size: 40px;
-		color: var(--header-item-color);
+		color: var(--primary-main-color);
+		cursor: pointer;
 	}
 
-	.menu {
+	#Header .menu {
 		display: none;
 		position: absolute;
 		top: 100%;
 		left: 0;
-		background-color: var(--header-bg-color);
+		background-color: #ffffff;
 		z-index: 1;
 		width: 100%;
 		box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
 	}
 
-	.menu.show-menu {
+	#Header .menu.show-menu {
 		display: block;
 	}
 
-	.menu li.menu-item {
+	#Header .menu li.menu-item {
 		padding: 10px;
 	}
 
-}
-
-/* Language Switch css */
-
-.language-switch {
-	position: absolute;
-	color: #fff;
-	z-index: 3;
-	width: 150px;
-	text-align: right;
-	top: 50px;
-	right: 20px;
-	margin-right: 50px;
-	font-size: 13.333px;
-}
-
-.language-switch button {
-	border: none;
-	background-color: transparent;
-	color: #fff;
-	/* font-weight: bold; */
-	border-bottom: 2px solid transparent;
-	cursor: pointer;
-	padding: 0 5px;
-	padding-bottom: 3px;
-	margin: 0 8px;
-	outline: none;
-	z-index: 3;
-}
-
-.language-switch.mobile {
-	display: none;
-}
-
-.language-switch button:hover {
-	color: var(--secondary-light-color);
-	border-bottom: 2px solid var(--secondary-light-color);
-	transition: all 0.3s;
-}
-
-.language-switch button.active {
-	border-bottom: 2px solid var(--secondary-light-color);
-	color: var(--secondary-light-color);
+	#Header .menu li.menu-item a {
+		text-align: center;
+		display: block;
+		margin-right: 0;
+	}
 }

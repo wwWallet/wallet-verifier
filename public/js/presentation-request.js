@@ -1,29 +1,23 @@
-const form = document.getElementById("PresentationRequestForm");
+(function () {
+	const path = window.location.pathname;
+	const segments = path.split("/").filter(Boolean);
+	const presentationRequestId = segments[segments.length - 1];
+	if (!presentationRequestId) return;
 
-
-const path = window.location.pathname;
-
-const pathSegments = path.split('/');
-
-const nonEmptySegments = pathSegments.filter(segment => segment !== '');
-const presentationRequestId = nonEmptySegments[nonEmptySegments.length - 1];
-
-setInterval(() => {
-	fetch('/verifier/public/definitions/presentation-request/status/' + presentationRequestId, {
-			method: 'GET',
-		}).then((response) => {
-			if (!response.ok) {
-				throw new Error(`HTTP error with status ${response.status}`);
-			}
-			return response.json();
-		})
-		.then((data) => {
-			const { url } = data;
-			if (url) {
-				window.location.href = url;
-			}
-		})
-		.catch((err) => {
-			console.error(err);
-		});
-}, 3000);
+	setInterval(() => {
+		fetch(
+			"/verifier/public/definitions/presentation-request/status/" +
+			encodeURIComponent(presentationRequestId),
+			{ method: "GET" }
+		)
+			.then((response) => {
+				if (!response.ok) throw new Error(`HTTP error with status ${response.status}`);
+				return response.json();
+			})
+			.then((data) => {
+				const url = data?.url;
+				if (url) window.location.href = url;
+			})
+			.catch((err) => console.error(err));
+	}, 3000);
+})();

@@ -1,0 +1,119 @@
+/* Custom checkbox */
+
+.checkbox-wrapper {
+	position: relative;
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	padding: 0.3rem 0.3rem;
+	border-radius: 4px;
+}
+
+.checkbox-wrapper:hover {
+	background: rgba(0, 0, 0, 0.035);
+}
+
+/* Hide the native checkbox */
+.checkbox-wrapper input[type="checkbox"] {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* The label becomes the clickable UI */
+.checkbox-wrapper label {
+	position: relative;
+	padding-left: 32px;
+	/* space for the box */
+	cursor: pointer;
+	user-select: none;
+	color: #111;
+	line-height: 1.35;
+	font-size: 0.95rem;
+	word-break: break-word;
+	display: inline-block;
+}
+
+/* Draw the box */
+.checkbox-wrapper label::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0rem;
+	width: 20px;
+	height: 20px;
+	border: 1px solid rgba(0, 0, 0, 0.35);
+	border-radius: 4px;
+	background: #fff;
+	box-sizing: border-box;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Draw the checkmark (hidden by default) */
+.checkbox-wrapper label::after {
+	content: "";
+	position: absolute;
+	left: 6px;
+	top: 1px;
+	width: 8px;
+	height: 15px;
+	border: solid #fff;
+	border-width: 0 3px 3px 0;
+	transform: rotate(45deg);
+	opacity: 0;
+	transition: opacity 0.12s ease;
+}
+
+/* Checked state */
+.checkbox-wrapper input[type="checkbox"]:checked+label::before {
+	background: var(--primary-main-color);
+	border-color: var(--primary-main-color);
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked+label::after {
+	opacity: 1;
+}
+
+/* Disabled state */
+.checkbox-wrapper input[type="checkbox"]:disabled+label {
+	color: #9ca3af;
+	cursor: not-allowed;
+}
+
+.checkbox-wrapper input[type="checkbox"]:disabled+label::before {
+	background: #d1d5db;
+	border-color: #9ca3af;
+}
+
+/* Keyboard focus (since input is hidden) */
+.checkbox-wrapper input[type="checkbox"]:focus-visible+label::before {
+	outline: 3px solid color-mix(in srgb, var(--primary-main-color) 40%, transparent);
+	outline-offset: 2px;
+}
+
+/* Submit */
+.request-qr {
+	width: 100%;
+}
+
+.request-qr:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	section {
+		padding: 2rem 0;
+	}
+
+	.config-pres__header,
+	.presentation-card {
+		padding: 1rem;
+	}
+
+	#attributes-container {
+		max-height: 320px;
+	}
+}
