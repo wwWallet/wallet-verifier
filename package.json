@@ -1,7 +1,6 @@
 {
-  "name": "wallet-enterprise-issuer",
+  "name": "wallet-verifier",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,9 +12,6 @@
     "build:prod": "rm -rf node_modules && yarn install && yarn build && rm -rf node_modules && yarn install --production",
     "snapshot": "paketo"
   },
-  "keywords": [],
-  "author": "",
-  "description": "",
   "dependencies": {
     "@auth0/mdl": "^2.2.0",
     "@digitalbazaar/did-io": "^2.0.0",
