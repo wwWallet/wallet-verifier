@@ -39,7 +39,7 @@ main {
 }
 
 .container__padded {
-	padding-block: 2rem;
+	padding: 0 2rem;
 }
 
 .container__flexed {
