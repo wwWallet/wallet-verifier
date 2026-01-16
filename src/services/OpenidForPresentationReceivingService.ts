@@ -53,13 +53,13 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			return ctx.res.status(500).send({ error: "id does not exist on query params" });
 		}
 
-    const rpStateRaw = this.rpStateKV.get(`rpstate:${ctx.req.query['id']}`);
+		const rpStateRaw = this.rpStateKV.get(`rpstate:${ctx.req.query['id']}`);
 
 		if (!rpStateRaw) {
 			return ctx.res.status(500).send({ error: "rpState state could not be fetched with this id" });
 		}
 
-    const rpState = JSON.parse(rpStateRaw) as RPState;
+		const rpState = JSON.parse(rpStateRaw) as RPState;
 
 		if (rpState.signed_request === "") {
 			return ctx.res.status(500).send({ error: "rpState state signed request object has been invalidated" });
