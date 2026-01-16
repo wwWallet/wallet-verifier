@@ -38,7 +38,7 @@ block layout-content
 					i Verified on #{new Date(verificationTimestamp)}
 
 				// Claims extracted
-				.presentation-card
+				.card__container
 					h2.presentation-success__sectionTitle Requested claims extracted from credentials
 
 					.claims-tables
@@ -65,7 +65,7 @@ block layout-content
 											p= message
 
 				// JSON viewer
-				.presentation-card
+				.card__container
 					.presentation-json__header
 						h2.presentation-success__sectionTitle Credentials (raw JSON)
 						button#copy-button.Btn.Btn--xs.presentation-json__copy(type="button")

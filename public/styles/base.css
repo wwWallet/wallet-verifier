@@ -212,3 +212,24 @@ a {
 	font-weight: 800;
 	border-radius: 10px;
 }
+
+/* Card styles */
+
+.card__container {
+	background: #fff;
+	border-radius: 12px;
+	padding: 1.25rem;
+	width: 100%;
+	max-width: 920px;
+	margin: 0 auto;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+	text-align: left;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+	.card__container {
+		padding: 1rem;
+	}
+}
