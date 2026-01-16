@@ -4,12 +4,10 @@ import { VerifiableCredentialFormat } from "wallet-common/dist/types";
 import { compactDecrypt, CompactDecryptResult, exportJWK, generateKeyPair, importJWK, importPKCS8, SignJWT } from "jose";
 import { randomUUID } from "crypto";
 import base64url from "base64url";
-import { Repository } from "typeorm";
-import AppDataSource from "../AppDataSource";
 import { config } from "../../config";
 import fs from 'fs';
 import path from "path";
-import { PresentationClaims, RelyingPartyState } from "../entities/RelyingPartyState.entity";
+import { PresentationClaims } from "../entities/RelyingPartyState.entity";
 import { generateRandomIdentifier } from "../util/generateRandomIdentifier";
 import * as z from 'zod';
 import { initializeCredentialEngine } from "../util/initializeCredentialEngine";
@@ -17,6 +15,8 @@ import { TransactionData } from "../util/transactionData";
 import { serializeDcqlQuery } from "../util/serializeDcqlQuery";
 import { DcqlPresentationResult } from 'dcql';
 import { pemToBase64 } from "../util/pemToBase64";
+import { RPState } from '../types/RPState';
+import { KeyValueStore } from '../KeyValueStore';
 
 const privateKeyPem = fs.readFileSync(path.join(__dirname, "../../../keys/pem.key"), 'utf-8').toString();
 const leafCert = fs.readFileSync(path.join(__dirname, "../../../keys/pem.crt"), 'utf-8').toString();
@@ -41,29 +41,33 @@ const ResponseModeSchema = z.nativeEnum(ResponseMode);
 const response_mode: ResponseMode = config?.presentationFlow?.response_mode ? ResponseModeSchema.parse(config?.presentationFlow?.response_mode) : ResponseMode.DIRECT_POST_JWT;
 
 export class OpenidForPresentationsReceivingService implements OpenidForPresentationsReceivingInterface {
-	private rpStateRepository: Repository<RelyingPartyState> = AppDataSource.getRepository(RelyingPartyState);
-
+	private rpStateKV: KeyValueStore<any>;
 	constructor(
 		private configurationService: VerifierConfigurationInterface,
-	) { }
+	) {
+		this.rpStateKV = new KeyValueStore<any>();
+	}
 
 	public async getSignedRequestObject(ctx: { req: Request, res: Response }): Promise<any> {
 		if (!ctx.req.query['id'] || typeof ctx.req.query['id'] != 'string') {
 			return ctx.res.status(500).send({ error: "id does not exist on query params" });
 		}
-		const rpState = await this.rpStateRepository.createQueryBuilder()
-			.where("state = :state", { state: ctx.req.query['id'] })
-			.getOne();
 
-		if (!rpState) {
+    const rpStateRaw = this.rpStateKV.get(`rpstate:${ctx.req.query['id']}`);
+
+		if (!rpStateRaw) {
 			return ctx.res.status(500).send({ error: "rpState state could not be fetched with this id" });
 		}
+
+    const rpState = JSON.parse(rpStateRaw) as RPState;
+
 		if (rpState.signed_request === "") {
 			return ctx.res.status(500).send({ error: "rpState state signed request object has been invalidated" });
 		}
 		const signedRequest = rpState.signed_request;
 		rpState.signed_request = "";
-		await this.rpStateRepository.save(rpState);
+		// await this.rpStateRepository.save(rpState);
+		this.rpStateKV.set(`rpstate:${ctx.req.query['id']}`, JSON.stringify(rpState));
 		return ctx.res.send(signedRequest.toString());
 	}
 
@@ -73,7 +77,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		console.log("Presentation Request: Session id used for authz req ", sessionId);
 
 		const nonce = randomUUID();
-		const state = randomUUID();
+		const state = sessionId;
 
 		const responseUri = this.configurationService.getConfiguration().redirect_uri;
 		const client_id = new URL(responseUri).hostname
@@ -159,26 +163,47 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			.sign(rsaImportedPrivateKey);
 		const redirectUri = "openid4vp://cb";
 
-		const newRpState = new RelyingPartyState();
-		newRpState.dcql_query = presentationRequest?.dcql_query ? presentationRequest.dcql_query : null;
-		newRpState.presentation_request_id = presentationRequest.id ? presentationRequest.id : presentationRequest.dcql_query?.credentials[0].id;
-		newRpState.date_created = new Date();
-		newRpState.nonce = nonce;
-		newRpState.state = state;
-		newRpState.rp_eph_pub = exportedEphPub;
-		newRpState.rp_eph_priv = exportedEphPriv;
-		newRpState.rp_eph_kid = exportedEphPub.kid;
-		newRpState.audience = "x509_san_dns:" + client_id;
+		const newRpState: RPState = {
+			session_id: sessionId,
+			is_cross_device: false, // TODO
+			signed_request: signedRequestObject,
+			state,
+			nonce,
 
-		newRpState.session_id = sessionId;
-		newRpState.signed_request = signedRequestObject;
+			callback_endpoint: callbackEndpoint ?? null,
 
-		if (callbackEndpoint) {
-			newRpState.callback_endpoint = callbackEndpoint;
-		}
+			audience: `x509_san_dns:${client_id}`,
+			presentation_request_id:
+				presentationRequest.id ??
+				(presentationRequest.dcql_query as any)?.credentials?.[0]?.id,
 
+			presentation_definition: null,
+			dcql_query: presentationRequest?.dcql_query ?? null,
 
-		await this.rpStateRepository.save(newRpState);
+			rp_eph_kid: exportedEphPub.kid ?? "",
+			rp_eph_pub: exportedEphPub,
+			rp_eph_priv: exportedEphPriv,
+
+			apv_jarm_encrypted_response_header: null,
+			apu_jarm_encrypted_response_header: null,
+
+			encrypted_response: null,
+			vp_token: null,
+
+			presentation_submission: null,
+			response_code: null,
+
+			claims: null,
+			completed: null,
+			presentation_during_issuance_session: null,
+
+			date_created: Date.now(),
+			};
+
+		this.rpStateKV.set("rpstate:" + sessionId, JSON.stringify(newRpState));
+		this.rpStateKV.set("key:" + exportedEphPub.kid, sessionId);
+
+		// await this.rpStateRepository.save(newRpState);
 
 		const requestUri = config.url + "/verification/request-object?id=" + state;
 
@@ -194,16 +219,8 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		return { url: authorizationRequestURL, stateId: state };
 	}
 
-
-	private async handlePresentationDuringIssuance(ctx: { req: Request, res: Response }, rpState: RelyingPartyState) {
-		rpState.presentation_during_issuance_session = base64url.encode(randomUUID());
-		await this.rpStateRepository.save(rpState);
-		ctx.res.send({ presentation_during_issuance_session: rpState.presentation_during_issuance_session });
-	}
-
 	async responseHandler(ctx: { req: Request, res: Response }): Promise<void> {
 		// let presentationSubmissionObject: PresentationSubmission | null = qs.parse(decodeURI(presentation_submission)) as any;
-
 		let vp_token = ctx.req.body?.vp_token;
 		let state = ctx.req.body?.state;
 		let presentation_submission = ctx.req.body.presentation_submission ? JSON.parse(decodeURI(ctx.req.body.presentation_submission)) as any : null;
@@ -215,12 +232,18 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 				throw new Error("Couldnt extract kid");
 			}
 			// get rpstate only to get the private key to decrypt the response
-			let rpState = await this.rpStateRepository.createQueryBuilder()
-				.where("rp_eph_kid = :rp_eph_kid", { rp_eph_kid: kid })
-				.getOne();
-			if (!rpState) {
-				throw new Error();
+
+			// match kid with rpstate
+			const kidToRP = this.rpStateKV.get("key:" + kid);
+			if (!kidToRP) {
+				throw new Error("responseHandler: Could not retrieve rpState from kid");
 			}
+			const rpStateRaw = this.rpStateKV.get(`rpstate:${kidToRP}`)
+			if (!rpStateRaw) {
+				throw new Error("responseHandler: Could not retrieve rpState");
+			}
+			let rpState = JSON.parse(rpStateRaw) as RPState;
+
 			const rp_eph_priv = await importJWK(rpState.rp_eph_priv, 'ECDH-ES');
 			const result = await compactDecrypt(ctx.req.body.response, rp_eph_priv).then((r) => ({ data: r, err: null })).catch((err) => ({ data: null, err: err }));
 			if (result.err) {
@@ -239,14 +262,6 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 				throw new Error("Missing state");
 			}
 
-			// get rpState using the state value
-			rpState = await this.rpStateRepository.createQueryBuilder()
-				.where("state = :state", { state: payload.state })
-				.getOne();
-
-			if (!rpState) {
-				throw new Error("Couldn't get rp state with state");
-			}
 			if (rpState.completed) {
 				throw new Error("Presentation flow already completed");
 			}
@@ -263,17 +278,14 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			rpState.presentation_submission = payload.presentation_submission;
 			console.log("Encoding....")
 			rpState.vp_token = base64url.encode(JSON.stringify(payload.vp_token));
-			rpState.date_created = new Date();
+			rpState.date_created = Date.now();
 			rpState.apv_jarm_encrypted_response_header = protectedHeader.apv && typeof protectedHeader.apv == 'string' ? protectedHeader.apv as string : null;
 			rpState.apu_jarm_encrypted_response_header = protectedHeader.apu && typeof protectedHeader.apu == 'string' ? protectedHeader.apu as string : null;
 			rpState.completed = true;
 
 			console.log("Stored rp state = ", rpState)
-			if (rpState.session_id.startsWith("auth_session:")) { // is presentation during issuance
-				await this.handlePresentationDuringIssuance(ctx, rpState);
-				return;
-			}
-			await this.rpStateRepository.save(rpState);
+			//await this.rpStateRepository.save(rpState);
+			this.rpStateKV.set("rpstate:" + rpState.session_id, JSON.stringify(rpState));
 
 			if (!rpState.is_cross_device) {
 				ctx.res.send({ redirect_uri: rpState.callback_endpoint + '#response_code=' + rpState.response_code })
@@ -297,28 +309,23 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		}
 
 		// get rpState using the state value
-		const rpState = await this.rpStateRepository.createQueryBuilder()
-			.where("state = :state", { state: state })
-			.getOne();
-
-		if (!rpState) {
+		const rpStateRaw = this.rpStateKV.get(`rpstate:${state}`)
+		if (!rpStateRaw) {
 			throw new Error("Couldn't get rp state with state");
 		}
+		const rpState = JSON.parse(rpStateRaw) as RPState;
 		if (rpState.completed) {
 			throw new Error("Presentation flow already completed");
 		}
 		rpState.response_code = base64url.encode(randomUUID());
 		rpState.presentation_submission = presentation_submission;
 		rpState.vp_token = base64url.encode(JSON.stringify(vp_token));
-		rpState.date_created = new Date();
+		rpState.date_created = Date.now();
 		rpState.completed = true;
 
 		console.log("Session id = ", rpState.session_id)
-		if (rpState.session_id.startsWith("auth_session:")) { // is presentation during issuance
-			await this.handlePresentationDuringIssuance(ctx, rpState);
-			return;
-		}
-		await this.rpStateRepository.save(rpState);
+		//await this.rpStateRepository.save(rpState);
+		this.rpStateKV.set(`rpstate:${rpState.session_id}`, JSON.stringify(rpState));
 		ctx.res.send({ redirect_uri: rpState.callback_endpoint + '#response_code=' + rpState.response_code })
 		return;
 	}
@@ -326,7 +333,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 	private async validateDcqlVpToken(
 		vp_token_list: any,
 		dcql_query: any,
-		rpState: RelyingPartyState
+		rpState: RPState
 	): Promise<{ presentationClaims?: PresentationClaims, messages?: PresentationInfo, error?: Error }> {
 		const presentationClaims: PresentationClaims = {};
 		const ce = await initializeCredentialEngine();
@@ -489,24 +496,21 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		return { presentationClaims, messages };
 	}
 
-	public async getPresentationBySessionIdOrPresentationDuringIssuanceSession(sessionId?: string, presentationDuringIssuanceSession?: string, cleanupSession: boolean = false): Promise<{ status: true, presentations: unknown[], presentationInfo: PresentationInfo, rpState: RelyingPartyState } | { status: false, error: Error }> {
-		if (!sessionId && !presentationDuringIssuanceSession) {
-			console.error("getPresentationBySessionIdOrPresentationDuringIssuanceSession: Nor sessionId nor presentationDuringIssuanceSession was given");
-			const error = new Error("getPresentationBySessionIdOrPresentationDuringIssuanceSession: Nor sessionId nor presentationDuringIssuanceSession was given")
+	public async getPresentationBySessionId(sessionId?: string, cleanupSession: boolean = false): Promise<{ status: true, presentations: unknown[], presentationInfo: PresentationInfo, rpState: RPState } | { status: false, error: Error }> {
+		if (!sessionId) {
+			console.error("getPresentationBySessionId: Invalid sessionId");
+			const error = new Error("getPresentationBySessionId: Invalid sessionId");
 			return { status: false, error };
 		}
-		const rpState = sessionId ? await this.rpStateRepository.createQueryBuilder()
-			.where("session_id = :session_id", { session_id: sessionId })
-			.getOne() :
-			await this.rpStateRepository.createQueryBuilder()
-				.where("presentation_during_issuance_session = :presentation_during_issuance_session", { presentation_during_issuance_session: presentationDuringIssuanceSession })
-				.getOne();
+		const rpStateRaw = this.rpStateKV.get(`rpstate:${sessionId}`);
 
-		if (!rpState) {
+		if (!rpStateRaw) {
 			console.error("Couldn't get rpState with the session_id " + sessionId);
 			const error = new Error("Couldn't get rpState with the session_id " + sessionId);
 			return { status: false, error };
 		}
+
+		const rpState = JSON.parse(rpStateRaw) as RPState;
 
 		if (!rpState.vp_token) {
 			console.error("Presentation has not been sent. session_id " + sessionId);
@@ -533,11 +537,13 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			rpState.state = "";
 			rpState.session_id = ""; // invalidate session id
 			rpState.response_code = "";
-			await this.rpStateRepository.save(rpState);
+			// await this.rpStateRepository.save(rpState);
+			this.rpStateKV.set("rpstate:"+sessionId, JSON.stringify(rpState));
 		}
 		if (!rpState.claims && presentationClaims) {
 			rpState.claims = presentationClaims;
-			await this.rpStateRepository.save(rpState);
+			// await this.rpStateRepository.save(rpState);
+			this.rpStateKV.set("rpstate:"+sessionId, JSON.stringify(rpState));
 		}
 		if (rpState) {
 			return {
@@ -550,23 +556,5 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		const unkownErr = new Error("Uknown error");
 		return { status: false, error: unkownErr };
 
-	}
-
-	public async getPresentationById(id: string): Promise<{ status: boolean, presentationClaims?: PresentationClaims, presentations?: unknown[] }> {
-		const rpState = await this.rpStateRepository.createQueryBuilder('vp')
-			.where("id = :id", { id: id })
-			.getOne();
-
-		if (!rpState?.vp_token || !rpState.claims) {
-			return { status: false };
-		}
-
-		const vp_token = JSON.parse(base64url.decode(rpState.vp_token)) as string[] | string;
-
-		if (rpState) {
-			return { status: true, presentationClaims: rpState.claims, presentations: vp_token instanceof Array ? vp_token : [vp_token] };
-		}
-
-		return { status: false };
 	}
 }

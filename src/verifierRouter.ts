@@ -135,7 +135,7 @@ verifierRouter.get('/callback/status', async (req, res) => { // response with th
 	if (!req.cookies['session_id']) {
 		return res.send({ status: false, error: "Missing session_id from cookies" });
 	}
-	const result = await openidForPresentationReceivingService.getPresentationBySessionIdOrPresentationDuringIssuanceSession(req.cookies['session_id'], undefined, false);
+	const result = await openidForPresentationReceivingService.getPresentationBySessionId(req.cookies['session_id'], false);
 	if (!result.status) {
 		return res.send({ status: false, error: "Presentation not received" });
 	}
@@ -164,7 +164,7 @@ verifierRouter.post('/callback', async (req, res) => {
 		return res.status(400).send({ error: "Problem with the verification flow" })
 	}
 
-	const result = await openidForPresentationReceivingService.getPresentationBySessionIdOrPresentationDuringIssuanceSession(session_id, undefined, true);
+	const result = await openidForPresentationReceivingService.getPresentationBySessionId(session_id, true);
 
 	if (result.status == false ||
 		result.rpState.vp_token == null ||
@@ -201,7 +201,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	console.log("Presentation messages: ", result.presentationInfo);
 	return res.render('success.pug', {
 		status: status,
-		verificationTimestamp: date_created.toISOString(),
+		verificationTimestamp: new Date(date_created).toISOString(),
 		presentationClaims: claims,
 		credentialPayloads: credentialPayloads,
 		presentationInfo: result.presentationInfo,
@@ -304,7 +304,7 @@ verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 verifierRouter.get('/public/definitions/presentation-request/status/:presentation_request_id', async (req, res) => {
 	console.log("session_id : ", req.cookies['session_id'])
 	if (req.cookies['session_id'] && req.method == "GET") {
-		const { status } = await openidForPresentationReceivingService.getPresentationBySessionIdOrPresentationDuringIssuanceSession(req.cookies['session_id'], undefined, false);
+		const { status } = await openidForPresentationReceivingService.getPresentationBySessionId(req.cookies['session_id'], false);
 		if (status == true) {
 			return res.send({ url: `/verifier/callback` });
 		}
