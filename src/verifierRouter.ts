@@ -199,7 +199,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	}
 
 	console.log("Presentation messages: ", result.presentationInfo);
-	return res.render('success.pug', {
+	return res.render('presentation-success.pug', {
 		status: status,
 		verificationTimestamp: date_created.toISOString(),
 		presentationClaims: claims,
