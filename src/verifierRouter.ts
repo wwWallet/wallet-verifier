@@ -292,7 +292,7 @@ verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 			});
 	}) as string;
 
-	return res.render('QR.pug', {
+	return res.render('presentation-request.pug', {
 		wwwalletURL: config.wwwalletURL,
 		authorizationRequestURL: modifiedUrl,
 		authorizationRequestQR,
@@ -371,7 +371,7 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 			});
 	}) as string;
 
-	return res.render('QR.pug', {
+	return res.render('presentation-request.pug', {
 		wwwalletURL: config.wwwalletURL,
 		authorizationRequestURL: modifiedUrl,
 		authorizationRequestQR,
