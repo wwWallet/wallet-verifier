@@ -1,20 +1,3 @@
-.scan-qr__container {
-	display: flex;
-	flex-direction: column;
-	gap: 1.25rem;
-}
-
-/* Header */
-.scan-qr__header {
-	text-align: center;
-}
-
-.scan-qr__subtitle {
-	color: #4b5563;
-	line-height: 1.5;
-}
-
-/* Card style — same spirit as configurable */
 .presentation-card {
 	background: #fff;
 	border-radius: 12px;

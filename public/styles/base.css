@@ -35,7 +35,17 @@ main {
 /* Global container utility */
 .container {
 	width: min(1100px, calc(100% - 2rem));
-	margin: 0 auto;
+	margin-inline: auto;
+}
+
+.container__padded {
+	padding-block: 2rem;
+}
+
+.container__flexed {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
 }
 
 /* Global Typography */
@@ -69,8 +79,16 @@ h4 {
 	font-size: 18px;
 }
 
+.subtitle {
+	color: #4b5563;
+}
+
+.page__header {
+	text-align: center;
+}
+
 p {
-	margin: 0 0 1em;
+	margin: 0 0 0.50em;
 	font-size: 1rem;
 	color: #444;
 }

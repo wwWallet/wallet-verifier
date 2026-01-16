@@ -1,20 +1,3 @@
-/* Page wrapper */
-.edit-dcql {
-	padding: 2rem 0;
-}
-
-/* Header */
-.edit-dcql__header {
-	text-align: center;
-	margin-bottom: 1.25rem;
-}
-
-.edit-dcql__subtitle {
-	margin: 0.5rem 0 0;
-	color: #4b5563;
-	line-height: 1.5;
-}
-
 /* Error box */
 .edit-dcql__error {
 	margin: 0 auto 1rem;
@@ -115,10 +98,6 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-	.edit-dcql {
-		padding: 1.25rem 0;
-	}
-
 	.presentation-card {
 		padding: 1rem;
 	}

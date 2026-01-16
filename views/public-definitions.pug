@@ -5,10 +5,10 @@ block head-styles
 
 block layout-content
 	section
-		.definitions__container.container
-			header
+		.container.container__flexed
+			header.page__header
 				h1 Present your Verifiable Credentials
-				p.definitions__subtitle Choose a predefined request or create a custom one.
+				p.subtitle Choose a predefined request or create a custom one.
 
 			nav.definitions__grid(aria-label="Presentation request definitions")
 				for definition in presentationRequests

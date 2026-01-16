@@ -6,10 +6,10 @@ block head-styles
 
 block layout-content
 	section
-		.container.edit-dcql
-			eader.edit-dcql__header
+		.container.container__padded
+			header.page__header
 				h1 Edit Request
-				p.edit-dcql__subtitle Edit scheme and DCQL query, then submit.
+				p.subtitle Edit scheme and DCQL query, then submit.
 
 			if error
 				p.edit-dcql__error= error.errorMessage
@@ -107,4 +107,3 @@ block layout-content
 			document.querySelector("#dcqlQueryText").innerText = JSON.stringify(definition);
 			e.target.submit();
 		});
-

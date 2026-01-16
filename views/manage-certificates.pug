@@ -5,10 +5,10 @@ block head-styles
 
 block layout-content
 	section
-		.container.certs-page
-			header.certs-page__header
+		.container.container__flexed
+			header.page__header
 				h1 Certificates
-				p.certs-page__subtitle View trusted root certificates and add new ones.
+				p.subtitle View trusted root certificates and add new ones.
 
 			if error
 				p.certs-page__error= error.errorMessage

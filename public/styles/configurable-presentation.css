@@ -1,27 +1,4 @@
-.config-pres__container {
-	display: flex;
-	flex-direction: column;
-	gap: 1.25rem;
-}
-
-/* Header panel */
-.config-pres__header {
-	text-align: center;
-}
-
-.config-pres__header h1 {
-	margin: 0;
-	font-size: clamp(24px, 2.6vw, 38px);
-	line-height: 1.15;
-	color: #111;
-}
-
-.config-pres__subtitle {
-	color: #4b5563;
-	line-height: 1.5;
-}
-
-/* Main card (replaces the old grey block look) */
+/* Main card */
 .presentation-card {
 	background: #fff;
 	border-radius: 12px;
