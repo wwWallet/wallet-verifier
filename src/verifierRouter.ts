@@ -237,13 +237,13 @@ verifierRouter.use('/public/definitions/configurable-presentation-request/:prese
 	});
 })
 
-verifierRouter.get('/public/definitions/edit-dcql-query', async (_req, res) => {
-	return res.render('edit-dcql-query', {
+verifierRouter.get('/public/definitions/request-custom-credential', async (_req, res) => {
+	return res.render('request-custom-credential', {
 		schema: dcqlQuerySchema
 	});
 })
 
-verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
+verifierRouter.post('/public/definitions/request-custom-credential', async (req, res) => {
 	if (req.method === "POST" && req.body.action && req.cookies.session_id) {
 		// update is_cross_device --> false since the button was pressed
 		await AppDataSource.getRepository(RelyingPartyState).createQueryBuilder("rp_state")
