@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 	const typeDropdown = document.getElementById("type");
 	const attributesContainer = document.getElementById("attributes-container");
-	const scriptEl = document.currentScript || document.querySelector('script[src^="/js/configurable-presentation.js"]');
+	const scriptEl = document.currentScript || document.querySelector('script[src^="/js/request-credentials.js"]');
 	const dcqlQuery = JSON.parse(scriptEl.dataset.dcqlQuery);
 
 	const form = document.querySelector("form");

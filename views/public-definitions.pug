@@ -13,7 +13,7 @@ block layout-content
 			nav.definitions__grid(aria-label="Presentation request definitions")
 				for definition in presentationRequests
 					if definition._selectable === true
-						a.card.def-card(href=`/verifier/public/definitions/configurable-presentation-request/${definition.id}`)
+						a.card.def-card(href=`/verifier/public/definitions/request-credentials/${definition.id}`)
 							.card-title #{definition.title}
 							p.card-text #{definition.description}
 					else

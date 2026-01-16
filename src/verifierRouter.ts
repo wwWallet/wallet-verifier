@@ -209,7 +209,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	});
 })
 
-verifierRouter.use('/public/definitions/configurable-presentation-request/:presentation_request_id', async (req, res) => {
+verifierRouter.use('/public/definitions/request-credentials/:presentation_request_id', async (req, res) => {
 	const presentation_request_id = req.params.presentation_request_id;
 	if (!presentation_request_id) {
 		return res.render('error', {
