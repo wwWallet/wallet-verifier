@@ -230,7 +230,7 @@ verifierRouter.use('/public/definitions/configurable-presentation-request/:prese
 			const label = claim.path.join(".");
 			return [label, claim.path[0]];
 		});
-	return res.render('configurable-presentation', {
+	return res.render('request-credentials', {
 		presentationRequestId: presentationRequest.id,
 		dcqlQuery: presentationRequest.dcql_query,
 		selectableFields,
