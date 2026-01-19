@@ -77,18 +77,18 @@
 
 /* Accent card (Custom Request) */
 .def-card--accent {
-	border-color: color-mix(in srgb, var(--primary-main-color) 35%, #e5e7eb);
+	border:1px solid color-mix(in srgb, var(--primary-main-color) 30%, #e5e7eb);
 	background: linear-gradient(135deg,
-			color-mix(in srgb, var(--primary-main-color) 10%, #fff),
+			color-mix(in srgb, var(--primary-main-color) 5%, #fff),
 			#ffffff);
 }
 
 .def-card--accent::before {
-	background: var(--primary-dark-color);
+	background: var(--primary-main-color);
 }
 
 .def-card--accent .card-title {
-	color: var(--primary-dark-color);
+	color: var(--primary-main-color);
 }
 
 /* Responsive */
