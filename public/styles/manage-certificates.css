@@ -8,45 +8,6 @@
 	color: #111;
 }
 
-.certs-page__sectionTitle {
-	margin: 0 0 0.75rem;
-	font-size: 1rem;
-	font-weight: 800;
-	color: #111;
-	opacity: 0.9;
-}
-
-/* Add form */
-.certs-form {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-}
-
-.field {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-}
-
-#certificate {
-	width: 100%;
-	padding: 10px 12px;
-	border: 1px solid rgba(0, 0, 0, 0.18);
-	border-radius: 10px;
-	background: #fff;
-	font: inherit;
-	resize: vertical;
-
-	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-		"Liberation Mono", "Courier New", monospace;
-}
-
-#certificate:focus-visible {
-	outline: 3px solid color-mix(in srgb, var(--primary-main-color) 40%, white);
-	outline-offset: 2px;
-}
-
 /* Certificate blocks */
 .cert-container {
 	display: flex;

@@ -100,10 +100,9 @@ const locale = {
 		manageCertificates: {
 			title: "Manage Certificates",
 			subtitle: "View trusted root certificates and add new ones",
-			addCertificate: "Add Certificate",
-			certificateLabel: "X.509 Certificate (PEM or Base64)",
+			addCertificateLabel: "Add X.509 Certificate (PEM or Base64)",
 			certificatePlaceholder: "-----BEGIN CERTIFICATE----- ...",
-			certificateHint: "Paste the full PEM block or Base64 content.",
+			certificateHint: "Paste the full PEM block or Base64 content",
 			addButton: "Add X.509 Certificate",
 			trustedRootsTitle: "Trusted Root Certificates",
 			noCertificates: "No trusted root certificates found.",

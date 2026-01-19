@@ -15,22 +15,21 @@ block layout-content
 
 			// Add certificate
 			.card__container
-				h2.certs-page__sectionTitle #{locale.manageCertificates.addCertificate}
-				form.certs-form(method="POST" action="/verifier/public/manage-certificates")
-					.field
-						label.config-pres__label(for="certificate") #{locale.manageCertificates.certificateLabel}
-						textarea#certificate(name="certificate" rows="10" placeholder="-----BEGIN CERTIFICATE----- ...")
-						p.config-pres__hint #{locale.manageCertificates.certificateHint}
+				form.form-layout(method="POST" action="/verifier/public/manage-certificates")
+					.form-field
+						label.form-label(for="certificate") #{locale.manageCertificates.addCertificateLabel}
+						p.form-hint #{locale.manageCertificates.certificateHint}
+						textarea.form-control#certificate(name="certificate" rows="10" placeholder="-----BEGIN CERTIFICATE----- ...")
 
 					button.Btn.Btn--block(type="submit") #{locale.manageCertificates.addButton}
 			// Trusted roots list
-			.presentation-card
-				h2.certs-page__sectionTitle #{locale.manageCertificates.trustedRoots}
-
+			.card__container.form-layout
 				if !trustedRootCertificates || trustedRootCertificates.length === 0
-					p.config-pres__hint #{locale.manageCertificates.noCertificates}
+					h4 #{locale.manageCertificates.trustedRootsTitle}
+					p.form-hint #{locale.manageCertificates.noCertificates}
 				else
 					.cert-container
+						h4 #{locale.manageCertificates.trustedRootsTitle}
 						details(open)
 							summary #{locale.manageCertificates.pemSummary}
 							pre !{trustedRootCertificates.join('\n\n')}
