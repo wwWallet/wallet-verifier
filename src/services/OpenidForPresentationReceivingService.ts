@@ -172,7 +172,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 
 		const newRpState: RPState = {
 			session_id: sessionId,
-			is_cross_device: false, // TODO
+			is_cross_device: true,
 			signed_request: signedRequestObject,
 			state,
 			nonce,
@@ -570,7 +570,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		return { status: false, error: unkownErr };
 	}
 
-	public async getPresentationByResponseCode(responseCode: string): Promise<RPState | null> {
+	public async getRPStateByResponseCode(responseCode: string): Promise<RPState | null> {
 		const sessionId = this.rpStateKV.get(`response_code:${responseCode}`);
 
 		if (!sessionId) {
@@ -581,6 +581,16 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		const rpStateRaw = this.rpStateKV.get(`rpstate:${sessionId}`);
 		if (!rpStateRaw) {
 			console.error("getPresentationByResponseCode: Missing rpState for session id");
+			return null;
+		}
+
+		return JSON.parse(rpStateRaw) as RPState;
+	}
+
+	public async getRPStateBySessionId(sessionId: string): Promise<RPState | null> {
+		const rpStateRaw = this.rpStateKV.get(`rpstate:${sessionId}`);
+		if (!rpStateRaw) {
+			console.error("getRPStateBySessionId: Missing rpState for session id");
 			return null;
 		}
 

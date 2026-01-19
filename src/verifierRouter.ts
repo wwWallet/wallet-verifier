@@ -149,7 +149,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	// this request includes the response code
 	let session_id = req.cookies['session_id'];
 	if (req.body.response_code) { // response_code is considered more stable than session_id
-		const s = await openidForPresentationReceivingService.getPresentationByResponseCode(req.body.response_code);
+		const s = await openidForPresentationReceivingService.getRPStateByResponseCode(req.body.response_code);
 		if (s) {
 			session_id = s.session_id;
 		}
@@ -242,10 +242,10 @@ verifierRouter.get('/public/definitions/edit-dcql-query', async (_req, res) => {
 verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 	if (req.method === "POST" && req.body.action && req.cookies.session_id) {
 		// update is_cross_device --> false since the button was pressed
-		const p = await openidForPresentationReceivingService.getPresentationBySessionId(req.cookies.session_id);
-		if (p.status && p.rpState) {
-			p.rpState.is_cross_device = false;
-			openidForPresentationReceivingService.saveRPState(p.rpState.session_id, p.rpState);
+		const rpState = await openidForPresentationReceivingService.getRPStateBySessionId(req.cookies.session_id);
+		if (rpState) {
+			rpState.is_cross_device = false;
+			openidForPresentationReceivingService.saveRPState(rpState.session_id, rpState);
 		}
 		return res.redirect(req.body.action);
 	}
@@ -346,10 +346,10 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 	if (req.method === "POST" && req.body.action && req.cookies.session_id) { // handle click of "open with..." button
 		console.log("Cookie = ", req.cookies)
 		// update is_cross_device --> false since the button was pressed
-		const p = await openidForPresentationReceivingService.getPresentationBySessionId(req.cookies.session_id);
-		if (p.status && p.rpState) {
-			p.rpState.is_cross_device = false;
-			openidForPresentationReceivingService.saveRPState(p.rpState.session_id, p.rpState);
+		const rpState = await openidForPresentationReceivingService.getRPStateBySessionId(req.cookies.session_id);
+		if (rpState) {
+			rpState.is_cross_device = false;
+			openidForPresentationReceivingService.saveRPState(rpState.session_id, rpState);
 		}
 		return res.redirect(req.body.action);
 	}
