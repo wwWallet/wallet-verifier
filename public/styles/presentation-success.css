@@ -15,39 +15,10 @@
 	color: #4b5563;
 }
 
-/* Page wrapper */
-
-.presentation-success__header {
-	text-align: center;
-	margin-bottom: 1.25rem;
-}
-
-.presentation-success__subtitle {
-	margin: 0.5rem 0 0;
-	color: #4b5563;
-	line-height: 1.5;
-}
-
 .presentation-success__meta {
 	text-align: center;
 	margin: 0.75rem 0 1rem;
 	color: #4b5563;
-}
-
-/* Reuse your card style */
-.presentation-card {
-	background: #fff;
-	border-radius: 12px;
-	padding: 1.25rem;
-	width: 100%;
-	max-width: 920px;
-	margin: 0 auto;
-	border: 1px solid rgba(0, 0, 0, 0.12);
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-}
-
-.presentation-card + .presentation-card {
-	margin-top: 1rem;
 }
 
 .presentation-success__sectionTitle {
@@ -119,7 +90,7 @@
 	text-align: left;
 	font-weight: 800;
 	color: #ffffff;
-	background-color: var(--primary-main-color)!important;
+	background-color: var(--primary-main-color) !important;
 }
 
 .additional-info {
@@ -177,15 +148,11 @@
 	display: inline-flex;
 }
 
-.jsoneditor-menu{
-	background-color: var(--primary-main-color)!important;
+.jsoneditor-menu {
+	background-color: var(--primary-main-color) !important;
 }
 
 @media (max-width: 768px) {
-
-	.presentation-card {
-		padding: 1rem;
-	}
 
 	.credential-image {
 		width: 50%;

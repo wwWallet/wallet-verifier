@@ -199,7 +199,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	}
 
 	console.log("Presentation messages: ", result.presentationInfo);
-	return res.render('success.pug', {
+	return res.render('presentation-success.pug', {
 		status: status,
 		verificationTimestamp: date_created.toISOString(),
 		presentationClaims: claims,
@@ -209,7 +209,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	});
 })
 
-verifierRouter.use('/public/definitions/configurable-presentation-request/:presentation_request_id', async (req, res) => {
+verifierRouter.use('/public/definitions/request-credentials/:presentation_request_id', async (req, res) => {
 	const presentation_request_id = req.params.presentation_request_id;
 	if (!presentation_request_id) {
 		return res.render('error', {
@@ -230,20 +230,20 @@ verifierRouter.use('/public/definitions/configurable-presentation-request/:prese
 			const label = claim.path.join(".");
 			return [label, claim.path[0]];
 		});
-	return res.render('configurable-presentation', {
+	return res.render('request-credentials', {
 		presentationRequestId: presentationRequest.id,
 		dcqlQuery: presentationRequest.dcql_query,
 		selectableFields,
 	});
 })
 
-verifierRouter.get('/public/definitions/edit-dcql-query', async (_req, res) => {
-	return res.render('edit-dcql-query', {
+verifierRouter.get('/public/definitions/request-custom-credential', async (_req, res) => {
+	return res.render('request-custom-credential', {
 		schema: dcqlQuerySchema
 	});
 })
 
-verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
+verifierRouter.post('/public/definitions/request-custom-credential', async (req, res) => {
 	if (req.method === "POST" && req.body.action && req.cookies.session_id) {
 		// update is_cross_device --> false since the button was pressed
 		await AppDataSource.getRepository(RelyingPartyState).createQueryBuilder("rp_state")
@@ -292,7 +292,7 @@ verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 			});
 	}) as string;
 
-	return res.render('QR.pug', {
+	return res.render('presentation-request.pug', {
 		wwwalletURL: config.wwwalletURL,
 		authorizationRequestURL: modifiedUrl,
 		authorizationRequestQR,
@@ -371,7 +371,7 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 			});
 	}) as string;
 
-	return res.render('QR.pug', {
+	return res.render('presentation-request.pug', {
 		wwwalletURL: config.wwwalletURL,
 		authorizationRequestURL: modifiedUrl,
 		authorizationRequestQR,
