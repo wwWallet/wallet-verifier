@@ -7,36 +7,35 @@ block layout-content
 	section
 		.container.container__flexed
 			header.page__header
-				h2 Certificates
-				p.subtitle View trusted root certificates and add new ones.
+				h2 #{locale.manageCertificates.title}
+				p.subtitle #{locale.manageCertificates.subtitle}
 
 			if error
 				p.certs-page__error= error.errorMessage
 
 			// Add certificate
 			.card__container
-				h2.certs-page__sectionTitle Add Certificate
+				h2.certs-page__sectionTitle #{locale.manageCertificates.addCertificate}
 				form.certs-form(method="POST" action="/verifier/public/manage-certificates")
 					.field
-						label.config-pres__label(for="certificate") X.509 Certificate (PEM or Base64)
+						label.config-pres__label(for="certificate") #{locale.manageCertificates.certificateLabel}
 						textarea#certificate(name="certificate" rows="10" placeholder="-----BEGIN CERTIFICATE----- ...")
-						p.config-pres__hint Paste the full PEM block or Base64 content.
+						p.config-pres__hint #{locale.manageCertificates.certificateHint}
 
-					button.Btn.Btn--block(type="submit") Add X.509 Certificate
-
+					button.Btn.Btn--block(type="submit") #{locale.manageCertificates.addButton}
 			// Trusted roots list
 			.presentation-card
-				h2.certs-page__sectionTitle Trusted Root Certificates
+				h2.certs-page__sectionTitle #{locale.manageCertificates.trustedRoots}
 
 				if !trustedRootCertificates || trustedRootCertificates.length === 0
-					p.config-pres__hint No trusted root certificates found.
+					p.config-pres__hint #{locale.manageCertificates.noCertificates}
 				else
 					.cert-container
 						details(open)
-							summary X.509 Certificate PEM
+							summary #{locale.manageCertificates.pemSummary}
 							pre !{trustedRootCertificates.join('\n\n')}
 
 						details
-							summary X.509 Certificate Base64
+							summary #{locale.manageCertificates.base64Summary}
 							- const base64Certs = trustedRootCertificates.map((cert) => cert.replace('-----BEGIN CERTIFICATE-----', '').replace('-----END CERTIFICATE-----', '').replace(/\n/g, '')).join('\n\n')
 							pre !{base64Certs}

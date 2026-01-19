@@ -7,8 +7,8 @@ block layout-content
 	section
 		.container.container__flexed
 			header.page__header
-				h2 Present your Verifiable Credentials
-				p.subtitle Choose a predefined request or create a custom one.
+				h2 #{locale.definitions.title}
+				p.subtitle #{locale.definitions.subtitle}
 
 			nav.definitions__grid(aria-label="Presentation request definitions")
 				for definition in presentationRequests
@@ -22,5 +22,5 @@ block layout-content
 							p.card-text #{definition.description}
 
 				a.card.def-card.def-card--accent(href="/verifier/public/definitions/request-custom-credential")
-					.card-title Custom Request
-					p.card-text Import the DCQL query of your choice.
+					.card-title #{locale.definitions.customRequestTitle}
+					p.card-text #{locale.definitions.customRequestDescription}

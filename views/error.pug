@@ -7,8 +7,8 @@ block layout-content
 	section
 		.container
 			header.page__header
-				h2 Error
+				h2 #{locale.error.title}
 				p #{msg}
 
 			.error-page__actions
-				a.Btn(href=redirect ? redirect : "/") #{locale.ReturnToMainPage}
+				a.Btn(href=redirect ? redirect : "/") #{locale.error.return}

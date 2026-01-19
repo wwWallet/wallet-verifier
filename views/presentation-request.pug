@@ -7,8 +7,8 @@ block layout-content
 	section
 		.container.container__flexed
 			header.page__header
-				h2 Present your Credentials
-				p.subtitle Scan or open the request in your wallet.
+				h2 #{locale.presentationRequest.title}
+				p.subtitle #{locale.presentationRequest.subtitle}
 
 			.card__container
 				form.form-layout(name="PresentationRequestForm" method="POST")
@@ -20,8 +20,8 @@ block layout-content
 
 						.buttons
 							- const modifiedURL = authorizationRequestURL.replace("openid4vp://cb", wwwalletURL)
-							button.Btn(type="submit" name="action" value=`${modifiedURL}`) Open with wwWallet
-							button.Btn(type="submit" name="action" value=`${authorizationRequestURL}`) Open with a native wallet
+							button.Btn(type="submit" name="action" value=`${modifiedURL}`) #{locale.presentationRequest.buttons.OpenWithwwwallet}
+							button.Btn(type="submit" name="action" value=`${authorizationRequestURL}`) #{locale.presentationRequest.buttons.OpenWithNativeWallet}
 
 						input(type="hidden" name="state" id="state" value=state)
 						input(type="hidden" name="authorizationRequestQR" id="authorizationRequestQR" value=authorizationRequestQR)
