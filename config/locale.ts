@@ -1,8 +1,13 @@
+import { config } from "./index.js";
+
 const locale = {
 	en: {
 		ReturnToMainPage: "Return",
 		header: {
-			title: "",
+			title: "", // set to empty if you don't want text next to logo
+			home: "Home",
+			requestCredentials: "Request Credentials",
+			manageCertificates: "Manage Certificates",
 		},
 		footer: {
 			services: "Services",
@@ -11,9 +16,8 @@ const locale = {
 			contact: "Contact",
 		},
 		index: {
-			header: "wwWallet Verifier",
 			verifyCredential: "Request Credentials",
-			heading: "wwWallet Verifier",
+			heading: config.siteConfig.name,
 			oid4vpProfile: "OpenID4VP Interoperability Profile",
 			openid4vp: [
 				["OIDVP Specification", "Draft 24"],
@@ -24,17 +28,6 @@ const locale = {
 			],
 			paragraph: "This website is a proof-of-concept service designed to perform verifications of Verifiable Credentials (VCs) in SD-JWT or mDoc formats, supporting the wwWallet ecosystem. It conducts only sample verifications to showcase credential checks (not valid for real-world use).",
 		},
-		login: {
-			title: "Login",
-			description: "",
-			btnText: "Login",
-			error: {
-				emptyUsername: "Username is empty",
-				emptyPassword: "Password is empty",
-				invalidCredentials: "Invalid credentials",
-				networkError: "Network error occured",
-			}
-		}
 	}
 }
 
