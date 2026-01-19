@@ -59,6 +59,7 @@
 	color: var(--primary-main-color);
 	margin-right: 20px;
 	text-decoration: none;
+	font-size: 18px;
 }
 
 #Header li.menu-item a.is-active {
