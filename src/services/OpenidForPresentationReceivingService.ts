@@ -7,7 +7,6 @@ import base64url from "base64url";
 import { config } from "../../config";
 import fs from 'fs';
 import path from "path";
-import { PresentationClaims } from "../entities/RelyingPartyState.entity";
 import { generateRandomIdentifier } from "../util/generateRandomIdentifier";
 import * as z from 'zod';
 import { initializeCredentialEngine } from "../util/initializeCredentialEngine";
@@ -15,7 +14,7 @@ import { TransactionData } from "../util/transactionData";
 import { serializeDcqlQuery } from "../util/serializeDcqlQuery";
 import { DcqlPresentationResult } from 'dcql';
 import { pemToBase64 } from "../util/pemToBase64";
-import { RPState } from '../types/RPState';
+import { RPState, PresentationClaims } from '../types/RPState';
 import { KeyValueStore } from '../KeyValueStore';
 
 const privateKeyPem = fs.readFileSync(path.join(__dirname, "../../../keys/pem.key"), 'utf-8').toString();
@@ -48,6 +47,14 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		this.rpStateKV = new KeyValueStore<any>();
 	}
 
+	public saveRPState(sessionId: string, state: RPState): void {
+		this.rpStateKV.set(`rpstate:${sessionId}`, JSON.stringify(state));
+	}
+
+	private saveResponseCodeMapping(responseCode: string, sessionId: string): void {
+		this.rpStateKV.set(`response_code:${responseCode}`, sessionId);
+	}
+
 	public async getSignedRequestObject(ctx: { req: Request, res: Response }): Promise<any> {
 		if (!ctx.req.query['id'] || typeof ctx.req.query['id'] != 'string') {
 			return ctx.res.status(500).send({ error: "id does not exist on query params" });
@@ -67,7 +74,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		const signedRequest = rpState.signed_request;
 		rpState.signed_request = "";
 		// await this.rpStateRepository.save(rpState);
-		this.rpStateKV.set(`rpstate:${ctx.req.query['id']}`, JSON.stringify(rpState));
+		this.saveRPState(ctx.req.query['id'], rpState);
 		return ctx.res.send(signedRequest.toString());
 	}
 
@@ -200,7 +207,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			date_created: Date.now(),
 			};
 
-		this.rpStateKV.set("rpstate:" + sessionId, JSON.stringify(newRpState));
+		this.saveRPState(sessionId, newRpState);
 		this.rpStateKV.set("key:" + exportedEphPub.kid, sessionId);
 
 		// await this.rpStateRepository.save(newRpState);
@@ -274,6 +281,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 				throw new Error("Encrypted Response: presentation_submission and vp_token are missing");
 			}
 			rpState.response_code = base64url.encode(randomUUID());
+			this.saveResponseCodeMapping(rpState.response_code, rpState.session_id);
 			rpState.encrypted_response = ctx.req.body.response;
 			rpState.presentation_submission = payload.presentation_submission;
 			console.log("Encoding....")
@@ -285,7 +293,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 
 			console.log("Stored rp state = ", rpState)
 			//await this.rpStateRepository.save(rpState);
-			this.rpStateKV.set("rpstate:" + rpState.session_id, JSON.stringify(rpState));
+			this.saveRPState(rpState.session_id, rpState);
 
 			if (!rpState.is_cross_device) {
 				ctx.res.send({ redirect_uri: rpState.callback_endpoint + '#response_code=' + rpState.response_code })
@@ -318,6 +326,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			throw new Error("Presentation flow already completed");
 		}
 		rpState.response_code = base64url.encode(randomUUID());
+		this.saveResponseCodeMapping(rpState.response_code, rpState.session_id);
 		rpState.presentation_submission = presentation_submission;
 		rpState.vp_token = base64url.encode(JSON.stringify(vp_token));
 		rpState.date_created = Date.now();
@@ -325,7 +334,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 
 		console.log("Session id = ", rpState.session_id)
 		//await this.rpStateRepository.save(rpState);
-		this.rpStateKV.set(`rpstate:${rpState.session_id}`, JSON.stringify(rpState));
+		this.saveRPState(rpState.session_id, rpState);
 		ctx.res.send({ redirect_uri: rpState.callback_endpoint + '#response_code=' + rpState.response_code })
 		return;
 	}
@@ -534,16 +543,20 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			return { status: false, error };
 		}
 		if (cleanupSession) {
+			const responseCode = rpState.response_code;
 			rpState.state = "";
 			rpState.session_id = ""; // invalidate session id
 			rpState.response_code = "";
 			// await this.rpStateRepository.save(rpState);
-			this.rpStateKV.set("rpstate:"+sessionId, JSON.stringify(rpState));
+			this.saveRPState(sessionId, rpState);
+			if (responseCode) {
+				this.rpStateKV.delete(`response_code:${responseCode}`);
+			}
 		}
 		if (!rpState.claims && presentationClaims) {
 			rpState.claims = presentationClaims;
 			// await this.rpStateRepository.save(rpState);
-			this.rpStateKV.set("rpstate:"+sessionId, JSON.stringify(rpState));
+			this.saveRPState(sessionId, rpState);
 		}
 		if (rpState) {
 			return {
@@ -555,6 +568,22 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		}
 		const unkownErr = new Error("Uknown error");
 		return { status: false, error: unkownErr };
+	}
 
+	public async getPresentationByResponseCode(responseCode: string): Promise<RPState | null> {
+		const sessionId = this.rpStateKV.get(`response_code:${responseCode}`);
+
+		if (!sessionId) {
+			console.error("getPresentationByResponseCode: No session id for response code");
+			return null;
+		}
+
+		const rpStateRaw = this.rpStateKV.get(`rpstate:${sessionId}`);
+		if (!rpStateRaw) {
+			console.error("getPresentationByResponseCode: Missing rpState for session id");
+			return null;
+		}
+
+		return JSON.parse(rpStateRaw) as RPState;
 	}
 }

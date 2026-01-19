@@ -5,8 +5,6 @@ import { OpenidForPresentationsReceivingService } from "./services/OpenidForPres
 import { VerifierConfigurationService } from "./services/VerifierConfigurationService";
 import { generateRandomIdentifier } from "./util/generateRandomIdentifier";
 import { addSessionIdCookieToResponse } from "../config/sessionIdCookieConfig";
-import AppDataSource from "./AppDataSource";
-import { RelyingPartyState } from "./entities/RelyingPartyState.entity";
 import { initializeCredentialEngine } from "./util/initializeCredentialEngine";
 
 import Ajv from 'ajv';
@@ -151,9 +149,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	// this request includes the response code
 	let session_id = req.cookies['session_id'];
 	if (req.body.response_code) { // response_code is considered more stable than session_id
-		const s = await AppDataSource.getRepository(RelyingPartyState).createQueryBuilder()
-			.where("response_code = :response_code", { response_code: req.body.response_code })
-			.getOne();
+		const s = await openidForPresentationReceivingService.getPresentationByResponseCode(req.body.response_code);
 		if (s) {
 			session_id = s.session_id;
 		}
@@ -246,10 +242,11 @@ verifierRouter.get('/public/definitions/edit-dcql-query', async (_req, res) => {
 verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 	if (req.method === "POST" && req.body.action && req.cookies.session_id) {
 		// update is_cross_device --> false since the button was pressed
-		await AppDataSource.getRepository(RelyingPartyState).createQueryBuilder("rp_state")
-			.update({ is_cross_device: false })
-			.where("session_id = :session_id", { session_id: req.cookies.session_id })
-			.execute();
+		const p = await openidForPresentationReceivingService.getPresentationBySessionId(req.cookies.session_id);
+		if (p.status && p.rpState) {
+			p.rpState.is_cross_device = false;
+			openidForPresentationReceivingService.saveRPState(p.rpState.session_id, p.rpState);
+		}
 		return res.redirect(req.body.action);
 	}
 	let query;
@@ -349,10 +346,11 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 	if (req.method === "POST" && req.body.action && req.cookies.session_id) { // handle click of "open with..." button
 		console.log("Cookie = ", req.cookies)
 		// update is_cross_device --> false since the button was pressed
-		await AppDataSource.getRepository(RelyingPartyState).createQueryBuilder("rp_state")
-			.update({ is_cross_device: false })
-			.where("session_id = :session_id", { session_id: req.cookies.session_id })
-			.execute();
+		const p = await openidForPresentationReceivingService.getPresentationBySessionId(req.cookies.session_id);
+		if (p.status && p.rpState) {
+			p.rpState.is_cross_device = false;
+			openidForPresentationReceivingService.saveRPState(p.rpState.session_id, p.rpState);
+		}
 		return res.redirect(req.body.action);
 	}
 	const newSessionId = generateRandomIdentifier(12);
