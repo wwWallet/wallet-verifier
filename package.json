@@ -11,7 +11,10 @@
     "start": "node -r source-map-support/register dist/src/app.js",
     "start-debug": "node --inspect=0.0.0.0:9259 -r source-map-support/register dist/src/app.js",
     "build:prod": "rm -rf node_modules && yarn install && yarn build && rm -rf node_modules && yarn install --production",
-    "snapshot": "paketo"
+    "snapshot": "paketo",
+    "migration:generate": "typeorm-ts-node-commonjs -d src/AppDataSource.ts migration:generate",
+    "migration:run": "typeorm-ts-node-commonjs -d src/AppDataSource.ts migration:run",
+    "migration:revert": "typeorm-ts-node-commonjs -d src/AppDataSource.ts migration:revert"
   },
   "keywords": [],
   "author": "",
@@ -84,6 +87,7 @@
     "@types/ws": "^8.5.3",
     "nodemon": "^2.0.19",
     "source-map-support": "^0.5.21",
+    "ts-node": "^10.9.2",
     "typescript": "^5.1.6"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"

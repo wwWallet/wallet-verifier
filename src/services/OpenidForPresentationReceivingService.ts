@@ -16,6 +16,8 @@ import { DcqlPresentationResult } from 'dcql';
 import { pemToBase64 } from "../util/pemToBase64";
 import { RPState, PresentationClaims } from '../types/RPState';
 import { KeyValueStore } from '../KeyValueStore';
+import AppDataSource from '../AppDataSource';
+import { Audit } from '../entities/Audit.entity';
 
 const privateKeyPem = fs.readFileSync(path.join(__dirname, "../../../keys/pem.key"), 'utf-8').toString();
 const leafCert = fs.readFileSync(path.join(__dirname, "../../../keys/pem.crt"), 'utf-8').toString();
@@ -53,6 +55,40 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 
 	private saveResponseCodeMapping(responseCode: string, sessionId: string): void {
 		this.rpStateKV.set(`response_code:${responseCode}`, sessionId);
+	}
+
+	private async createAuditEntry(params: { sessionId: string; crossDevice: boolean; dcqlQuery: Record<string, unknown> | null }): Promise<void> {
+		if (!AppDataSource.isInitialized) {
+			console.warn("Audit skipped: data source not initialized");
+			return;
+		}
+		const auditRepository = AppDataSource.getRepository(Audit);
+		const entry = auditRepository.create({
+			sessionId: params.sessionId,
+			crossDevice: params.crossDevice,
+			dcqlQuery: params.dcqlQuery,
+			completed: false,
+			errorCode: null,
+		});
+		await auditRepository.save(entry);
+	}
+
+	private async updateAuditEntry(sessionId: string, update: Partial<Audit>): Promise<void> {
+		if (!AppDataSource.isInitialized) {
+			console.warn("Audit update skipped: data source not initialized");
+			return;
+		}
+		const auditRepository = AppDataSource.getRepository(Audit);
+		const existing = await auditRepository.findOneBy({ sessionId });
+		if (!existing) {
+			return;
+		}
+		Object.assign(existing, update);
+		await auditRepository.save(existing);
+	}
+
+	public async setAuditCrossDevice(sessionId: string, crossDevice: boolean): Promise<void> {
+		await this.updateAuditEntry(sessionId, { crossDevice });
 	}
 
 	public async getSignedRequestObject(ctx: { req: Request, res: Response }): Promise<any> {
@@ -209,6 +245,11 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 
 		this.saveRPState(sessionId, newRpState);
 		this.rpStateKV.set("key:" + exportedEphPub.kid, sessionId);
+		await this.createAuditEntry({
+			sessionId,
+			crossDevice: newRpState.is_cross_device,
+			dcqlQuery: presentationRequest?.dcql_query ?? null,
+		});
 
 		// await this.rpStateRepository.save(newRpState);
 
@@ -227,116 +268,130 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 	}
 
 	async responseHandler(ctx: { req: Request, res: Response }): Promise<void> {
-		// let presentationSubmissionObject: PresentationSubmission | null = qs.parse(decodeURI(presentation_submission)) as any;
-		let vp_token = ctx.req.body?.vp_token;
-		let state = ctx.req.body?.state;
-		let presentation_submission = ctx.req.body.presentation_submission ? JSON.parse(decodeURI(ctx.req.body.presentation_submission)) as any : null;
+		let auditSessionId: string | null = null;
+		try {
+			// let presentationSubmissionObject: PresentationSubmission | null = qs.parse(decodeURI(presentation_submission)) as any;
+			let vp_token = ctx.req.body?.vp_token;
+			let state = ctx.req.body?.state;
+			let presentation_submission = ctx.req.body.presentation_submission ? JSON.parse(decodeURI(ctx.req.body.presentation_submission)) as any : null;
 
+			if (ctx.req.body.response) { // E2EE - JARM
+				const { kid } = JSON.parse(base64url.decode(ctx.req.body.response.split('.')[0])) as { kid: string | undefined };
+				if (!kid) {
+					throw new Error("Couldnt extract kid");
+				}
+				// get rpstate only to get the private key to decrypt the response
 
-		if (ctx.req.body.response) { // E2EE - JARM
-			const { kid } = JSON.parse(base64url.decode(ctx.req.body.response.split('.')[0])) as { kid: string | undefined };
-			if (!kid) {
-				throw new Error("Couldnt extract kid");
-			}
-			// get rpstate only to get the private key to decrypt the response
+				// match kid with rpstate
+				const kidToRP = this.rpStateKV.get("key:" + kid);
+				if (!kidToRP) {
+					throw new Error("responseHandler: Could not retrieve rpState from kid");
+				}
+				const rpStateRaw = this.rpStateKV.get(`rpstate:${kidToRP}`)
+				if (!rpStateRaw) {
+					throw new Error("responseHandler: Could not retrieve rpState");
+				}
+				let rpState = JSON.parse(rpStateRaw) as RPState;
+				auditSessionId = rpState.session_id;
 
-			// match kid with rpstate
-			const kidToRP = this.rpStateKV.get("key:" + kid);
-			if (!kidToRP) {
-				throw new Error("responseHandler: Could not retrieve rpState from kid");
-			}
-			const rpStateRaw = this.rpStateKV.get(`rpstate:${kidToRP}`)
-			if (!rpStateRaw) {
-				throw new Error("responseHandler: Could not retrieve rpState");
-			}
-			let rpState = JSON.parse(rpStateRaw) as RPState;
+				const rp_eph_priv = await importJWK(rpState.rp_eph_priv, 'ECDH-ES');
+				const result = await compactDecrypt(ctx.req.body.response, rp_eph_priv).then((r) => ({ data: r, err: null })).catch((err) => ({ data: null, err: err }));
+				if (result.err) {
+					const error = { error: "JWE Decryption failure", error_description: result.err };
+					console.error(error);
+					console.log("Received JWE headers: ", JSON.parse(base64url.decode(ctx.req.body.response.split('.')[0])));
+					console.log("Received JWE: ", ctx.req.body.response);
+					await this.updateAuditEntry(rpState.session_id, { errorCode: "JWE Decryption failure" });
+					ctx.res.status(500).send(error);
+					return;
+				}
 
-			const rp_eph_priv = await importJWK(rpState.rp_eph_priv, 'ECDH-ES');
-			const result = await compactDecrypt(ctx.req.body.response, rp_eph_priv).then((r) => ({ data: r, err: null })).catch((err) => ({ data: null, err: err }));
-			if (result.err) {
-				const error = { error: "JWE Decryption failure", error_description: result.err };
-				console.error(error);
-				console.log("Received JWE headers: ", JSON.parse(base64url.decode(ctx.req.body.response.split('.')[0])));
-				console.log("Received JWE: ", ctx.req.body.response);
-				ctx.res.status(500).send(error);
+				const { protectedHeader, plaintext } = result.data as CompactDecryptResult;
+				console.log("Protected header = ", protectedHeader)
+				const payload = JSON.parse(new TextDecoder().decode(plaintext)) as { state: string | undefined, vp_token: string | undefined, presentation_submission: any };
+				if (!payload?.state) {
+					throw new Error("Missing state");
+				}
+
+				if (rpState.completed) {
+					throw new Error("Presentation flow already completed");
+				}
+
+				if (!payload.vp_token) {
+					throw new Error("Encrypted Response: vp_token is missing");
+				}
+
+				if (!payload.presentation_submission && !payload.vp_token) {
+					throw new Error("Encrypted Response: presentation_submission and vp_token are missing");
+				}
+				rpState.response_code = base64url.encode(randomUUID());
+				this.saveResponseCodeMapping(rpState.response_code, rpState.session_id);
+				rpState.encrypted_response = ctx.req.body.response;
+				rpState.presentation_submission = payload.presentation_submission;
+				console.log("Encoding....")
+				rpState.vp_token = base64url.encode(JSON.stringify(payload.vp_token));
+				rpState.date_created = Date.now();
+				rpState.apv_jarm_encrypted_response_header = protectedHeader.apv && typeof protectedHeader.apv == 'string' ? protectedHeader.apv as string : null;
+				rpState.apu_jarm_encrypted_response_header = protectedHeader.apu && typeof protectedHeader.apu == 'string' ? protectedHeader.apu as string : null;
+				rpState.completed = true;
+
+				console.log("Stored rp state = ", rpState)
+				//await this.rpStateRepository.save(rpState);
+				this.saveRPState(rpState.session_id, rpState);
+				await this.updateAuditEntry(rpState.session_id, { completed: true, errorCode: null });
+
+				if (!rpState.is_cross_device) {
+					ctx.res.send({ redirect_uri: rpState.callback_endpoint + '#response_code=' + rpState.response_code })
+					return;
+				}
+				// in cross-device scenario just return an empty response
+				ctx.res.send();
 				return;
 			}
 
-			const { protectedHeader, plaintext } = result.data as CompactDecryptResult;
-			console.log("Protected header = ", protectedHeader)
-			const payload = JSON.parse(new TextDecoder().decode(plaintext)) as { state: string | undefined, vp_token: string | undefined, presentation_submission: any };
-			if (!payload?.state) {
-				throw new Error("Missing state");
+			if (!state) {
+				console.log("Missing state param");
+				ctx.res.status(401).send({ error: "Missing state param" });
+				return;
 			}
 
+			auditSessionId = state;
+			if (!vp_token) {
+				console.log("Missing state param")
+				await this.updateAuditEntry(state, { errorCode: "Missing vp_token" });
+				ctx.res.status(401).send({ error: "Missing state param" });
+				return;
+			}
+
+			// get rpState using the state value
+			const rpStateRaw = this.rpStateKV.get(`rpstate:${state}`)
+			if (!rpStateRaw) {
+				throw new Error("Couldn't get rp state with state");
+			}
+			const rpState = JSON.parse(rpStateRaw) as RPState;
 			if (rpState.completed) {
 				throw new Error("Presentation flow already completed");
 			}
-
-			if (!payload.vp_token) {
-				throw new Error("Encrypted Response: vp_token is missing");
-			}
-
-			if (!payload.presentation_submission && !payload.vp_token) {
-				throw new Error("Encrypted Response: presentation_submission and vp_token are missing");
-			}
 			rpState.response_code = base64url.encode(randomUUID());
-			this.saveResponseCodeMapping(rpState.response_code, rpState.session_id);
-			rpState.encrypted_response = ctx.req.body.response;
-			rpState.presentation_submission = payload.presentation_submission;
-			console.log("Encoding....")
-			rpState.vp_token = base64url.encode(JSON.stringify(payload.vp_token));
+			this.saveResponseCodeMapping(rpState.response_code as string, rpState.session_id);
+			rpState.presentation_submission = presentation_submission;
+			rpState.vp_token = base64url.encode(JSON.stringify(vp_token));
 			rpState.date_created = Date.now();
-			rpState.apv_jarm_encrypted_response_header = protectedHeader.apv && typeof protectedHeader.apv == 'string' ? protectedHeader.apv as string : null;
-			rpState.apu_jarm_encrypted_response_header = protectedHeader.apu && typeof protectedHeader.apu == 'string' ? protectedHeader.apu as string : null;
 			rpState.completed = true;
 
-			console.log("Stored rp state = ", rpState)
+			console.log("Session id = ", rpState.session_id)
 			//await this.rpStateRepository.save(rpState);
 			this.saveRPState(rpState.session_id, rpState);
-
-			if (!rpState.is_cross_device) {
-				ctx.res.send({ redirect_uri: rpState.callback_endpoint + '#response_code=' + rpState.response_code })
-				return;
+			await this.updateAuditEntry(rpState.session_id, { completed: true, errorCode: null });
+			ctx.res.send({ redirect_uri: rpState.callback_endpoint + '#response_code=' + rpState.response_code })
+			return;
+		} catch (err) {
+			const message = err instanceof Error ? err.message : "Unknown error";
+			if (auditSessionId) {
+				await this.updateAuditEntry(auditSessionId, { errorCode: message });
 			}
-			// in cross-device scenario just return an empty response
-			ctx.res.send();
-			return;
+			throw err;
 		}
-
-		if (!state) {
-			console.log("Missing state param");
-			ctx.res.status(401).send({ error: "Missing state param" });
-			return;
-		}
-
-		if (!vp_token) {
-			console.log("Missing state param")
-			ctx.res.status(401).send({ error: "Missing state param" });
-			return;
-		}
-
-		// get rpState using the state value
-		const rpStateRaw = this.rpStateKV.get(`rpstate:${state}`)
-		if (!rpStateRaw) {
-			throw new Error("Couldn't get rp state with state");
-		}
-		const rpState = JSON.parse(rpStateRaw) as RPState;
-		if (rpState.completed) {
-			throw new Error("Presentation flow already completed");
-		}
-		rpState.response_code = base64url.encode(randomUUID());
-		this.saveResponseCodeMapping(rpState.response_code, rpState.session_id);
-		rpState.presentation_submission = presentation_submission;
-		rpState.vp_token = base64url.encode(JSON.stringify(vp_token));
-		rpState.date_created = Date.now();
-		rpState.completed = true;
-
-		console.log("Session id = ", rpState.session_id)
-		//await this.rpStateRepository.save(rpState);
-		this.saveRPState(rpState.session_id, rpState);
-		ctx.res.send({ redirect_uri: rpState.callback_endpoint + '#response_code=' + rpState.response_code })
-		return;
 	}
 
 	private async validateDcqlVpToken(
@@ -540,6 +595,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		}
 		if (error) {
 			console.error(error)
+			await this.updateAuditEntry(sessionId, { errorCode: error.message });
 			return { status: false, error };
 		}
 		if (cleanupSession) {

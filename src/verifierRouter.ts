@@ -246,6 +246,7 @@ verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 		if (rpState) {
 			rpState.is_cross_device = false;
 			openidForPresentationReceivingService.saveRPState(rpState.session_id, rpState);
+			await openidForPresentationReceivingService.setAuditCrossDevice(rpState.session_id, false);
 		}
 		return res.redirect(req.body.action);
 	}
@@ -350,6 +351,7 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 		if (rpState) {
 			rpState.is_cross_device = false;
 			openidForPresentationReceivingService.saveRPState(rpState.session_id, rpState);
+			await openidForPresentationReceivingService.setAuditCrossDevice(rpState.session_id, false);
 		}
 		return res.redirect(req.body.action);
 	}
