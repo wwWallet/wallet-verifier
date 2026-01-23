@@ -5,38 +5,36 @@ block head-styles
 
 block layout-content
 	section
-		.container.certs-page
-			header.certs-page__header
-				h1 Certificates
-				p.certs-page__subtitle View trusted root certificates and add new ones.
+		.container.container__flexed
+			header.page__header
+				h2 #{locale.manageCertificates.title}
+				p.subtitle #{locale.manageCertificates.subtitle}
 
 			if error
 				p.certs-page__error= error.errorMessage
 
 			// Add certificate
-			.presentation-card
-				h2.certs-page__sectionTitle Add Certificate
-				form.certs-form(method="POST" action="/verifier/public/manage-certificates")
-					.field
-						label.config-pres__label(for="certificate") X.509 Certificate (PEM or Base64)
-						textarea#certificate(name="certificate" rows="10" placeholder="-----BEGIN CERTIFICATE----- ...")
-						p.config-pres__hint Paste the full PEM block or Base64 content.
+			.card__container
+				form.form-layout(method="POST" action="/verifier/public/manage-certificates")
+					.form-field
+						label.form-label(for="certificate") #{locale.manageCertificates.addCertificateLabel}
+						p.form-hint #{locale.manageCertificates.certificateHint}
+						textarea.form-control#certificate(name="certificate" rows="10" placeholder="-----BEGIN CERTIFICATE----- ...")
 
-					button.Btn.Btn--block(type="submit") Add X.509 Certificate
-
+					button.Btn.Btn--block(type="submit") #{locale.manageCertificates.addButton}
 			// Trusted roots list
-			.presentation-card
-				h2.certs-page__sectionTitle Trusted Root Certificates
-
+			.card__container.form-layout
 				if !trustedRootCertificates || trustedRootCertificates.length === 0
-					p.config-pres__hint No trusted root certificates found.
+					h4 #{locale.manageCertificates.trustedRootsTitle}
+					p.form-hint #{locale.manageCertificates.noCertificates}
 				else
 					.cert-container
+						h4 #{locale.manageCertificates.trustedRootsTitle}
 						details(open)
-							summary X.509 Certificate PEM
+							summary #{locale.manageCertificates.pemSummary}
 							pre !{trustedRootCertificates.join('\n\n')}
 
 						details
-							summary X.509 Certificate Base64
+							summary #{locale.manageCertificates.base64Summary}
 							- const base64Certs = trustedRootCertificates.map((cert) => cert.replace('-----BEGIN CERTIFICATE-----', '').replace('-----END CERTIFICATE-----', '').replace(/\n/g, '')).join('\n\n')
 							pre !{base64Certs}

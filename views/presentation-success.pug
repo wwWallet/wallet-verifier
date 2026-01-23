@@ -16,15 +16,14 @@ block layout-content
 		#loading-text.presentation-status
 			.container.presentation-status__container
 				.presentation-status__header
-					h1 Loading
-					p.presentation-status__subtitle Please wait while we process the result.
+					h2 #{locale.presentationSuccess.loading.title}
+					p.presentation-status__subtitle #{locale.presentationSuccess.loading.subtitle}
 
 		// Success (initially hidden)
 		#success-container(style="display: none;")
-			.container.presentation-success
-				header.presentation-success__header
-					h1 Success
-					p.presentation-success__subtitle Verification completed.
+			.container.container__flexed
+				header.page__header
+					h2 #{locale.presentationSuccess.title}
 
 				// Credentials images
 				.inline-box-container
@@ -35,12 +34,11 @@ block layout-content
 
 				// Verified timestamp
 				p.presentation-success__meta
-					i Verified on #{new Date(verificationTimestamp)}
+					i  #{locale.presentationSuccess.verifiedOn} #{new Date(verificationTimestamp)}
 
 				// Claims extracted
-				.presentation-card
-					h2.presentation-success__sectionTitle Requested claims extracted from credentials
-
+				.card__container
+					h2.presentation-success__sectionTitle #{locale.presentationSuccess.claims.title}
 					.claims-tables
 						each descriptorId in Object.keys(presentationClaims)
 							.claims-block
@@ -50,8 +48,8 @@ block layout-content
 									table.claims-table
 										thead
 											tr
-												th Name
-												th Value
+												th #{locale.presentationSuccess.claims.name}
+												th #{locale.presentationSuccess.claims.value}
 										tbody
 											each claim in presentationClaims[descriptorId]
 												tr
@@ -60,20 +58,20 @@ block layout-content
 
 								if presentationInfo[descriptorId]
 									.additional-info
-										h4 Additional info
+										h4 #{locale.presentationSuccess.claims.additionalInfoTitle}
 										each message in presentationInfo[descriptorId]
 											p= message
 
 				// JSON viewer
-				.presentation-card
+				.card__container
 					.presentation-json__header
-						h2.presentation-success__sectionTitle Credentials (raw JSON)
+						h2.presentation-success__sectionTitle #{locale.presentationSuccess.json.title}
 						button#copy-button.Btn.Btn--xs.presentation-json__copy(type="button")
 							span.copy-state.copy-default
-								span Copy
+								span #{locale.presentationSuccess.json.copy}
 								span.presentation-json__copyIcon(aria-hidden="true") ⧉
 							span.copy-state.copy-success
-								span Copied
+								span #{locale.presentationSuccess.json.copied}
 								span(aria-hidden="true") ✓
 					div#jsoneditor.jsoneditor-host.wide
 

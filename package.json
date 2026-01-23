@@ -1,7 +1,6 @@
 {
-  "name": "wallet-enterprise-issuer",
+  "name": "wallet-verifier",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,9 +15,6 @@
     "migration:run": "typeorm-ts-node-commonjs -d src/AppDataSource.ts migration:run",
     "migration:revert": "typeorm-ts-node-commonjs -d src/AppDataSource.ts migration:revert"
   },
-  "keywords": [],
-  "author": "",
-  "description": "",
   "dependencies": {
     "@auth0/mdl": "^2.2.0",
     "@digitalbazaar/did-io": "^2.0.0",

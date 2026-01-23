@@ -5,7 +5,7 @@ footer#Footer.footer
 				h3#footer-services.footer__title #{locale.footer.services}
 				ul.footer__list
 					li
-						span.fa.fa-code(aria-hidden="true")
+						img.icon(src="/icons/code.svg" alt="" aria-hidden="true")
 						a(
 							href="https://wwwallet.github.io/wallet-docs/"
 							target="_blank"
@@ -16,7 +16,7 @@ footer#Footer.footer
 				h3#footer-contact.footer__title #{locale.footer.contact}
 				ul.footer__list
 					li
-						span.fa.fa-github(aria-hidden="true")
+						img.icon(src="/icons/github.svg" alt="" aria-hidden="true")
 						a(
 							href="https://github.com/wwWallet"
 							target="_blank"
@@ -24,7 +24,7 @@ footer#Footer.footer
 							aria-label="wwWallet on GitHub"
 						) www.github.com/wwWallet
 					li
-						span.fa.fa-envelope(aria-hidden="true")
+						img.icon(src="/icons/email.svg" alt="" aria-hidden="true")
 						a(
 							href="mailto:info@wwWallet.org"
 							aria-label="Email wwWallet"
@@ -33,5 +33,4 @@ footer#Footer.footer
 		.footer__bottom
 			.footer__meta
 				small.footer__copyright
-					span.fa.fa-copyright(aria-hidden="true")
-					|  #{new Date().getFullYear()} · wwWallet Verifier
+					span © #{new Date().getFullYear()} · wwWallet Verifier

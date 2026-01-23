@@ -1,6 +1,6 @@
 {
-  "short_name": "wwwWallet Issuer",
-  "name": "wwwWallet Issuer",
+  "short_name": "wwwWallet Verifier",
+  "name": "wwwWallet Verifier",
   "icons": [
     {
       "src": "/images/favicon.ico",

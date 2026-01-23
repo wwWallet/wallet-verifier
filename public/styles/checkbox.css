@@ -90,30 +90,3 @@
 	outline: 3px solid color-mix(in srgb, var(--primary-main-color) 40%, transparent);
 	outline-offset: 2px;
 }
-
-/* Submit */
-.request-qr {
-	width: 100%;
-}
-
-.request-qr:disabled {
-	opacity: 0.55;
-	cursor: not-allowed;
-	pointer-events: none;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-	section {
-		padding: 2rem 0;
-	}
-
-	.config-pres__header,
-	.presentation-card {
-		padding: 1rem;
-	}
-
-	#attributes-container {
-		max-height: 320px;
-	}
-}
