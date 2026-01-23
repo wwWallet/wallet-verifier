@@ -46,10 +46,11 @@
 	min-width: 0;
 }
 
-.footer__list .fa {
-	/* FontAwesome icons */
-	flex: 0 0 auto;
-	opacity: 0.95;
+.footer__list .icon {
+	width: 1.2rem;
+	height: 1.2rem;
+	vertical-align: middle;
+	filter: brightness(0) invert(1);
 }
 
 .footer__list a {
