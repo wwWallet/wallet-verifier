@@ -133,7 +133,7 @@ verifierRouter.get('/callback/status', async (req, res) => { // response with th
 	if (!req.cookies['session_id']) {
 		return res.send({ status: false, error: "Missing session_id from cookies" });
 	}
-	const result = await openidForPresentationReceivingService.getPresentationBySessionId(req.cookies['session_id'], false);
+	const result = await openidForPresentationReceivingService.openid4vp.getPresentationBySessionId(req.cookies['session_id'], false);
 	if (!result.status) {
 		return res.send({ status: false, error: "Presentation not received" });
 	}
@@ -149,7 +149,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	// this request includes the response code
 	let session_id = req.cookies['session_id'];
 	if (req.body.response_code) { // response_code is considered more stable than session_id
-		const s = await openidForPresentationReceivingService.getRPStateByResponseCode(req.body.response_code);
+		const s = await openidForPresentationReceivingService.openid4vp.getRPStateByResponseCode(req.body.response_code);
 		if (s) {
 			session_id = s.session_id;
 		}
@@ -160,7 +160,7 @@ verifierRouter.post('/callback', async (req, res) => {
 		return res.status(400).send({ error: "Problem with the verification flow" })
 	}
 
-	const result = await openidForPresentationReceivingService.getPresentationBySessionId(session_id, true);
+	const result = await openidForPresentationReceivingService.openid4vp.getPresentationBySessionId(session_id, true);
 
 	if (result.status == false ||
 		result.rpState.vp_token == null ||
@@ -242,10 +242,10 @@ verifierRouter.get('/public/definitions/edit-dcql-query', async (_req, res) => {
 verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 	if (req.method === "POST" && req.body.action && req.cookies.session_id) {
 		// update is_cross_device --> false since the button was pressed
-		const rpState = await openidForPresentationReceivingService.getRPStateBySessionId(req.cookies.session_id);
+		const rpState = await openidForPresentationReceivingService.openid4vp.getRPStateBySessionId(req.cookies.session_id);
 		if (rpState) {
 			rpState.is_cross_device = false;
-			openidForPresentationReceivingService.saveRPState(rpState.session_id, rpState);
+			openidForPresentationReceivingService.openid4vp.saveRPState(rpState.session_id, rpState);
 		}
 		return res.redirect(req.body.action);
 	}
@@ -301,7 +301,7 @@ verifierRouter.post('/public/definitions/edit-dcql-query', async (req, res) => {
 verifierRouter.get('/public/definitions/presentation-request/status/:presentation_request_id', async (req, res) => {
 	console.log("session_id : ", req.cookies['session_id'])
 	if (req.cookies['session_id'] && req.method == "GET") {
-		const { status } = await openidForPresentationReceivingService.getPresentationBySessionId(req.cookies['session_id'], false);
+		const { status } = await openidForPresentationReceivingService.openid4vp.getPresentationBySessionId(req.cookies['session_id'], false);
 		if (status == true) {
 			return res.send({ url: `/verifier/callback` });
 		}
@@ -346,10 +346,10 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 	if (req.method === "POST" && req.body.action && req.cookies.session_id) { // handle click of "open with..." button
 		console.log("Cookie = ", req.cookies)
 		// update is_cross_device --> false since the button was pressed
-		const rpState = await openidForPresentationReceivingService.getRPStateBySessionId(req.cookies.session_id);
+		const rpState = await openidForPresentationReceivingService.openid4vp.getRPStateBySessionId(req.cookies.session_id);
 		if (rpState) {
 			rpState.is_cross_device = false;
-			openidForPresentationReceivingService.saveRPState(rpState.session_id, rpState);
+			openidForPresentationReceivingService.openid4vp.saveRPState(rpState.session_id, rpState);
 		}
 		return res.redirect(req.body.action);
 	}
