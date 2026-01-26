@@ -15,4 +15,4 @@ repos:
         entry: mstruebing/editorconfig-checker:latest
         args: ["ec", "-no-color"]
         types_or: [text]
-        exclude: ^(node_modules|dist|build|src/migrations)/
+        exclude: ^(node_modules|dist|build)/
