@@ -59,6 +59,7 @@
 	color: var(--primary-main-color);
 	margin-right: 20px;
 	text-decoration: none;
+	font-size: 18px;
 }
 
 #Header li.menu-item a.is-active {
@@ -90,10 +91,6 @@
 
 	#Header ul.menu {
 		display: none;
-	}
-
-	#Header .menu li.menu-item a.is-active {
-		background-color: color-mix(in srgb, var(--primary-main-color) 12%, transparent);
 	}
 
 	#Header #menu-toggle-button {

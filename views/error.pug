@@ -5,10 +5,10 @@ block head-styles
 
 block layout-content
 	section
-		.container.error-page
-			header.error-page__header
-				h1 Error
-				p.error-page__message #{msg}
+		.container
+			header.page__header
+				h2 #{locale.error.title}
+				p #{msg}
 
 			.error-page__actions
-				a.Btn(href=redirect ? redirect : "/") #{locale.ReturnToMainPage}
+				a.Btn(href=redirect ? redirect : "/") #{locale.error.return}
