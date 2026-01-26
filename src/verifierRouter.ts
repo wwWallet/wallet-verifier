@@ -5,8 +5,6 @@ import { OpenidForPresentationsReceivingService } from "./services/OpenidForPres
 import { VerifierConfigurationService } from "./services/VerifierConfigurationService";
 import { generateRandomIdentifier } from "./util/generateRandomIdentifier";
 import { addSessionIdCookieToResponse } from "../config/sessionIdCookieConfig";
-import AppDataSource from "./AppDataSource";
-import { RelyingPartyState } from "./entities/RelyingPartyState.entity";
 import { initializeCredentialEngine } from "./util/initializeCredentialEngine";
 
 import Ajv from 'ajv';
@@ -135,7 +133,7 @@ verifierRouter.get('/callback/status', async (req, res) => { // response with th
 	if (!req.cookies['session_id']) {
 		return res.send({ status: false, error: "Missing session_id from cookies" });
 	}
-	const result = await openidForPresentationReceivingService.getPresentationBySessionIdOrPresentationDuringIssuanceSession(req.cookies['session_id'], undefined, false);
+	const result = await openidForPresentationReceivingService.getPresentationBySessionId(req.cookies['session_id'], false);
 	if (!result.status) {
 		return res.send({ status: false, error: "Presentation not received" });
 	}
@@ -151,9 +149,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	// this request includes the response code
 	let session_id = req.cookies['session_id'];
 	if (req.body.response_code) { // response_code is considered more stable than session_id
-		const s = await AppDataSource.getRepository(RelyingPartyState).createQueryBuilder()
-			.where("response_code = :response_code", { response_code: req.body.response_code })
-			.getOne();
+		const s = await openidForPresentationReceivingService.getRPStateByResponseCode(req.body.response_code);
 		if (s) {
 			session_id = s.session_id;
 		}
@@ -164,7 +160,7 @@ verifierRouter.post('/callback', async (req, res) => {
 		return res.status(400).send({ error: "Problem with the verification flow" })
 	}
 
-	const result = await openidForPresentationReceivingService.getPresentationBySessionIdOrPresentationDuringIssuanceSession(session_id, undefined, true);
+	const result = await openidForPresentationReceivingService.getPresentationBySessionId(session_id, true);
 
 	if (result.status == false ||
 		result.rpState.vp_token == null ||
@@ -201,7 +197,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	console.log("Presentation messages: ", result.presentationInfo);
 	return res.render('presentation-success.pug', {
 		status: status,
-		verificationTimestamp: date_created.toISOString(),
+		verificationTimestamp: new Date(date_created).toISOString(),
 		presentationClaims: claims,
 		credentialPayloads: credentialPayloads,
 		presentationInfo: result.presentationInfo,
@@ -246,10 +242,12 @@ verifierRouter.get('/public/definitions/request-custom-credential', async (_req,
 verifierRouter.post('/public/definitions/request-custom-credential', async (req, res) => {
 	if (req.method === "POST" && req.body.action && req.cookies.session_id) {
 		// update is_cross_device --> false since the button was pressed
-		await AppDataSource.getRepository(RelyingPartyState).createQueryBuilder("rp_state")
-			.update({ is_cross_device: false })
-			.where("session_id = :session_id", { session_id: req.cookies.session_id })
-			.execute();
+		const rpState = await openidForPresentationReceivingService.getRPStateBySessionId(req.cookies.session_id);
+		if (rpState) {
+			rpState.is_cross_device = false;
+			openidForPresentationReceivingService.saveRPState(rpState.session_id, rpState);
+			await openidForPresentationReceivingService.setAuditCrossDevice(rpState.session_id, false);
+		}
 		return res.redirect(req.body.action);
 	}
 	let query;
@@ -304,7 +302,7 @@ verifierRouter.post('/public/definitions/request-custom-credential', async (req,
 verifierRouter.get('/public/definitions/presentation-request/status/:presentation_request_id', async (req, res) => {
 	console.log("session_id : ", req.cookies['session_id'])
 	if (req.cookies['session_id'] && req.method == "GET") {
-		const { status } = await openidForPresentationReceivingService.getPresentationBySessionIdOrPresentationDuringIssuanceSession(req.cookies['session_id'], undefined, false);
+		const { status } = await openidForPresentationReceivingService.getPresentationBySessionId(req.cookies['session_id'], false);
 		if (status == true) {
 			return res.send({ url: `/verifier/callback` });
 		}
@@ -349,10 +347,12 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 	if (req.method === "POST" && req.body.action && req.cookies.session_id) { // handle click of "open with..." button
 		console.log("Cookie = ", req.cookies)
 		// update is_cross_device --> false since the button was pressed
-		await AppDataSource.getRepository(RelyingPartyState).createQueryBuilder("rp_state")
-			.update({ is_cross_device: false })
-			.where("session_id = :session_id", { session_id: req.cookies.session_id })
-			.execute();
+		const rpState = await openidForPresentationReceivingService.getRPStateBySessionId(req.cookies.session_id);
+		if (rpState) {
+			rpState.is_cross_device = false;
+			openidForPresentationReceivingService.saveRPState(rpState.session_id, rpState);
+			await openidForPresentationReceivingService.setAuditCrossDevice(rpState.session_id, false);
+		}
 		return res.redirect(req.body.action);
 	}
 	const newSessionId = generateRandomIdentifier(12);

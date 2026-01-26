@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import cors from 'cors';
+import morgan from 'morgan';
 import { LanguageMiddleware } from './middlewares/language.middleware';
 import { initDataSource } from './AppDataSource';
 import createHttpError, { HttpError } from 'http-errors';
@@ -66,7 +67,7 @@ async function main() {
 		next();
 	});
 
-	app.use('/verifier', verifierRouter);
+	app.use('/verifier', morgan('combined'), verifierRouter);
 
 
 	app.get('/', async (_req: Request, res: Response) => {
