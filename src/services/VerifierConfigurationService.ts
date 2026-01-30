@@ -181,6 +181,18 @@ const pidMdocClaims: DcqlClaim[] = [
 ];
 
 const bachelorSdJwtClaims: DcqlClaim[] = [
+	{ path: ["title"] },
+	{ path: ["expiry_date"] },
+	{ path: ["eqf_level"] },
+	{ path: ["birth_date"] },
+	{ path: ["blueprint_id"] },
+	{ path: ["graduation_date"] },
+	{ path: ["family_name"] },
+	{ path: ["grade"] },
+	{ path: ["given_name"] },
+];
+
+const minimalBachelorSdJwtClaims: DcqlClaim[] = [
 	{ path: ["grade"] },
 	{ path: ["eqf_level"] },
 	{ path: ["title"] },
@@ -244,6 +256,15 @@ const bachelorCredentialQuery: DcqlCredentialQuery = {
 		vct_values: ["urn:credential:diploma"],
 	},
 	claims: bachelorSdJwtClaims,
+};
+
+const minimalBachelorCredentialQuery: DcqlCredentialQuery = {
+	id: "minimalBachelor",
+	format: "dc+sd-jwt",
+	meta: {
+		vct_values: ["urn:credential:diploma"],
+	},
+	claims: minimalBachelorSdJwtClaims,
 };
 
 const europeanHealthInsuranceCardCredentialQuery: DcqlCredentialQuery = {
@@ -318,12 +339,12 @@ const minimalPidAndPorDcqlQuery: DcqlQuery = {
 const minimalPidAndBachelorDcqlQuery: DcqlQuery = {
 	credentials: [
 		minimalPidSdJwtCredentialQuery,
-		bachelorCredentialQuery,
+		minimalBachelorCredentialQuery,
 	],
 	credential_sets: [
 		{
 			options: [
-				[minimalPidSdJwtCredentialQuery.id, bachelorCredentialQuery.id],
+				[minimalPidSdJwtCredentialQuery.id, minimalBachelorCredentialQuery.id],
 			],
 			required: true,
 		},
