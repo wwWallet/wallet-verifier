@@ -7,7 +7,7 @@ import path from "path";
 import * as z from 'zod';
 import { pemToBase64 } from "../util/pemToBase64";
 import { RPState, ResponseMode } from "wallet-common/dist/protocols/openid4vp/types";
-import { HandleResponseErrors, OpenID4VPClientAPI } from "wallet-common/dist/protocols/openid4vp/OpenID4VPClientAPI";
+import { OpenID4VPClientErrors, OpenID4VPClientAPI } from "wallet-common/dist/protocols/openid4vp/OpenID4VPClientAPI";
 import { MemoryStore } from 'wallet-common';
 import { defaultHttpClient } from 'wallet-common/dist/defaultHttpClient';
 import { webcrypto } from "node:crypto";
@@ -92,18 +92,19 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			return ctx.res.status(500).send({ error: "id does not exist on query params" });
 		}
 
-		const rpState = await this.openid4vp.getRPStateBySessionId(ctx.req.query['id'])
+		const signedRequestResult = await this.openid4vp.getSignedRequestObject(ctx.req.query['id'])
 
-		if (!rpState) {
-			return ctx.res.status(500).send({ error: "rpState state could not be fetched with this id" });
+		if (!signedRequestResult.ok) {
+			const { error, error_description } = signedRequestResult;
+			if (error === OpenID4VPClientErrors.MissingRPState) {
+				return ctx.res.status(500).send({ error, error_description});
+			}
+			if (error === OpenID4VPClientErrors.SignedRequestObjectInvalidated) {
+				return ctx.res.status(500).send({ error, error_description });
+			}
+			return ctx.res.status(500).send({ error: "unknown error"});
 		}
-		if (rpState.signed_request === "") {
-			return ctx.res.status(500).send({ error: "rpState state signed request object has been invalidated" });
-		}
-		const signedRequest = rpState.signed_request;
-		rpState.signed_request = "";
-		// await this.rpStateRepository.save(rpState);
-		this.openid4vp.saveRPState(ctx.req.query['id'], rpState);
+		const signedRequest = signedRequestResult.value;
 		return ctx.res.send(signedRequest.toString());
 	}
 
@@ -148,7 +149,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 					await this.updateAuditEntry(rpStateFromKid.session_id, { errorCode: error });
 				}
 
-				if (error === HandleResponseErrors.JWEDecryptionFailure) {
+				if (error === OpenID4VPClientErrors.JWEDecryptionFailure) {
 					ctx.res.status(500).send({ error, error_description });
 					return;
 				}
