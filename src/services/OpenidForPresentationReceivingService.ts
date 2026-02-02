@@ -7,7 +7,7 @@ import path from "path";
 import * as z from 'zod';
 import { pemToBase64 } from "../util/pemToBase64";
 import { RPState, ResponseMode } from "wallet-common/dist/protocols/openid4vp/types";
-import { HandleResponseErrors, OpenID4VPHelper } from "wallet-common/dist/protocols/openid4vp/OpenID4VPHelper";
+import { HandleResponseErrors, OpenID4VPClientAPI } from "wallet-common/dist/protocols/openid4vp/OpenID4VPClientAPI";
 import { MemoryStore } from 'wallet-common';
 import { defaultHttpClient } from 'wallet-common/dist/defaultHttpClient';
 import { webcrypto } from "node:crypto";
@@ -30,13 +30,13 @@ const response_mode: ResponseMode = config?.presentationFlow?.response_mode ? Re
 
 export class OpenidForPresentationsReceivingService implements OpenidForPresentationsReceivingInterface {
 	private static rpStateKV: MemoryStore<string, RPState | string> = new MemoryStore();
-	public openid4vp: OpenID4VPHelper;
+	public openid4vp: OpenID4VPClientAPI;
 
 	constructor(
 		private configurationService: VerifierConfigurationInterface,
 	) {
 		const trustedCredentialIssuerIdentifiers = config.trustedIssuers as string[] | undefined;
-		this.openid4vp = new OpenID4VPHelper(
+		this.openid4vp = new OpenID4VPClientAPI(
 			OpenidForPresentationsReceivingService.rpStateKV,
 			{
 				redirectUri: this.configurationService.getConfiguration().redirect_uri, credentialEngineOptions: {
