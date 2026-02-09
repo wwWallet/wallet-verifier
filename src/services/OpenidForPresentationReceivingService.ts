@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from "path";
 import * as z from 'zod';
 import { pemToBase64 } from "../util/pemToBase64";
-import { MemoryStore, OpenID4VPClientErrors, OpenID4VPClientAPI, RPState, OpenID4VPClientResponseMode } from 'wallet-common';
+import { MemoryStore, OpenID4VPClientErrors, OpenID4VPClientAPI, RPState, OpenID4VPResponseMode } from 'wallet-common';
 import { defaultHttpClient } from 'wallet-common/dist/defaultHttpClient';
 import { webcrypto } from "node:crypto";
 import AppDataSource from '../AppDataSource';
@@ -21,7 +21,7 @@ const x5c = [
 	pemToBase64(leafCert),
 ];
 
-const ResponseModeSchema = z.nativeEnum(OpenID4VPClientResponseMode);
+const ResponseModeSchema = z.nativeEnum(OpenID4VPResponseMode);
 
 // @ts-ignore
 const response_mode: ResponseMode = config?.presentationFlow?.response_mode ? ResponseModeSchema.parse(config?.presentationFlow?.response_mode) : ResponseMode.DIRECT_POST_JWT;
