@@ -1,3 +1,21 @@
+# wwWallet Verifier
+wwWallet Verifier is a standalone digital credential verifier implementing OpenID4VP.
+
+> [!NOTE]
+> To quickly setup the **wwWallet** ecosystem see https://github.com/wwWallet/wwwallet
+
+## How to run
+
+Install dependencies
+```
+yarn install
+```
+
+Run in dev mode
+```
+yarn run dev
+```
+
 ## Pre-commit
 
 We use [pre-commit](https://pre-commit.com/) to enforce our `.editorconfig` (newline at EOF, no bad indentation, etc.) before code is committed.
