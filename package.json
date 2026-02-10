@@ -54,7 +54,7 @@
     "redis": "^4.3.1",
     "ts-results": "^3.3.0",
     "typeorm": "^0.3.9",
-    "wallet-common": "git+https://github.com/wwWallet/wallet-common.git#311232423b11dea31cf70f43c006b08deea5a212",
+    "wallet-common": "git+https://github.com/wwWallet/wallet-common.git#f99b578bf67e2342fe36372279e5ca8a28e707fb",
     "winston": "^3.8.2",
     "ws": "^8.9.0",
     "xlsx": "^0.18.5",

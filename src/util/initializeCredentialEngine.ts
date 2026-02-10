@@ -1,9 +1,7 @@
 import { MsoMdocParser, MsoMdocVerifier, ParsingEngine, PublicKeyResolverEngine, SDJWTVCParser, SDJWTVCVerifier } from 'wallet-common';
 import { config } from '../../config';
 import { webcrypto } from "node:crypto";
-import { OpenID4VCICredentialRendering } from 'wallet-common/dist/functions/openID4VCICredentialRendering';
-import { CredentialRenderingService } from 'wallet-common/dist/rendering';
-import { defaultHttpClient } from 'wallet-common/dist/defaultHttpClient';
+import { CustomCredentialSvg, defaultHttpClient, CredentialRenderingService } from 'wallet-common';
 import axios from 'axios';
 
 // @ts-ignore
@@ -53,7 +51,7 @@ export async function initializeCredentialEngine() {
 	console.log("Registered MsoMdocParser...");
 
 	const pkResolverEngine = PublicKeyResolverEngine();
-	const openid4vcRendering = OpenID4VCICredentialRendering({ httpClient: defaultHttpClient });
+	const openid4vcRendering = CustomCredentialSvg({ httpClient: defaultHttpClient });
 	const credentialRendering = CredentialRenderingService();
 	return {
 		credentialParsingEngine,
