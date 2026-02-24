@@ -2,6 +2,11 @@
 	padding: 2rem 0;
 }
 
+#loading-text {
+	position: relative;
+	z-index: 10000;
+}
+
 .presentation-status__container {
 	padding: 2rem 0;
 }

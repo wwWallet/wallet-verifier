@@ -9,7 +9,6 @@
 
 	/* subtle dim background */
 	background: rgba(255, 255, 255, 0.4);
-	backdrop-filter: blur(1px);
 }
 
 /* Spinner */
