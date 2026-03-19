@@ -1,4 +1,4 @@
-import { MsoMdocParser, MsoMdocVerifier, ParsingEngine, PublicKeyResolverEngine, SDJWTVCParser, SDJWTVCVerifier } from 'wallet-common';
+import { MsoMdocParser, MsoMdocVerifier, ParsingEngine, PublicKeyResolverEngine, resolveWellKnownUrl, SDJWTVCParser, SDJWTVCVerifier } from 'wallet-common';
 import { config } from '../../config';
 import { webcrypto } from "node:crypto";
 import { CustomCredentialSvg, defaultHttpClient, CredentialRenderingService } from 'wallet-common';
@@ -19,11 +19,16 @@ export async function initializeCredentialEngine() {
 	};
 
 	if (trustedCredentialIssuerIdentifiers) {
-		const result = (await Promise.all(trustedCredentialIssuerIdentifiers.map(async (credentialIssuerIdentifier) =>
-			axios.get(`${credentialIssuerIdentifier}/openid/.well-known/openid-credential-issuer`)
+		const result = (await Promise.all(trustedCredentialIssuerIdentifiers.map(async (credentialIssuerIdentifier) => {
+			const credentialIssuerMetadataUrl = resolveWellKnownUrl(credentialIssuerIdentifier, 'openid-credential-issuer');
+			if (!credentialIssuerMetadataUrl) {
+				console.error(`Could not resolve well-known URL for ${credentialIssuerIdentifier}`);
+				return null;
+			}
+			return axios.get(credentialIssuerMetadataUrl)
 				.then((res) => res.data)
 				.catch((e) => { console.error(e); return null; })
-		))).filter((r: any) => r !== null);
+		}))).filter((r: any) => r !== null);
 
 		const iacasResponses = (await Promise.all(result.map(async (metadata) => {
 			if (metadata && metadata.mdoc_iacas_uri) {
