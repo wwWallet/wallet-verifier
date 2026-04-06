@@ -3325,9 +3325,9 @@ void-elements@^3.1.0:
   resolved "https://registry.npmjs.org/void-elements/-/void-elements-3.1.0.tgz"
   integrity sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==
 
-"wallet-common@git+https://github.com/wwWallet/wallet-common.git#131445c5632254835f7acb9364af487a045f9951":
+"wallet-common@git+https://github.com/wwWallet/wallet-common.git#b0fb76941820d1b3868840661baf7e056773ba62":
   version "0.0.1"
-  resolved "git+https://github.com/wwWallet/wallet-common.git#131445c5632254835f7acb9364af487a045f9951"
+  resolved "git+https://github.com/wwWallet/wallet-common.git#b0fb76941820d1b3868840661baf7e056773ba62"
   dependencies:
     "@auth0/mdl" "^2.2.0"
     "@sd-jwt/core" "^0.10.0"
