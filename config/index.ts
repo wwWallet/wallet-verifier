@@ -24,7 +24,7 @@ export const config = {
 	trustedRootCertificates: [rootCa],
 	trustedIssuers: process.env.TRUSTED_ISSUERS
 		? process.env.TRUSTED_ISSUERS.split(',')
-		: ["http://localhost:8003"],
+		: ["http://localhost:8003/openid"],
 	sessionIdCookieConfiguration: {
 		maxAge: parseInt(process.env.SESSION_ID_COOKIE_MAX_AGE || "900000", 10),
 		secure: process.env.SESSION_ID_COOKIE_SECURE === 'true' ? true : false,

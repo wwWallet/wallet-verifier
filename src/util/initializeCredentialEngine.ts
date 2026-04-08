@@ -1,7 +1,17 @@
-import { MsoMdocParser, MsoMdocVerifier, ParsingEngine, PublicKeyResolverEngine, SDJWTVCParser, SDJWTVCVerifier } from 'wallet-common';
+import {
+	MsoMdocParser,
+	MsoMdocVerifier,
+	ParsingEngine,
+	PublicKeyResolverEngine,
+	SDJWTVCParser,
+	SDJWTVCVerifier,
+	CustomCredentialSvg,
+	defaultHttpClient,
+	CredentialRenderingService,
+	getIssuerMetadataUrl
+} from 'wallet-common';
 import { config } from '../../config';
-import { webcrypto } from "node:crypto";
-import { CustomCredentialSvg, defaultHttpClient, CredentialRenderingService } from 'wallet-common';
+import { webcrypto } from 'node:crypto';
 import axios from 'axios';
 
 // @ts-ignore
@@ -20,7 +30,7 @@ export async function initializeCredentialEngine() {
 
 	if (trustedCredentialIssuerIdentifiers) {
 		const result = (await Promise.all(trustedCredentialIssuerIdentifiers.map(async (credentialIssuerIdentifier) =>
-			axios.get(`${credentialIssuerIdentifier}/openid/.well-known/openid-credential-issuer`)
+			axios.get(await getIssuerMetadataUrl(credentialIssuerIdentifier))
 				.then((res) => res.data)
 				.catch((e) => { console.error(e); return null; })
 		))).filter((r: any) => r !== null);
