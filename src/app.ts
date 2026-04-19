@@ -12,6 +12,7 @@ import { ExpressAppService } from './services/ExpressAppService';
 import session from 'express-session';
 import { OpenidForPresentationsReceivingService } from './services/OpenidForPresentationReceivingService';
 import { VerifierConfigurationService } from './services/VerifierConfigurationService';
+import { v4 as uuidv4 } from 'uuid';
 
 import locale from '../config/locale';
 import titles from '../config/titles';
@@ -110,6 +111,21 @@ async function main() {
 		res.setHeader('Content-Type', 'application/manifest+json');
 		return res.send(manifest);
 	});
+
+	if (process.env.NODE_ENV !== 'production') {
+		app.get('/.well-known/appspecific/com.chrome.devtools.json', (_req, res) => {
+			const projectRoot = path.resolve(__dirname);
+			const workspaceUuid = uuidv4();
+
+			res.json({
+				workspace: {
+					root: projectRoot,
+					uuid: workspaceUuid,
+				},
+			});
+		});
+	}
+
 
 	// catch 404 and forward to error handler
 	app.use((req, _res, next) => {
