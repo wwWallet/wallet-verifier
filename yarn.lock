@@ -93,11 +93,6 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
-"@gsiou/paketo@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.npmjs.org/@gsiou/paketo/-/paketo-0.0.1.tgz"
-  integrity sha512-UouhkiqAzyALZQH9Z69UYYDNU45zTTEAF1HiFhKYkLoQTCgyvxPj5c/R0Gxqt9TDsmp/OF1sxbNYXWaXMtKUQg==
-
 "@jridgewell/resolve-uri@^3.0.3":
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/@jridgewell/resolve-uri/-/resolve-uri-3.1.2.tgz#7a0ee601f60f99a20c7c7c5ff0c80388c1189bd6"
