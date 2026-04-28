@@ -25,6 +25,9 @@ const locale = {
 				label: "Edit Schema",
 				hint: "Keep the default unless you need a custom scheme",
 				default: "openid4vp://cb",
+			},
+			clientIdPrefix: {
+				label: "Client Id Prefix"
 			}
 		},
 		customRequestCredential: {
@@ -89,10 +92,9 @@ const locale = {
 			heading: config.siteConfig.name,
 			oid4vpProfile: "OpenID4VP Interoperability Profile",
 			openid4vp: [
-				["OIDVP Specification", "Draft 24"],
 				["Response Mode", "direct_post.jwt [OpenID4VP]"],
 				["Request Method", "request_uri signed [JAR]"],
-				["Client ID Scheme", "x509_san_dns"],
+				["Client ID Prefix", "x509_san_dns, x509_hash"],
 				["Credential Format", "dc+sd-jwt, mso_mdoc"],
 			],
 			paragraph: "This website is a proof-of-concept service designed to perform verifications of Verifiable Credentials (VCs) in SD-JWT or mDoc formats, supporting the wwWallet ecosystem. It conducts only sample verifications to showcase credential checks (not valid for real-world use).",
