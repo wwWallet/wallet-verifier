@@ -106,7 +106,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		return ctx.res.send(signedRequest.toString());
 	}
 
-	async generateAuthorizationRequestURL(presentationRequest: any, sessionId: string, callbackEndpoint?: string): Promise<{ url: URL; stateId: string }> {
+	async generateAuthorizationRequestURL(presentationRequest: any, sessionId: string, callbackEndpoint?: string, clientIdPrefix?: string): Promise<{ url: URL; stateId: string }> {
 		const generated = await this.openid4vp.generateAuthorizationRequestURL(
 			presentationRequest,
 			sessionId,
@@ -115,7 +115,8 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			privateKeyPem,
 			x5c,
 			response_mode,
-			callbackEndpoint
+			callbackEndpoint,
+			clientIdPrefix === "x509_hash" || clientIdPrefix === "x509_san_dns" ? clientIdPrefix : "x509_san_dns"
 		);
 		await this.createAuditEntry({
 			sessionId,
