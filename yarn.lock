@@ -2589,9 +2589,9 @@ void-elements@^3.1.0:
   resolved "https://registry.npmjs.org/void-elements/-/void-elements-3.1.0.tgz"
   integrity sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==
 
-"wallet-common@git+https://github.com/wwWallet/wallet-common.git#7248778a756913a6f738694f48f4b10563726c8d":
+"wallet-common@git+https://github.com/wwWallet/wallet-common.git#daf25260c860f6a8be66e246e848fddcf53479b3":
   version "0.0.1"
-  resolved "git+https://github.com/wwWallet/wallet-common.git#7248778a756913a6f738694f48f4b10563726c8d"
+  resolved "git+https://github.com/wwWallet/wallet-common.git#daf25260c860f6a8be66e246e848fddcf53479b3"
   dependencies:
     "@noble/curves" "^2.2.0"
     "@owf/mdoc" "^0.6.0"
