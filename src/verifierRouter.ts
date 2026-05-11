@@ -357,7 +357,8 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 	}
 	const newSessionId = generateRandomIdentifier(12);
 	addSessionIdCookieToResponse(res, newSessionId); // start session here
-	const { url } = await openidForPresentationReceivingService.generateAuthorizationRequestURL(presentationRequest, newSessionId, config.url + "/verifier/callback");
+	const clientIdPrefix = req.body.clientIdPrefix;
+	const { url } = await openidForPresentationReceivingService.generateAuthorizationRequestURL(presentationRequest, newSessionId, config.url + "/verifier/callback", clientIdPrefix);
 	const modifiedUrl = url.toString().replace("openid4vp://cb", scheme)
 	let authorizationRequestQR = await new Promise((resolve) => {
 		qrcode.toDataURL(modifiedUrl.toString(), {
