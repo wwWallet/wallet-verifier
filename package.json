@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "ajv": "^8.11.0",
-    "axios": "^0.27.2",
     "base64url": "^3.0.1",
     "body-parser": "^1.20.0",
     "cookie-parser": "^1.4.6",
@@ -31,12 +30,11 @@
     "pug": "^3.0.2",
     "qrcode": "^1.5.1",
     "typeorm": "^0.3.9",
-    "wallet-common": "git+https://github.com/wwWallet/wallet-common.git#daf25260c860f6a8be66e246e848fddcf53479b3",
+    "wallet-common": "git+https://github.com/wwWallet/wallet-common.git#8cf222eb170009110c926b24a8b8cd0543a6b345",
     "zod": "^3.20.6"
   },
   "devDependencies": {
     "@total-typescript/ts-reset": "^0.4.2",
-    "@types/axios": "^0.14.0",
     "@types/body-parser": "^1.19.2",
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.12",
