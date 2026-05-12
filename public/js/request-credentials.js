@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function renderFields(type) {
-		attributesContainer.innerHTML = "";
+		attributesContainer.replaceChildren();
 		const credential = getCredentialByType(type);
 		if (!credential) return;
 
