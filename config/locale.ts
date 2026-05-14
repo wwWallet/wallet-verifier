@@ -12,12 +12,12 @@ const locale = {
 			title: "Configure your Presentation Request",
 			subtitle: "Choose format and fields, then request a QR",
 			format: {
-				label: "Select Format",
+				label: "Credential Format",
 				sdjwt: "SD-JWT",
 				mdoc: "mDoc",
 			},
 			attributes: {
-				label: "Select Attributes",
+				label: "Attributes to Request",
 				all: "Select all",
 				none: "Select none",
 			},
@@ -27,7 +27,7 @@ const locale = {
 				default: "openid4vp://cb",
 			},
 			clientIdPrefix: {
-				label: "Client Id Prefix"
+				label: "Client ID Prefix"
 			}
 		},
 		customRequestCredential: {
@@ -59,13 +59,23 @@ const locale = {
 			title: "Presentation Successful",
 			verifiedOn: "Verified on",
 			claims: {
-				title: "Requested claims extracted from credentials",
+				title: "Verified Claims",
 				name: "Name",
 				value: "Value",
 				additionalInfoTitle: "Additional Info",
+				descriptorFriendlyNames: {
+					CustomPid: "PID",
+					pidSdJwt: "PID (SD-JWT)",
+					minimalSdJwtPID: "PID (SD-JWT)",
+					pidMsoMdoc: "PID (mDoc)",
+					Bachelor: "Bachelor Diploma",
+					minimalBachelor: "Bachelor Diploma",
+					EuropeanHealthInsuranceCard: "European Health Insurance Card (EHIC)",
+					POR: "Proof of Representation (POR)",
+				},
 			},
 			json: {
-				title: "Credentials (raw JSON)",
+				title: "JSON Dataset",
 				copy: "Copy",
 				copied: "Copied",
 			},
