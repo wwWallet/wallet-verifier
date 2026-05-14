@@ -6,12 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	const form = document.querySelector("form");
 	const dcqlQueryInput = document.getElementById("dcql-query-input");
+	const typeToFormat = new Map(Array.from(typeRadios).map((radio) => [radio.value, radio.dataset.format]));
 
 	function getCredentialByType(type) {
-		return dcqlQuery.credentials.find(cred =>
-			(type === "sd-jwt" && cred.format === "dc+sd-jwt") ||
-			(type === "mdoc" && cred.format === "mso_mdoc")
-		);
+		const format = typeToFormat.get(type);
+		if (!format) return null;
+		return dcqlQuery.credentials.find((cred) => cred.format === format);
 	}
 
 	function getSelectedType() {
