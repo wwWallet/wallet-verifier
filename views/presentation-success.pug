@@ -25,12 +25,10 @@ block layout-content
 				header.page__header
 					h2 #{locale.presentationSuccess.title}
 
-				// Credentials images
-				.inline-box-container
-					each credential, index in credentialPayloads
-						- const branding = credential.credentialBranding || { backgroundColor: 'var(--primary-main-color)', textColor: '#fff' }
-						.credential-box(id=`credential-box-${index}`)
-							img.credential-image(src=credentialImages[index] alt=`Credential ${index + 1}`)
+					// Credentials images
+					.inline-box-container
+						span.credential-checkmark(aria-hidden="true")
+							include ./partials/icons/checkmark-badge.pug
 
 				// Verified timestamp
 				p.presentation-success__meta
@@ -41,8 +39,15 @@ block layout-content
 					h2.presentation-success__sectionTitle #{locale.presentationSuccess.claims.title}
 					.claims-tables
 						each descriptorId in Object.keys(presentationClaims)
+							- const descriptorFriendlyName = descriptorFriendlyNames && descriptorFriendlyNames[descriptorId]
 							.claims-block
-								h3.claims-title= descriptorId
+								h3.claims-title
+									span.claims-title__icon(aria-hidden="true")
+										include ./partials/icons/generic-card.pug
+									if descriptorFriendlyName
+										span #{descriptorFriendlyName}
+									else
+										span= descriptorId
 
 								.table-container
 									table.claims-table

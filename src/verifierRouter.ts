@@ -194,14 +194,16 @@ verifierRouter.post('/callback', async (req, res) => {
 		}
 	}
 
-	console.log("Presentation messages: ", result.presentationInfo);
+	const verificationTimestamp = new Date(date_created).toISOString();
+	const descriptorFriendlyNames = res.locals.locale?.presentationSuccess?.claims?.descriptorFriendlyNames || {};
 	return res.render('presentation-success.pug', {
 		status: status,
-		verificationTimestamp: new Date(date_created).toISOString(),
+		verificationTimestamp: verificationTimestamp,
 		presentationClaims: claims,
 		credentialPayloads: credentialPayloads,
 		presentationInfo: result.presentationInfo,
 		credentialImages: credentialImages,
+		descriptorFriendlyNames: descriptorFriendlyNames,
 	});
 })
 

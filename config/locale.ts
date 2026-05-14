@@ -59,10 +59,20 @@ const locale = {
 			title: "Presentation Successful",
 			verifiedOn: "Verified on",
 			claims: {
-				title: "Requested claims extracted from credentials",
+				title: "Verified Claims",
 				name: "Name",
 				value: "Value",
 				additionalInfoTitle: "Additional Info",
+				descriptorFriendlyNames: {
+					CustomPid: "PID",
+					pidSdJwt: "PID (SD-JWT)",
+					minimalSdJwtPID: "PID (SD-JWT)",
+					pidMsoMdoc: "PID (mDoc)",
+					Bachelor: "Bachelor Diploma",
+					minimalBachelor: "Bachelor Diploma",
+					EuropeanHealthInsuranceCard: "European Health Insurance Card (EHIC)",
+					POR: "Proof of Representation (POR)",
+				},
 			},
 			json: {
 				title: "JSON Dataset",
