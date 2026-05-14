@@ -72,7 +72,7 @@
 }
 
 .table-container {
-	overflow-x: auto;
+	overflow-x: visible;
 	border: 1px solid rgba(0, 0, 0, 0.12);
 	border-radius: 10px;
 	background: #fff;
@@ -80,26 +80,81 @@
 
 .claims-table {
 	width: 100%;
-	border-collapse: collapse;
+	border-collapse: separate;
+	border-spacing: 0;
 	font-size: 0.875rem;
 }
 
-.claims-table th,
+.claims-table,
+.claims-table tbody,
+.claims-table tr,
 .claims-table td {
-	padding: 0.6rem 0.75rem;
+	display: block;
+	width: 100%;
+}
+
+.claims-table thead {
+	display: none;
+}
+
+.claims-table tr {
+	padding: 0.5rem 0.75rem 0.75rem;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.claims-table td {
+	padding: 0;
+	border: 0;
 	vertical-align: top;
 }
 
-.claims-table th {
-	text-align: left;
+.claims-table td:first-child {
+	font-size: 0.75rem;
 	font-weight: 800;
-	color: #ffffff;
-	background-color: var(--primary-main-color) !important;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	color: #4b5563;
+}
+
+.claims-table td:last-child {
+	margin-top: 0.35rem;
+	font-size: 0.92rem;
+	color: #111;
+	word-break: break-word;
+}
+
+.claims-table tbody tr:last-child {
+	border-bottom: 0;
 }
 
 .additional-info {
 	margin-top: 0.75rem;
+}
+
+/* Toggle section (same pattern as DCQL query) */
+.details-toggle {
+	width: 100%;
+	padding: 0;
+}
+
+.details-toggle summary {
+	font-size: 1.05rem;
+	font-weight: 800;
+	cursor: pointer;
+	list-style: none;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.details-toggle summary::before {
+	content: "▸";
+	font-size: 22px;
+	transition: transform 0.2s ease;
+}
+
+.details-toggle[open] summary::before {
+	transform: rotate(90deg);
 }
 
 /* JSON header + copy */

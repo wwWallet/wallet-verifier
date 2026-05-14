@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-	const typeDropdown = document.getElementById("type");
+	const typeRadios = document.querySelectorAll('input[name="type"]');
 	const attributesContainer = document.getElementById("attributes-container");
 	const scriptEl = document.currentScript || document.querySelector('script[src^="/js/request-credentials.js"]');
 	const dcqlQuery = JSON.parse(scriptEl.dataset.dcqlQuery);
@@ -12,6 +12,11 @@ document.addEventListener("DOMContentLoaded", () => {
 			(type === "sd-jwt" && cred.format === "dc+sd-jwt") ||
 			(type === "mdoc" && cred.format === "mso_mdoc")
 		);
+	}
+
+	function getSelectedType() {
+		const selectedTypeRadio = document.querySelector('input[name="type"]:checked');
+		return selectedTypeRadio ? selectedTypeRadio.value : null;
 	}
 
 	function renderFields(type) {
@@ -49,8 +54,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		submitButton.disabled = !anySelected;
 	}
 
-	typeDropdown.addEventListener("change", (e) => {
-		renderFields(e.target.value);
+	typeRadios.forEach((radio) => {
+		radio.addEventListener("change", (e) => {
+			renderFields(e.target.value);
+		});
 	});
 
 	document.querySelector("#select-all").addEventListener("click", () => {
@@ -69,8 +76,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	form.addEventListener("submit", (e) => {
 		e.preventDefault();
-		const selectedType = typeDropdown.value;
+		const selectedType = getSelectedType();
+		if (!selectedType) return;
+
 		const credential = getCredentialByType(selectedType);
+		if (!credential) return;
+
 		const selectedClaims = Array.from(attributesContainer.querySelectorAll('input[type="checkbox"]:checked'))
 			.map(cb => cb.value);
 
@@ -83,5 +94,18 @@ document.addEventListener("DOMContentLoaded", () => {
 		dcqlQueryInput.value = JSON.stringify(filteredDcqlQuery);
 		form.submit();
 	});
-	renderFields(typeDropdown.value);
+
+	const initialType = getSelectedType();
+	if (initialType) {
+		renderFields(initialType);
+		return;
+	}
+
+	const firstTypeRadio = typeRadios[0];
+	if (firstTypeRadio) {
+		firstTypeRadio.checked = true;
+		renderFields(firstTypeRadio.value);
+	} else {
+		updateRequestButtonState();
+	}
 });

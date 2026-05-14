@@ -12,12 +12,12 @@ const locale = {
 			title: "Configure your Presentation Request",
 			subtitle: "Choose format and fields, then request a QR",
 			format: {
-				label: "Select Format",
+				label: "Credential Format",
 				sdjwt: "SD-JWT",
 				mdoc: "mDoc",
 			},
 			attributes: {
-				label: "Select Attributes",
+				label: "Attributes to Request",
 				all: "Select all",
 				none: "Select none",
 			},
@@ -27,7 +27,7 @@ const locale = {
 				default: "openid4vp://cb",
 			},
 			clientIdPrefix: {
-				label: "Client Id Prefix"
+				label: "Client ID Prefix"
 			}
 		},
 		customRequestCredential: {
@@ -65,7 +65,7 @@ const locale = {
 				additionalInfoTitle: "Additional Info",
 			},
 			json: {
-				title: "Credentials (raw JSON)",
+				title: "JSON Dataset",
 				copy: "Copy",
 				copied: "Copied",
 			},

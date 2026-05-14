@@ -64,16 +64,17 @@ block layout-content
 
 				// JSON viewer
 				.card__container
-					.presentation-json__header
-						h2.presentation-success__sectionTitle #{locale.presentationSuccess.json.title}
-						button#copy-button.Btn.Btn--xs.presentation-json__copy(type="button")
-							span.copy-state.copy-default
-								span #{locale.presentationSuccess.json.copy}
-								span.presentation-json__copyIcon(aria-hidden="true") ⧉
-							span.copy-state.copy-success
-								span #{locale.presentationSuccess.json.copied}
-								span(aria-hidden="true") ✓
-					div#jsoneditor.jsoneditor-host.wide
+					details.details-toggle
+						summary #{locale.presentationSuccess.json.title}
+						.presentation-json__header
+							button#copy-button.Btn.Btn--xs.presentation-json__copy(type="button")
+								span.copy-state.copy-default
+									span #{locale.presentationSuccess.json.copy}
+									span.presentation-json__copyIcon(aria-hidden="true") ⧉
+								span.copy-state.copy-success
+									span #{locale.presentationSuccess.json.copied}
+									span(aria-hidden="true") ✓
+						div#jsoneditor.jsoneditor-host.wide
 
 
 block body-scripts
