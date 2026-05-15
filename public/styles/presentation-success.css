@@ -139,6 +139,33 @@
 	word-break: break-word;
 }
 
+.claim-image {
+	display: block;
+	max-width: min(100%, 260px);
+	max-height: 180px;
+	border-radius: 8px;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	background: #fff;
+}
+
+.claim-image-link {
+	display: inline-block;
+	margin-top: 0.4rem;
+	font-size: 0.82rem;
+}
+
+.claim-json {
+	margin: 0;
+	padding: 0.55rem 0.65rem;
+	border-radius: 8px;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	background: #f9fafb;
+	font-size: 0.8rem;
+	line-height: 1.35;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
 .claims-table tbody tr:last-child {
 	border-bottom: 0;
 }

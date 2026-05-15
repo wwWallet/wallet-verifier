@@ -59,7 +59,16 @@ block layout-content
 											each claim in presentationClaims[descriptorId]
 												tr
 													td= claim.name
-													td.claim-value(data-raw-value=String(claim.value))= claim.value
+													td.claim-value(
+														data-raw-value=typeof claim.value === 'string' ? claim.value : JSON.stringify(claim.value)
+														data-inferred-type=claim.inferredType || 'text'
+													)
+														if claim.inferredType === 'imageUri'
+															img.claim-image(src=claim.value alt=`${claim.name} image`)
+														else if claim.inferredType === 'jsonObject' || claim.inferredType === 'jsonArray'
+															pre.claim-json= JSON.stringify(claim.parsedJsonValue || claim.value, null, 2)
+														else
+															= claim.value
 
 								if presentationInfo[descriptorId]
 									.additional-info
