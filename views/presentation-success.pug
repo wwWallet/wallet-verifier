@@ -62,13 +62,23 @@ block layout-content
 													td.claim-value(
 														data-raw-value=typeof claim.value === 'string' ? claim.value : JSON.stringify(claim.value)
 														data-inferred-type=claim.inferredType || 'text'
-													)
-														if claim.inferredType === 'imageUri'
-															img.claim-image(src=claim.value alt=`${claim.name} image`)
-														else if claim.inferredType === 'jsonObject' || claim.inferredType === 'jsonArray'
-															pre.claim-json= JSON.stringify(claim.parsedJsonValue || claim.value, null, 2)
-														else
-															= claim.value
+														)
+															if claim.inferredType === 'imageUri'
+																img.claim-image(src=claim.value alt=`${claim.name} image`)
+															else if claim.inferredType === 'jsonObject' || claim.inferredType === 'jsonArray'
+																if claim.inferredType === 'jsonArray'
+																	- const items = Array.isArray(claim.parsedJsonValue) ? claim.parsedJsonValue : []
+																	span= items.map((item) => typeof item === 'string' ? item : JSON.stringify(item)).join(', ')
+																else
+																	- const obj = claim.parsedJsonValue && typeof claim.parsedJsonValue === 'object' ? claim.parsedJsonValue : {}
+																	table.claims-table.claims-table--nested
+																		tbody
+																			each nestedValue, nestedKey in obj
+																				tr
+																					td= nestedKey
+																					td= typeof nestedValue === 'string' ? nestedValue : JSON.stringify(nestedValue)
+															else
+																= claim.value
 
 								if presentationInfo[descriptorId]
 									.additional-info

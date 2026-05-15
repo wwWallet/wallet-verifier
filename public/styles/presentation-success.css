@@ -170,6 +170,28 @@
 	border-bottom: 0;
 }
 
+.claims-table--nested {
+	margin-top: 0.5rem;
+	margin-left: 0.1rem;
+	border-left: 3px solid rgba(0, 0, 0, 0.12);
+	background: #f8fafc;
+}
+
+.claims-table--nested tr {
+	padding: 0.45rem 0.65rem 0.55rem;
+	border-bottom: 1px dashed rgba(0, 0, 0, 0.12);
+}
+
+.claims-table--nested td:first-child {
+	font-size: 0.7rem;
+	color: #64748b;
+}
+
+.claims-table--nested td:last-child {
+	margin-top: 0.25rem;
+	font-size: 0.85rem;
+}
+
 .additional-info {
 	margin-top: 0.75rem;
 }
