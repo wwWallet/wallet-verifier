@@ -297,6 +297,7 @@ textarea.form-control {
 	cursor: pointer;
 	display: flex;
 	gap: 3px;
+	font-size: 0.9em;
 	transition:
 		background-color 180ms ease,
 		border-color 180ms ease,
