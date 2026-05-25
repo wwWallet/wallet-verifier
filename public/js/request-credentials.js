@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const attributesContainer = document.getElementById("attributes-container");
 	const scriptEl = document.currentScript || document.querySelector('script[src^="/js/request-credentials.js"]');
 	const dcqlQuery = JSON.parse(scriptEl.dataset.dcqlQuery);
+	const selectAllLabel = scriptEl.dataset.selectAllLabel || "Select all";
 
 	const form = document.querySelector("form");
 	const dcqlQueryInput = document.getElementById("dcql-query-input");
@@ -24,6 +25,29 @@ document.addEventListener("DOMContentLoaded", () => {
 		const credential = getCredentialByType(type);
 		if (!credential) return;
 
+		const masterWrapper = document.createElement("div");
+		masterWrapper.classList.add("checkbox-wrapper", "checkbox-wrapper--master");
+
+		const masterCheckbox = document.createElement("input");
+		masterCheckbox.type = "checkbox";
+		masterCheckbox.id = "select-all-attributes";
+
+		const masterLabel = document.createElement("label");
+		masterLabel.htmlFor = masterCheckbox.id;
+		masterLabel.textContent = selectAllLabel;
+
+		masterCheckbox.addEventListener("change", () => {
+			const attributeCheckboxes = getAttributeCheckboxes();
+			attributeCheckboxes.forEach((checkbox) => {
+				checkbox.checked = masterCheckbox.checked;
+			});
+			updateSelectionState();
+		});
+
+		masterWrapper.appendChild(masterCheckbox);
+		masterWrapper.appendChild(masterLabel);
+		attributesContainer.appendChild(masterWrapper);
+
 		(credential.claims || []).forEach((claim, idx) => {
 			const label = claim.path.join(".");
 			const value = claim.path.join(".");
@@ -39,18 +63,33 @@ document.addEventListener("DOMContentLoaded", () => {
 			const labelElement = document.createElement("label");
 			labelElement.htmlFor = input.id;
 			labelElement.textContent = label;
-			input.addEventListener("change", updateRequestButtonState);
+			input.addEventListener("change", updateSelectionState);
 			fieldWrapper.appendChild(input);
 			fieldWrapper.appendChild(labelElement);
 			attributesContainer.appendChild(fieldWrapper);
 		});
-		updateRequestButtonState();
+		updateSelectionState();
 	}
 
-	function updateRequestButtonState() {
+	function getAttributeCheckboxes() {
+		return attributesContainer.querySelectorAll('input[name="attributes[]"]');
+	}
+
+	function updateSelectionState() {
+		const masterCheckbox = attributesContainer.querySelector('#select-all-attributes');
+		const attributeCheckboxes = getAttributeCheckboxes();
 		const submitButton = document.querySelector(".request-qr");
-		const attributeCheckboxes = attributesContainer.querySelectorAll('input[type="checkbox"]');
-		const anySelected = Array.from(attributeCheckboxes).some(cb => cb.checked);
+		const checkedCount = Array.from(attributeCheckboxes).filter((checkbox) => checkbox.checked).length;
+		const anySelected = checkedCount > 0;
+		const allSelected = attributeCheckboxes.length > 0 && checkedCount === attributeCheckboxes.length;
+
+		if (masterCheckbox) {
+			masterCheckbox.disabled = attributeCheckboxes.length === 0;
+			masterCheckbox.checked = allSelected;
+			masterCheckbox.indeterminate = !allSelected && anySelected;
+			masterCheckbox.setAttribute("aria-checked", masterCheckbox.indeterminate ? "mixed" : String(masterCheckbox.checked));
+		}
+
 		submitButton.disabled = !anySelected;
 	}
 
@@ -58,20 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		radio.addEventListener("change", (e) => {
 			renderFields(e.target.value);
 		});
-	});
-
-	document.querySelector("#select-all").addEventListener("click", () => {
-		document.querySelectorAll("#attributes-container input[type=checkbox]:not(:disabled)").forEach(checkbox => {
-			checkbox.checked = true;
-		});
-		updateRequestButtonState();
-	});
-
-	document.querySelector("#select-none").addEventListener("click", () => {
-		document.querySelectorAll("#attributes-container input[type=checkbox]:not(:disabled)").forEach(checkbox => {
-			checkbox.checked = false;
-		});
-		updateRequestButtonState();
 	});
 
 	form.addEventListener("submit", (e) => {
@@ -106,6 +131,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		firstTypeRadio.checked = true;
 		renderFields(firstTypeRadio.value);
 	} else {
-		updateRequestButtonState();
+		updateSelectionState();
 	}
 });
