@@ -10,6 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	document.querySelectorAll('.claim-value').forEach(td => {
 		try {
+			const inferredType = td.getAttribute('data-inferred-type') || 'text';
+			if (inferredType !== 'text') {
+				return;
+			}
+
 			const raw = td.getAttribute('data-raw-value');
 			if (!raw) return;
 			const truncated = truncateValue(raw);

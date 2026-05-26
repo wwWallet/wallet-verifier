@@ -297,12 +297,25 @@ textarea.form-control {
 	cursor: pointer;
 	display: flex;
 	gap: 3px;
+	font-size: 0.9em;
+	transition:
+		background-color 180ms ease,
+		border-color 180ms ease,
+		color 180ms ease,
+		box-shadow 180ms ease,
+		transform 180ms ease;
 }
 
 .form-field .radio-field:has(input[type="radio"]:checked) {
-	background-color: var(--primary-main-color);
-	border-color: var(--primary-lighter-color);
-	color: white;
+	border-color: var(--primary-main-color);
+	box-shadow:
+		0 0 0 1px color-mix(in srgb, var(--primary-main-color) 30%, transparent) inset,
+		0 2px 4px color-mix(in srgb, var(--primary-main-color) 25%, transparent);
+	font-weight: 600;
+}
+
+.form-field .radio-field:has(input[type="radio"]:checked) .format-radio-subtitle {
+	font-weight: 400;
 }
 
 .form-field .radio-field input[type="radio"] {
@@ -310,6 +323,22 @@ textarea.form-control {
 	opacity: 0;
 	pointer-events: none;
 }
+
+.form-field .format-radio-field {
+	flex-direction: column;
+	align-items: center;
+	gap: 0.1rem;
+}
+
+.format-radio-title {
+	line-height: 1.15;
+}
+
+.format-radio-subtitle {
+	font-size: 0.85em;
+	opacity: 0.75;
+}
+
 
 /* Mobile */
 @media (max-width: 768px) {

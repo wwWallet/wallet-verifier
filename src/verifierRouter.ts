@@ -79,6 +79,56 @@ const dcqlQuerySchema = {
 export const sanitizeInput = (input: string): string =>
 	input.replace(/[^\x20-\x7E\n]/g, '');
 
+type InferredClaimType = "text" | "imageUri" | "jsonObject" | "jsonArray";
+
+const IMAGE_URI_PATTERN = /^data:image\/[a-zA-Z0-9.+-]+;base64,/i;
+
+const inferClaimValueType = (value: unknown): { inferredType: InferredClaimType, parsedJsonValue?: unknown } => {
+	if (typeof value !== "string") {
+		return { inferredType: "text" };
+	}
+
+	const trimmed = value.trim();
+	if (!trimmed) {
+		return { inferredType: "text" };
+	}
+
+	if (IMAGE_URI_PATTERN.test(trimmed)) {
+		return { inferredType: "imageUri" };
+	}
+
+	try {
+		const parsedJson = JSON.parse(trimmed);
+		if (Array.isArray(parsedJson)) {
+			return { inferredType: "jsonArray", parsedJsonValue: parsedJson };
+		}
+		if (parsedJson !== null && typeof parsedJson === "object") {
+			return { inferredType: "jsonObject", parsedJsonValue: parsedJson };
+		}
+	} catch {
+		// Not JSON content.
+	}
+
+	return { inferredType: "text" };
+};
+
+const enrichClaimsWithInferredTypes = (claims: Record<string, any[]>): Record<string, any[]> => {
+	return Object.fromEntries(
+		Object.entries(claims || {}).map(([descriptorId, descriptorClaims]) => {
+			const enrichedClaims = (descriptorClaims || []).map((claim) => {
+				const { inferredType, parsedJsonValue } = inferClaimValueType(claim?.value);
+				return {
+					...claim,
+					inferredType,
+					parsedJsonValue,
+				};
+			});
+
+			return [descriptorId, enrichedClaims];
+		}),
+	);
+};
+
 
 const MAX_CERT_LENGTH = 5000;
 
@@ -175,6 +225,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	const { claims, date_created } = result.rpState;
 	const presentations = result.presentations;
 	const status = result.status;
+	const enrichedClaims = enrichClaimsWithInferredTypes(claims);
 
 	const credentialImages = [];
 	const credentialPayloads = [];
@@ -199,7 +250,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	return res.render('presentation-success.pug', {
 		status: status,
 		verificationTimestamp: verificationTimestamp,
-		presentationClaims: claims,
+		presentationClaims: enrichedClaims,
 		credentialPayloads: credentialPayloads,
 		presentationInfo: result.presentationInfo,
 		credentialImages: credentialImages,
