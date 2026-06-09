@@ -133,13 +133,13 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		let presentation_submission = ctx.req.body.presentation_submission ? JSON.parse(decodeURI(ctx.req.body.presentation_submission)) as any : null;
 
 
-		if (ctx.req.body.response) { // E2EE - JARM
+		if (ctx.req.body.response) { // E2EE
 			const { kid } = JSON.parse(base64url.decode(ctx.req.body.response.split('.')[0])) as { kid: string | undefined };
 			if (!kid) {
 				throw new Error("Could not extract kid");
 			}
 
-			const rpStateResult = await this.openid4vp.handleResponseJARM(ctx.req.body.response, kid);
+			const rpStateResult = await this.openid4vp.handleEncryptedAuthorizationResponse(ctx.req.body.response, kid);
 
 			if (!rpStateResult.ok) {
 				const { error, error_description } = rpStateResult;
