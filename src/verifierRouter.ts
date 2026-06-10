@@ -8,6 +8,7 @@ import { addSessionIdCookieToResponse } from "../config/sessionIdCookieConfig";
 import { initializeCredentialEngine } from "./util/initializeCredentialEngine";
 
 import Ajv from 'ajv';
+import { siteTitle, titles } from "../config/titles";
 const ajv = new Ajv();
 
 const dcqlQuerySchema = {
@@ -158,6 +159,7 @@ verifierRouter.post('/public/manage-certificates', async (req, res) => {
 		res.redirect('/verifier/public/manage-certificates');
 	} catch (error) {
 		res.render('manage-certificates.pug', {
+			title: titles["manage-certificates"] || siteTitle,
 			trustedRootCertificates: config.trustedRootCertificates,
 			error: {
 				errorMessage: 'error adding x509 certificate'
@@ -168,12 +170,14 @@ verifierRouter.post('/public/manage-certificates', async (req, res) => {
 
 verifierRouter.get('/public/manage-certificates', async (_req, res) => {
 	return res.render('manage-certificates.pug',{
+		title: titles["manage-certificates"] || siteTitle,
 		trustedRootCertificates: config.trustedRootCertificates
 	});
 })
 
 verifierRouter.get('/public/definitions', async (_req, res) => {
 	return res.render('public-definitions.pug', {
+		title: titles["public-definitions"] || siteTitle,
 		presentationRequests: verifierConfiguration.getPresentationRequests(),
 	});
 })
@@ -192,7 +196,9 @@ verifierRouter.get('/callback/status', async (req, res) => { // response with th
 
 
 verifierRouter.get('/callback', async (_req, res) => {
-	res.render('handle-response-code');
+	res.render('handle-response-code', {
+		title: titles["handle-response-code"] || siteTitle,
+	});
 })
 
 verifierRouter.post('/callback', async (req, res) => {
@@ -217,6 +223,7 @@ verifierRouter.post('/callback', async (req, res) => {
 		result.rpState.claims == null ||
 		result.rpState.date_created == null) {
 		return res.render('error.pug', {
+			title: titles["error"] || siteTitle,
 			msg: result.status == false ? result.error.message : "Unknown error",
 			code: 0,
 		});
@@ -248,6 +255,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	const verificationTimestamp = new Date(date_created).toISOString();
 	const descriptorFriendlyNames = res.locals.locale?.presentationSuccess?.claims?.descriptorFriendlyNames || {};
 	return res.render('presentation-success.pug', {
+		title: titles["presentation-success"] || siteTitle,
 		status: status,
 		verificationTimestamp: verificationTimestamp,
 		presentationClaims: enrichedClaims,
@@ -262,6 +270,7 @@ verifierRouter.use('/public/definitions/request-credentials/:presentation_reques
 	const presentation_request_id = req.params.presentation_request_id;
 	if (!presentation_request_id) {
 		return res.render('error', {
+			title: titles["error"] || siteTitle,
 			msg: "No presentation request was selected",
 			code: 0,
 		});
@@ -269,6 +278,7 @@ verifierRouter.use('/public/definitions/request-credentials/:presentation_reques
 	const presentationRequest = verifierConfiguration.getPresentationRequests().filter(pd => pd.id == presentation_request_id)[0];
 	if (!presentationRequest) {
 		return res.render('error', {
+			title: titles["error"] || siteTitle,
 			msg: "No presentation request was found",
 			code: 0,
 		});
@@ -280,6 +290,7 @@ verifierRouter.use('/public/definitions/request-credentials/:presentation_reques
 			return [label, claim.path[0]];
 		});
 	return res.render('request-credentials', {
+		title: titles["request-credentials"] || siteTitle,
 		presentationRequestId: presentationRequest.id,
 		dcqlQuery: presentationRequest.dcql_query,
 		selectableFields,
@@ -288,6 +299,7 @@ verifierRouter.use('/public/definitions/request-credentials/:presentation_reques
 
 verifierRouter.get('/public/definitions/request-custom-credential', async (_req, res) => {
 	return res.render('request-custom-credential', {
+		title: titles["request-custom-credential"] || siteTitle,
 		schema: dcqlQuerySchema
 	});
 })
@@ -310,6 +322,7 @@ verifierRouter.post('/public/definitions/request-custom-credential', async (req,
 		const validate = ajv.compile(dcqlQuerySchema);
 		if (!validate(query)) {
 			return res.render('error.pug', {
+				title: titles["error"] || siteTitle,
 				msg: "Invalid DCQL query format",
 				code: 0,
 			});
@@ -321,6 +334,7 @@ verifierRouter.post('/public/definitions/request-custom-credential', async (req,
 		}
 	} catch (error) {
 		return res.render('error.pug', {
+			title: titles["error"] || siteTitle,
 			msg: "Error while parsing the DCQL query",
 			code: 0,
 		});
@@ -344,6 +358,7 @@ verifierRouter.post('/public/definitions/request-custom-credential', async (req,
 	}) as string;
 
 	return res.render('presentation-request.pug', {
+		title: titles["presentation-request"] || siteTitle,
 		wwwalletURL: config.wwwalletURL,
 		authorizationRequestURL: modifiedUrl,
 		authorizationRequestQR,
@@ -372,6 +387,7 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 	const presentation_request_id = req.params.presentation_request_id;
 	if (!presentation_request_id) {
 		return res.render('error', {
+			title: titles["error"] || siteTitle,
 			msg: "No presentation request was selected",
 			code: 0,
 		});
@@ -387,6 +403,7 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 	}
 	if (!presentationRequest) {
 		return res.render('error', {
+			title: titles["error"] || siteTitle,
 			msg: "No presentation request was found",
 			code: 0,
 		});
@@ -426,6 +443,7 @@ verifierRouter.use('/public/definitions/presentation-request/:presentation_reque
 	}) as string;
 
 	return res.render('presentation-request.pug', {
+		title: titles["presentation-request"] || siteTitle,
 		wwwalletURL: config.wwwalletURL,
 		authorizationRequestURL: modifiedUrl,
 		authorizationRequestQR,

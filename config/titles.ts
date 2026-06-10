@@ -1,9 +1,16 @@
 // titles.ts
 import { config } from ".";
 
-const titles = {
-	index: config?.siteConfig?.name || "wwWallet Verifier",
-	// Add other titles for different routes or pages here if needed
-};
+export const siteTitle = config?.siteConfig?.name || "wwWallet Verifier";
 
-export default titles;
+export const titles = {
+	"index": siteTitle,
+	"manage-certificates": "Manage Trusted Certificates",
+	"public-definitions": "Credential Verification Requests",
+	"handle-response-code": "Processing Verification Response",
+	"error": "Error",
+	"presentation-success": "Credential Verification Results",
+	"request-credentials": "Select Credential Claims",
+	"request-custom-credential": "Create Custom Credential Request",
+	"presentation-request": "Present Credentials",
+};
