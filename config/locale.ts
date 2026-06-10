@@ -2,6 +2,16 @@ import { config } from "./index.js";
 
 const locale = {
 	en: {
+		pageTitles: {
+			"manage-certificates": "Manage Trusted Certificates",
+			"public-definitions": "Credential Verification Requests",
+			"handle-response-code": "Processing Verification Response",
+			"error": "Error",
+			"presentation-success": "Credential Verification Results",
+			"request-credentials": "Select Credential Claims",
+			"request-custom-credential": "Create Custom Credential Request",
+			"presentation-request": "Present Credentials",
+		},
 		definitions: {
 			title: "Present your Verifiable Credentials",
 			subtitle: "Choose a predefined request or create a custom one",
