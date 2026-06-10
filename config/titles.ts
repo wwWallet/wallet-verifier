@@ -3,7 +3,7 @@ import { config } from ".";
 
 export const siteTitle = config?.siteConfig?.name || "wwWallet Verifier";
 
-export const titles = {
+export const titles: Record<string, string> = {
 	"index": siteTitle,
 	"manage-certificates": "Manage Trusted Certificates",
 	"public-definitions": "Credential Verification Requests",
@@ -14,3 +14,10 @@ export const titles = {
 	"request-custom-credential": "Create Custom Credential Request",
 	"presentation-request": "Present Credentials",
 };
+
+export function titleWithSiteName(titleKey: string): string {
+	if (Object.keys(titles).includes(titleKey)) {
+		return `${titles[titleKey]} | ${siteTitle}`;
+	}
+	return siteTitle;
+}
