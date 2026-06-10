@@ -14,10 +14,10 @@ import { OpenidForPresentationsReceivingService } from './services/OpenidForPres
 import { VerifierConfigurationService } from './services/VerifierConfigurationService';
 
 import locale from '../config/locale';
-import titles from '../config/titles';
 
 import { verifierRouter } from './verifierRouter';
 import _ from 'lodash';
+import { titleWithSiteName } from '../config/titles';
 
 async function main() {
 	const app: Express = express();
@@ -72,7 +72,7 @@ async function main() {
 
 	app.get('/', async (_req: Request, res: Response) => {
 		return res.render("index", {
-			title: titles.index,
+			title: titleWithSiteName("index"),
 		});
 	});
 
