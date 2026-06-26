@@ -221,6 +221,44 @@ const porSdJwtClaims: DcqlClaim[] = [
 	{ path: ["effective_until_date"] },
 ];
 
+const escSdJwtClaims: DcqlClaim[] = [
+	{ path: ["firstName"] },
+	{ path: ["firstName", "en"] },
+	{ path: ["firstName", "el"] },
+	{ path: ["lastName"] },
+	{ path: ["lastName", "en"] },
+	{ path: ["lastName", "el"] },
+	{ path: ["birthDate"] },
+	{ path: ["ssn"] },
+	{ path: ["ssnCountry"] },
+	{ path: ["displayName"] },
+	{ path: ["cardNumber"] },
+	{ path: ["issuedAt"] },
+	{ path: ["expiresAt"] },
+	{ path: ["photo"] },
+	{ path: ["QRCode"] },
+	{ path: ["academicDetails"] },
+	{ path: ["academicDetails", "fullLabel"] },
+	{ path: ["academicDetails", "enrollmentType"] },
+	{ path: ["academicDetails", "inscriptionAcYear"] },
+	{ path: ["academicDetails", "program"] },
+	{ path: ["academicDetails", "program", "en"] },
+	{ path: ["academicDetails", "program", "el"] },
+	{ path: ["academicDetails", "department"] },
+	{ path: ["academicDetails", "department", "en"] },
+	{ path: ["academicDetails", "department", "el"] },
+	{ path: ["academicDetails", "esiCode"] },
+	{ path: ["academicDetails", "registrationId"] },
+	{ path: ["academicDetails", "departmentId"] },
+	{ path: ["academicDetails", "programId"] },
+	{ path: ["academicDetails", "esi"] },
+];
+
+const escMdocClaims: DcqlClaim[] = escSdJwtClaims.map(claim => ({
+	path: ["org.example.esc.1", ...claim.path],
+	intent_to_retain: false,
+}));
+
 
 const pidSdJwtCredentialQuery: DcqlCredentialQuery = {
 	id: "pidSdJwt",
@@ -285,6 +323,24 @@ const porCredentialQuery: DcqlCredentialQuery = {
 	claims: porSdJwtClaims
 };
 
+const escSdJwtCredentialQuery: DcqlCredentialQuery = {
+	id: "escSdJwt",
+	format: "dc+sd-jwt",
+	meta: {
+		vct_values: ["urn:credential:esc"],
+	},
+	claims: escSdJwtClaims,
+};
+
+const escMdocCredentialQuery: DcqlCredentialQuery = {
+	id: "escMsoMdoc",
+	format: "mso_mdoc",
+	meta: {
+		doctype_value: "org.example.esc.1",
+	},
+	claims: escMdocClaims,
+};
+
 const minimalPidQuery: DcqlQuery = {
 	credentials: [
 		minimalPidSdJwtCredentialQuery
@@ -296,6 +352,13 @@ const customPidDcqlQuery: DcqlQuery = {
 		pidSdJwtCredentialQuery,
 		pidMdocCredentialQuery,
 	]
+};
+
+const escDcqlQuery: DcqlQuery = {
+	credentials: [
+		escSdJwtCredentialQuery,
+		escMdocCredentialQuery,
+	],
 };
 
 const bachelorDcqlQuery: DcqlQuery = {
@@ -360,6 +423,13 @@ export class VerifierConfigurationService implements VerifierConfigurationInterf
 				description: "Select the format and the fields you want to request",
 				_selectable: true,
 				dcql_query: customPidDcqlQuery,
+			},
+			{
+				id: "CustomESC",
+				title: "ESC",
+				description: "Select the format and the fields you want to request",
+				_selectable: true,
+				dcql_query: escDcqlQuery,
 			},
 			{
 				id: bachelorDcqlQuery.credentials[0].id,
