@@ -1,7 +1,9 @@
 if supportedCredentialType
 	title#the-title #{supportedCredentialType.display[0].name}
-else
+else if title
 	title#the-title #{title}
+else
+	title#the-title wwWallet Verifier
 
 meta(charset="utf-8")
 

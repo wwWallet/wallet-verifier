@@ -1,9 +1,12 @@
 // titles.ts
 import { config } from ".";
+import locale from "./locale";
 
-const titles = {
-	index: config?.siteConfig?.name || "wwWallet Verifier",
-	// Add other titles for different routes or pages here if needed
-};
+export const siteTitle = config?.siteConfig?.name || "wwWallet Verifier";
 
-export default titles;
+export function titleWithSiteName(titleKey: string, currentLocale = "en"): string {
+	if((locale as any)[currentLocale].pageTitles[titleKey]) {
+		return `${(locale as any)[currentLocale].pageTitles[titleKey]} | ${siteTitle}`;
+	}
+	return siteTitle;
+}

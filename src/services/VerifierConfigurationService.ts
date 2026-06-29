@@ -127,7 +127,7 @@ const pidMdocClaims: DcqlClaim[] = [
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "birth_place"],
+		path: ["eu.europa.ec.eudi.pid.1", "place_of_birth"],
 		intent_to_retain: false,
 	},
 	{

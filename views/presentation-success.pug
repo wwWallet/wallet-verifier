@@ -124,7 +124,7 @@ block body-scripts
 			modes: ['view'],
 		};
 
-		const payload = !{JSON.stringify(credentialPayloads)};
+		const payload = !{JSON.stringify(credentialPayloads, (_, value) => value instanceof Map ? Object.fromEntries(value) : value)};
 
 		const editor = new JSONEditor(container, options);
 		editor.set(payload)
