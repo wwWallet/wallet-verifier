@@ -13,10 +13,10 @@ RUN apt-get update && apt-get install -y \
 COPY . .
 
 RUN yarn cache clean && rm -rf ~/.cache/yarn \
-	&& yarn install --frozen-lockfile --network-timeout 120000 \
+	&& yarn install --frozen-lockfile --network-timeout 120000 --cache-folder /tmp/yarn-cache \
 	&& yarn build \
 	&& rm -rf node_modules/ \
-	&& yarn install --frozen-lockfile --production --network-timeout 120000
+	&& yarn install --frozen-lockfile --production --network-timeout 120000 --cache-folder /tmp/yarn-cache
 
 FROM gcr.io/distroless/nodejs24-debian12 AS production
 WORKDIR /home/node/app
