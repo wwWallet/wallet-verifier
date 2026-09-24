@@ -2,6 +2,9 @@
   "name": "wallet-verifier",
   "version": "1.0.0",
   "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "yarn tsc",
@@ -44,7 +47,7 @@
     "@types/http-errors": "^2.0.1",
     "@types/lodash": "^4.14.192",
     "@types/morgan": "^1.9.7",
-    "@types/node": "^18.7.17",
+    "@types/node": "^24.10.2",
     "@types/passport": "^1.0.12",
     "@types/passport-local": "^1.0.35",
     "@types/qrcode": "^1.5.0",
