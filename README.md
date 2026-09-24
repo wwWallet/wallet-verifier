@@ -35,7 +35,7 @@ Environment variables and how they are used:
 | `DB_USERNAME` | Database user. | Default: `root`. |
 | `DB_PASSWORD` | Database password. | Default: `root`. |
 | `DB_NAME` | Database name. | Default: `verifier`. |
-| `PRESENTATION_FLOW_RESPONSE_MODE` | OpenID4VP `response_mode` used in authorization requests. | Default: `direct_post.jwt`. Supported values: `direct_post`, `direct_post.jwt`, `dc_api`, `dc_api.jwt`. |
+| `PRESENTATION_FLOW_RESPONSE_MODE` | OpenID4VP `response_mode` used in authorization requests. | Default: `direct_post.jwt`. Supported values: `direct_post`, `direct_post.jwt`. |
 | `TRUSTED_ISSUERS` | Comma-separated list of credential issuer identifiers whose certificates are added as trusted roots. | Default: `http://localhost:8003/openid`. For each issuer, the verifier fetches `/.well-known/openid-credential-issuer` and, if it has an `mdoc_iacas_uri`, trusts the certificates listed there (relevant for mso_mdoc). |
 | `CLOCK_TOLERANCE` | Allowed clock skew (seconds) when validating credential and presentation timestamps. | Default: `60`. |
 | `SESSION_ID_COOKIE_MAX_AGE` | Max age (milliseconds) of the `session_id` cookie. | Default: `900000` (15 minutes). |
