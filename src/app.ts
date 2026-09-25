@@ -41,7 +41,13 @@ async function main() {
 	app.use(express.static(path.join(__dirname, '../../public')));
 
 	app.use(cookieParser());
-	app.use(session({ secret: config.appSecret, cookie: { expires: null, maxAge: 3600 * 1000 } }))
+	app.use(session({
+		secret: config.appSecret,
+		cookie: {
+			expires: null,
+			maxAge: config.sessionIdCookieConfiguration.maxAge,
+		},
+	}))
 
 
 	app.use(bodyParser.urlencoded({ extended: true })); // support url encoded bodies
