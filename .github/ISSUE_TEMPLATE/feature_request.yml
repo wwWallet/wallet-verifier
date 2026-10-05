@@ -1,8 +1,5 @@
 name: Feature request
-description: Suggest an idea for this project
-title: ""
-labels: []
-assignees: []
+description: Suggest a new feature for this project
 body:
   - type: textarea
     id: problem-statement
@@ -20,7 +17,7 @@ body:
         * Tradeoffs or challenges in your proposed approach.
         * Future implications or caveats to be aware of.
 
-        If you have multiple ideas for solutions, present each one clearly. Comparisons can be included at the end.)
+        If you have multiple ideas for solutions, present each one clearly. Comparisons can be included at the end.
 
   - type: textarea
     id: additional-information
