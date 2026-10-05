@@ -1,0 +1,35 @@
+name: Feature request
+description: Suggest an idea for this project
+title: ""
+labels: []
+assignees: []
+body:
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: Problem Statement
+      placeholder: "Provide a clear and concise description of the problem or need you want this feature to address. Specify which aspects of the problem are within the scope of this request and which are not."
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution (Optional)
+      placeholder: |
+        Describe your suggested solution in detail. Be sure to include:
+        * The technical implementation and any key considerations.
+        * Tradeoffs or challenges in your proposed approach.
+        * Future implications or caveats to be aware of.
+
+        If you have multiple ideas for solutions, present each one clearly. Comparisons can be included at the end.)
+
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional Information (Optional)
+      placeholder: "Add any other relevant details, such as context, screenshots, links to related issues or discussions or external references."
+
+  - type: markdown
+    attributes:
+      value: |
+        ### 📢 Before You Submit:
+        Please check our [Discussions](https://github.com/orgs/wwWallet/discussions) to see if this feature has already been requested or is being discussed. Joining an ongoing conversation can help refine ideas and avoid duplication!
