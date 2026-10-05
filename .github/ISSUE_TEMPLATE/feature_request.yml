@@ -5,12 +5,15 @@ body:
     id: problem-statement
     attributes:
       label: Problem Statement
-      placeholder: "Provide a clear and concise description of the problem or need you want this feature to address. Specify which aspects of the problem are within the scope of this request and which are not."
+      validations:
+        required: true
+      description: "A clear and concise description of the problem or need you want this feature to address."
 
   - type: textarea
     id: proposed-solution
     attributes:
-      label: Proposed Solution (Optional)
+      label: Proposed Solution
+      description: "The solution you propose to address the problem."
       placeholder: |
         Describe your suggested solution in detail. Be sure to include:
         * The technical implementation and any key considerations.
@@ -22,8 +25,8 @@ body:
   - type: textarea
     id: additional-information
     attributes:
-      label: Additional Information (Optional)
-      placeholder: "Add any other relevant details, such as context, screenshots, links to related issues or discussions or external references."
+      label: Additional Information
+      description: "Any other relevant details, such as context, screenshots, links to related issues or discussions, external references."
 
   - type: markdown
     attributes:
