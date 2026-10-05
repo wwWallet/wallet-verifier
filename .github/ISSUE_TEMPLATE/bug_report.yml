@@ -11,8 +11,8 @@ body:
     id: to-reproduce
     attributes:
       label: To Reproduce
-      description: "Steps to reproduce the behavior:"
-      placeholder: |
+      description: "Steps to reproduce the behavior"
+      value: |
         1. Go to '...'
         2. Click on '....'
         3. Scroll down to '....'
@@ -34,33 +34,13 @@ body:
     id: environment-information
     attributes:
       label: Environment information (if available)
-      placeholder: |
-        - wallet-verifier version or commit:
+      description: Please complete the lines that apply.
+      value: |
+        - wallet-verifier version, commit, or image tag:
         - Deployment method: [Docker / source]
-        - Docker image tag/version (if using Docker):
-        - Node version (if running without Docker):
-        - Server OS:
-
-  - type: textarea
-    id: desktop
-    attributes:
-      label: Desktop
-      description: "Please complete the following information:"
-      placeholder: |
-        - OS: [e.g. iOS]
-        - Browser [e.g. chrome, safari]
-        - Version [e.g. 22]
-
-  - type: textarea
-    id: smartphone
-    attributes:
-      label: Smartphone
-      description: "Please complete the following information:"
-      placeholder: |
-        - Device: [e.g. iPhone6]
-        - OS: [e.g. iOS8.1]
-        - Browser [e.g. stock browser, safari]
-        - Version [e.g. 22]
+        - Node version (if running from source):
+        - Device and OS:
+        - Browser and version:
 
   - type: textarea
     id: additional-context
