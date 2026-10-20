@@ -2,6 +2,7 @@ import eslint from '@eslint/js';
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import prettierConfig from 'eslint-config-prettier/flat';
 
 const typescriptFiles = ['{config,src}/**/*.ts'];
 const browserFiles = ['public/js/**/*.js'];
@@ -45,4 +46,5 @@ export default defineConfig(
 			'@typescript-eslint/no-unused-vars': 'off',
 		},
 	},
+	prettierConfig,
 );
