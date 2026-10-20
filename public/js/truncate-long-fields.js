@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		return value;
 	};
 
-	document.querySelectorAll('.claim-value').forEach(td => {
+	document.querySelectorAll('.claim-value').forEach((td) => {
 		try {
 			const inferredType = td.getAttribute('data-inferred-type') || 'text';
 			if (inferredType !== 'text') {

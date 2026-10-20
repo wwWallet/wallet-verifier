@@ -1,23 +1,21 @@
-import { OpenidForPresentationsConfiguration } from "../types/OpenidForPresentationsConfiguration.type";
-import { config } from "../../config";
-import { VerifierConfigurationInterface } from "./interfaces";
-
+import { OpenidForPresentationsConfiguration } from '../types/OpenidForPresentationsConfiguration.type';
+import { config } from '../../config';
+import { VerifierConfigurationInterface } from './interfaces';
 
 export type DcqlClaim = {
-	id?: string;                               // REQUIRED only if using claim_sets, OPTIONAL otherwise
+	id?: string; // REQUIRED only if using claim_sets, OPTIONAL otherwise
 	path: string[];
-	values?: (string | number | boolean)[];    // optional value matching
-	intent_to_retain?: boolean;                // ISO mdoc-specific extension
+	values?: (string | number | boolean)[]; // optional value matching
+	intent_to_retain?: boolean; // ISO mdoc-specific extension
 };
-
 
 export type DcqlCredentialQuery = {
 	id: string;
-	format: "dc+sd-jwt" | "mso_mdoc";
+	format: 'dc+sd-jwt' | 'mso_mdoc';
 	multiple?: boolean;
 	meta: {
-		vct_values?: string[];				 // SD-JWT VC
-		doctype_value?: string;				 // ISO mdoc
+		vct_values?: string[]; // SD-JWT VC
+		doctype_value?: string; // ISO mdoc
 	};
 	trusted_authorities?: any;
 	require_cryptographic_holder_binding?: boolean;
@@ -36,266 +34,260 @@ export type DcqlQuery = {
 };
 
 const pidSdJwtClaims: DcqlClaim[] = [
-	{ path: ["given_name"] },
-	{ path: ["birth_given_name"] },
-	{ path: ["family_name"] },
-	{ path: ["birth_family_name"] },
-	{ path: ["birthdate"] },
-	{ path: ["place_of_birth", "country"] },
-	{ path: ["place_of_birth", "region"] },
-	{ path: ["place_of_birth", "locality"] },
+	{ path: ['given_name'] },
+	{ path: ['birth_given_name'] },
+	{ path: ['family_name'] },
+	{ path: ['birth_family_name'] },
+	{ path: ['birthdate'] },
+	{ path: ['place_of_birth', 'country'] },
+	{ path: ['place_of_birth', 'region'] },
+	{ path: ['place_of_birth', 'locality'] },
 
-	{ path: ["nationalities"] },
-	{ path: ["personal_administrative_number"] },
-	{ path: ["sex"] },
+	{ path: ['nationalities'] },
+	{ path: ['personal_administrative_number'] },
+	{ path: ['sex'] },
 
-	{ path: ["address", "formatted"] },
-	{ path: ["address", "street_address"] },
-	{ path: ["address", "house_number"] },
-	{ path: ["address", "postal_code"] },
-	{ path: ["address", "locality"] },
-	{ path: ["address", "region"] },
-	{ path: ["address", "country"] },
+	{ path: ['address', 'formatted'] },
+	{ path: ['address', 'street_address'] },
+	{ path: ['address', 'house_number'] },
+	{ path: ['address', 'postal_code'] },
+	{ path: ['address', 'locality'] },
+	{ path: ['address', 'region'] },
+	{ path: ['address', 'country'] },
 
-	{ path: ["age_equal_or_over", "14"] },
-	{ path: ["age_equal_or_over", "16"] },
-	{ path: ["age_equal_or_over", "18"] },
-	{ path: ["age_equal_or_over", "21"] },
-	{ path: ["age_equal_or_over", "65"] },
+	{ path: ['age_equal_or_over', '14'] },
+	{ path: ['age_equal_or_over', '16'] },
+	{ path: ['age_equal_or_over', '18'] },
+	{ path: ['age_equal_or_over', '21'] },
+	{ path: ['age_equal_or_over', '65'] },
 
-	{ path: ["age_in_years"] },
-	{ path: ["age_birth_year"] },
+	{ path: ['age_in_years'] },
+	{ path: ['age_birth_year'] },
 
-	{ path: ["email"] },
-	{ path: ["phone_number"] },
+	{ path: ['email'] },
+	{ path: ['phone_number'] },
 
-	{ path: ["issuing_authority"] },
-	{ path: ["issuing_country"] },
-	{ path: ["issuing_jurisdiction"] },
+	{ path: ['issuing_authority'] },
+	{ path: ['issuing_country'] },
+	{ path: ['issuing_jurisdiction'] },
 
-	{ path: ["date_of_expiry"] },
-	{ path: ["date_of_issuance"] },
-	{ path: ["document_number"] },
-	{ path: ["picture"] },
+	{ path: ['date_of_expiry'] },
+	{ path: ['date_of_issuance'] },
+	{ path: ['document_number'] },
+	{ path: ['picture'] },
 ];
 
 const minimalPidSdJwtClaims: DcqlClaim[] = [
-	{ path: ["given_name"] },
-	{ path: ["family_name"] },
-	{ path: ["birthdate"] },
-	{ path: ["nationalities"] },
-	{ path: ["date_of_expiry"] },
-	{ path: ["issuing_authority"] },
-	{ path: ["issuing_country"] },
+	{ path: ['given_name'] },
+	{ path: ['family_name'] },
+	{ path: ['birthdate'] },
+	{ path: ['nationalities'] },
+	{ path: ['date_of_expiry'] },
+	{ path: ['issuing_authority'] },
+	{ path: ['issuing_country'] },
 ];
 
 const pidMdocClaims: DcqlClaim[] = [
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "family_name"],
+		path: ['eu.europa.ec.eudi.pid.1', 'family_name'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "family_name_birth"],
+		path: ['eu.europa.ec.eudi.pid.1', 'family_name_birth'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "given_name"],
+		path: ['eu.europa.ec.eudi.pid.1', 'given_name'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "given_name_birth"],
+		path: ['eu.europa.ec.eudi.pid.1', 'given_name_birth'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "personal_administrative_number"],
+		path: ['eu.europa.ec.eudi.pid.1', 'personal_administrative_number'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "birth_date"],
+		path: ['eu.europa.ec.eudi.pid.1', 'birth_date'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "age_over_18"],
+		path: ['eu.europa.ec.eudi.pid.1', 'age_over_18'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "age_over_21"],
+		path: ['eu.europa.ec.eudi.pid.1', 'age_over_21'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "age_in_years"],
+		path: ['eu.europa.ec.eudi.pid.1', 'age_in_years'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "place_of_birth"],
+		path: ['eu.europa.ec.eudi.pid.1', 'place_of_birth'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "resident_address"],
+		path: ['eu.europa.ec.eudi.pid.1', 'resident_address'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "resident_country"],
+		path: ['eu.europa.ec.eudi.pid.1', 'resident_country'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "resident_state"],
+		path: ['eu.europa.ec.eudi.pid.1', 'resident_state'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "resident_city"],
+		path: ['eu.europa.ec.eudi.pid.1', 'resident_city'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "resident_postal_code"],
+		path: ['eu.europa.ec.eudi.pid.1', 'resident_postal_code'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "resident_street"],
+		path: ['eu.europa.ec.eudi.pid.1', 'resident_street'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "resident_house_number"],
+		path: ['eu.europa.ec.eudi.pid.1', 'resident_house_number'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "email_address"],
+		path: ['eu.europa.ec.eudi.pid.1', 'email_address'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "mobile_phone_number"],
+		path: ['eu.europa.ec.eudi.pid.1', 'mobile_phone_number'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "issuing_authority"],
+		path: ['eu.europa.ec.eudi.pid.1', 'issuing_authority'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "issuing_country"],
+		path: ['eu.europa.ec.eudi.pid.1', 'issuing_country'],
 		intent_to_retain: false,
 	},
 	{
-		path: ["eu.europa.ec.eudi.pid.1", "issuing_jurisdiction"],
+		path: ['eu.europa.ec.eudi.pid.1', 'issuing_jurisdiction'],
 		intent_to_retain: false,
 	},
 ];
 
 const bachelorSdJwtClaims: DcqlClaim[] = [
-	{ path: ["title"] },
-	{ path: ["expiry_date"] },
-	{ path: ["eqf_level"] },
-	{ path: ["birth_date"] },
-	{ path: ["blueprint_id"] },
-	{ path: ["graduation_date"] },
-	{ path: ["family_name"] },
-	{ path: ["grade"] },
-	{ path: ["given_name"] },
+	{ path: ['title'] },
+	{ path: ['expiry_date'] },
+	{ path: ['eqf_level'] },
+	{ path: ['birth_date'] },
+	{ path: ['blueprint_id'] },
+	{ path: ['graduation_date'] },
+	{ path: ['family_name'] },
+	{ path: ['grade'] },
+	{ path: ['given_name'] },
 ];
 
 const minimalBachelorSdJwtClaims: DcqlClaim[] = [
-	{ path: ["grade"] },
-	{ path: ["eqf_level"] },
-	{ path: ["title"] },
+	{ path: ['grade'] },
+	{ path: ['eqf_level'] },
+	{ path: ['title'] },
 ];
 
 const ehicSdJwtClaims: DcqlClaim[] = [
-	{ path: ["personal_administrative_number"] },
-	{ path: ["document_number"] },
-	{ path: ["issuing_country"] },
-	{ path: ["issuing_authority", "id"] },
-	{ path: ["issuing_authority", "name"] },
-	{ path: ["authentic_source", "id"] },
-	{ path: ["authentic_source", "name"] },
-	{ path: ["starting_date"] },
-	{ path: ["ending_date"] },
-	{ path: ["date_of_expiry"] },
-	{ path: ["date_of_issuance"] },
+	{ path: ['personal_administrative_number'] },
+	{ path: ['document_number'] },
+	{ path: ['issuing_country'] },
+	{ path: ['issuing_authority', 'id'] },
+	{ path: ['issuing_authority', 'name'] },
+	{ path: ['authentic_source', 'id'] },
+	{ path: ['authentic_source', 'name'] },
+	{ path: ['starting_date'] },
+	{ path: ['ending_date'] },
+	{ path: ['date_of_expiry'] },
+	{ path: ['date_of_issuance'] },
 ];
 
 const porSdJwtClaims: DcqlClaim[] = [
-	{ path: ["legal_person_identifier"] }, // Legal entity ID
-	{ path: ["legal_name"] },              // Legal entity name
-	{ path: ["full_powers"] },             // Full Representation Powers
-	{ path: ["eService"] },                // Designated eService
-	{ path: ["effective_from_date"] },
-	{ path: ["effective_until_date"] },
+	{ path: ['legal_person_identifier'] }, // Legal entity ID
+	{ path: ['legal_name'] }, // Legal entity name
+	{ path: ['full_powers'] }, // Full Representation Powers
+	{ path: ['eService'] }, // Designated eService
+	{ path: ['effective_from_date'] },
+	{ path: ['effective_until_date'] },
 ];
 
-
 const pidSdJwtCredentialQuery: DcqlCredentialQuery = {
-	id: "pidSdJwt",
-	format: "dc+sd-jwt",
+	id: 'pidSdJwt',
+	format: 'dc+sd-jwt',
 	meta: {
-		vct_values: ["urn:eudi:pid:1"],
+		vct_values: ['urn:eudi:pid:1'],
 	},
 	claims: pidSdJwtClaims,
 };
 
 const minimalPidSdJwtCredentialQuery: DcqlCredentialQuery = {
-	id: "minimalSdJwtPID",
-	format: "dc+sd-jwt",
+	id: 'minimalSdJwtPID',
+	format: 'dc+sd-jwt',
 	meta: {
-		vct_values: ["urn:eudi:pid:1"],
+		vct_values: ['urn:eudi:pid:1'],
 	},
 	claims: minimalPidSdJwtClaims,
 };
 
 const pidMdocCredentialQuery: DcqlCredentialQuery = {
-	id: "pidMsoMdoc",
-	format: "mso_mdoc",
+	id: 'pidMsoMdoc',
+	format: 'mso_mdoc',
 	meta: {
-		doctype_value: "eu.europa.ec.eudi.pid.1",
+		doctype_value: 'eu.europa.ec.eudi.pid.1',
 	},
 	claims: pidMdocClaims,
 };
 
 const bachelorCredentialQuery: DcqlCredentialQuery = {
-	id: "Bachelor",
-	format: "dc+sd-jwt",
+	id: 'Bachelor',
+	format: 'dc+sd-jwt',
 	meta: {
-		vct_values: ["urn:credential:diploma"],
+		vct_values: ['urn:credential:diploma'],
 	},
 	claims: bachelorSdJwtClaims,
 };
 
 const minimalBachelorCredentialQuery: DcqlCredentialQuery = {
-	id: "minimalBachelor",
-	format: "dc+sd-jwt",
+	id: 'minimalBachelor',
+	format: 'dc+sd-jwt',
 	meta: {
-		vct_values: ["urn:credential:diploma"],
+		vct_values: ['urn:credential:diploma'],
 	},
 	claims: minimalBachelorSdJwtClaims,
 };
 
 const europeanHealthInsuranceCardCredentialQuery: DcqlCredentialQuery = {
-	id: "EuropeanHealthInsuranceCard",
-	format: "dc+sd-jwt",
+	id: 'EuropeanHealthInsuranceCard',
+	format: 'dc+sd-jwt',
 	meta: {
-		vct_values: ["urn:eudi:ehic:1"],
+		vct_values: ['urn:eudi:ehic:1'],
 	},
 	claims: ehicSdJwtClaims,
 };
 
 const porCredentialQuery: DcqlCredentialQuery = {
-	id: "POR",
-	format: "dc+sd-jwt",
+	id: 'POR',
+	format: 'dc+sd-jwt',
 	meta: {
-		vct_values: ["urn:eu.europa.ec.eudi:por:1"],
+		vct_values: ['urn:eu.europa.ec.eudi:por:1'],
 	},
-	claims: porSdJwtClaims
+	claims: porSdJwtClaims,
 };
 
 const minimalPidQuery: DcqlQuery = {
-	credentials: [
-		minimalPidSdJwtCredentialQuery
-	]
+	credentials: [minimalPidSdJwtCredentialQuery],
 };
 
 const customPidDcqlQuery: DcqlQuery = {
-	credentials: [
-		pidSdJwtCredentialQuery,
-		pidMdocCredentialQuery,
-	]
+	credentials: [pidSdJwtCredentialQuery, pidMdocCredentialQuery],
 };
 
 const bachelorDcqlQuery: DcqlQuery = {
@@ -307,45 +299,30 @@ const europeanHealthInsuranceCardDcqlQuery: DcqlQuery = {
 };
 
 const minimalPidAndEuropeanHealthInsuranceCardDcqlQuery: DcqlQuery = {
-	credentials: [
-		minimalPidSdJwtCredentialQuery,
-		europeanHealthInsuranceCardCredentialQuery,
-	],
+	credentials: [minimalPidSdJwtCredentialQuery, europeanHealthInsuranceCardCredentialQuery],
 	credential_sets: [
 		{
-			options: [
-				[minimalPidSdJwtCredentialQuery.id, europeanHealthInsuranceCardCredentialQuery.id],
-			],
+			options: [[minimalPidSdJwtCredentialQuery.id, europeanHealthInsuranceCardCredentialQuery.id]],
 			required: true,
 		},
 	],
 };
 
 const minimalPidAndPorDcqlQuery: DcqlQuery = {
-	credentials: [
-		minimalPidSdJwtCredentialQuery,
-		porCredentialQuery,
-	],
+	credentials: [minimalPidSdJwtCredentialQuery, porCredentialQuery],
 	credential_sets: [
 		{
-			options: [
-				[minimalPidSdJwtCredentialQuery.id, porCredentialQuery.id],
-			],
+			options: [[minimalPidSdJwtCredentialQuery.id, porCredentialQuery.id]],
 			required: true,
 		},
 	],
 };
 
 const minimalPidAndBachelorDcqlQuery: DcqlQuery = {
-	credentials: [
-		minimalPidSdJwtCredentialQuery,
-		minimalBachelorCredentialQuery,
-	],
+	credentials: [minimalPidSdJwtCredentialQuery, minimalBachelorCredentialQuery],
 	credential_sets: [
 		{
-			options: [
-				[minimalPidSdJwtCredentialQuery.id, minimalBachelorCredentialQuery.id],
-			],
+			options: [[minimalPidSdJwtCredentialQuery.id, minimalBachelorCredentialQuery.id]],
 			required: true,
 		},
 	],
@@ -355,76 +332,75 @@ export class VerifierConfigurationService implements VerifierConfigurationInterf
 	getPresentationRequests(): any[] {
 		return [
 			{
-				id: "CustomPid",
-				title: "PID",
-				description: "Select the format and the fields you want to request",
+				id: 'CustomPid',
+				title: 'PID',
+				description: 'Select the format and the fields you want to request',
 				_selectable: true,
 				dcql_query: customPidDcqlQuery,
 			},
 			{
 				id: bachelorDcqlQuery.credentials[0].id,
-				title: "Bachelor Diploma",
-				description: "Select the fields you want to request",
+				title: 'Bachelor Diploma',
+				description: 'Select the fields you want to request',
 				_selectable: true,
 				dcql_query: bachelorDcqlQuery,
 			},
 			{
 				id: europeanHealthInsuranceCardDcqlQuery.credentials[0].id,
-				title: "EHIC",
-				description: "Select the fields you want to request",
+				title: 'EHIC',
+				description: 'Select the fields you want to request',
 				_selectable: true,
 				dcql_query: europeanHealthInsuranceCardDcqlQuery,
 			},
 			{
-				id: "MinimalPIDAndEuropeanHealthInsuranceCard",
-				title: "PID + EHIC",
-				description: "Request a PID along with an EHIC",
+				id: 'MinimalPIDAndEuropeanHealthInsuranceCard',
+				title: 'PID + EHIC',
+				description: 'Request a PID along with an EHIC',
 				dcql_query: minimalPidAndEuropeanHealthInsuranceCardDcqlQuery,
 			},
 			{
-				id: "MinimalPIDAndPOR",
-				title: "PID + POR",
-				description: "Request a PID along with a POR",
+				id: 'MinimalPIDAndPOR',
+				title: 'PID + POR',
+				description: 'Request a PID along with a POR',
 				dcql_query: minimalPidAndPorDcqlQuery,
 			},
 			{
-				id: "MinimalPIDAndBachelorDiploma",
-				title: "PID + Diploma",
-				description: "Request a PID along with a Bachelor Diploma",
+				id: 'MinimalPIDAndBachelorDiploma',
+				title: 'PID + Diploma',
+				description: 'Request a PID along with a Bachelor Diploma',
 				dcql_query: minimalPidAndBachelorDcqlQuery,
 			},
 			{
 				// QES Transaction data
-				id: "MinimalPIDwithTransactionDataQES",
-				title: "PID with QES Authorization Transaction Data",
-				purpose: "Document Signing",
+				id: 'MinimalPIDwithTransactionDataQES',
+				title: 'PID with QES Authorization Transaction Data',
+				purpose: 'Document Signing',
 				description:
-					"Format: dc+sd-jwt - Transaction Data Type: https://cloudsignatureconsortium.org/2025/qes. " +
+					'Format: dc+sd-jwt - Transaction Data Type: https://cloudsignatureconsortium.org/2025/qes. ' +
 					"The user will be requested to authorize the QTSP to create QES for the document 'Personal Loan Agreement'",
 				dcql_query: {
 					...minimalPidQuery,
-					credentials: minimalPidQuery.credentials.map(cred => ({
+					credentials: minimalPidQuery.credentials.map((cred) => ({
 						...cred,
-						_transaction_data_type: "https://cloudsignatureconsortium.org/2025/qes",
+						_transaction_data_type: 'https://cloudsignatureconsortium.org/2025/qes',
 					})),
-				}
+				},
 			},
 			{
 				// QC Request Transaction data
-				id: "MinimalPIDwithTransactionDataQCRequest",
-				title: "PID with QC Request Transaction Data",
-				purpose: "Creation of Signature Certificate",
+				id: 'MinimalPIDwithTransactionDataQCRequest',
+				title: 'PID with QC Request Transaction Data',
+				purpose: 'Creation of Signature Certificate',
 				description:
-					"Format: dc+sd-jwt - Transaction Data Type: https://cloudsignatureconsortium.org/2025/qc-request. " +
-					"The user will be requested to give consent for the creation of signature certificates according to the T&C of the QTSP",
+					'Format: dc+sd-jwt - Transaction Data Type: https://cloudsignatureconsortium.org/2025/qc-request. ' +
+					'The user will be requested to give consent for the creation of signature certificates according to the T&C of the QTSP',
 				dcql_query: {
 					...minimalPidQuery,
-					credentials: minimalPidQuery.credentials.map(cred => ({
+					credentials: minimalPidQuery.credentials.map((cred) => ({
 						...cred,
-						_transaction_data_type:
-							"https://cloudsignatureconsortium.org/2025/qc-request",
-					}))
-				}
+						_transaction_data_type: 'https://cloudsignatureconsortium.org/2025/qc-request',
+					})),
+				},
 			},
 			// {
 			//   // example with Transaction Data
@@ -447,8 +423,8 @@ export class VerifierConfigurationService implements VerifierConfigurationInterf
 	getConfiguration(): OpenidForPresentationsConfiguration {
 		return {
 			baseUrl: config.url,
-			redirect_uri: config.url + "/verification/direct_post",
-			authorizationServerWalletIdentifier: "authorization_server",
+			redirect_uri: config.url + '/verification/direct_post',
+			authorizationServerWalletIdentifier: 'authorization_server',
 		};
 	}
 }

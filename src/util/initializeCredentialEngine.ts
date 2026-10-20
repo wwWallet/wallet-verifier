@@ -1,13 +1,21 @@
-import { MsoMdocParser, MsoMdocVerifier, ParsingEngine, prependToPath, PublicKeyResolverEngine, SDJWTVCParser, SDJWTVCVerifier } from 'wallet-common';
+import {
+	MsoMdocParser,
+	MsoMdocVerifier,
+	ParsingEngine,
+	prependToPath,
+	PublicKeyResolverEngine,
+	SDJWTVCParser,
+	SDJWTVCVerifier,
+} from 'wallet-common';
 import { config } from '../../config';
-import { webcrypto } from "node:crypto";
+import { webcrypto } from 'node:crypto';
 import { CustomCredentialSvg, defaultHttpClient, CredentialRenderingService } from 'wallet-common';
 
 // @ts-ignore
 const trustedCredentialIssuerIdentifiers = config.trustedIssuers as string[] | undefined;
 
 export async function initializeCredentialEngine() {
-	console.log("Initializing credential engine...")
+	console.log('Initializing credential engine...');
 
 	const ctx = {
 		// @ts-ignore
@@ -18,25 +26,43 @@ export async function initializeCredentialEngine() {
 	};
 
 	if (trustedCredentialIssuerIdentifiers) {
-		const result = (await Promise.all(trustedCredentialIssuerIdentifiers.map(async (credentialIssuerIdentifier) =>
-			fetch(prependToPath(credentialIssuerIdentifier, ".well-known/openid-credential-issuer") ?? "")
-				.then((res) => res.ok ? res.json() : null)
-				.catch((e) => { console.error(e); return null; })
-		))).filter((r: any) => r !== null);
+		const result = (
+			await Promise.all(
+				trustedCredentialIssuerIdentifiers.map(async (credentialIssuerIdentifier) =>
+					fetch(
+						prependToPath(credentialIssuerIdentifier, '.well-known/openid-credential-issuer') ?? '',
+					)
+						.then((res) => (res.ok ? res.json() : null))
+						.catch((e) => {
+							console.error(e);
+							return null;
+						}),
+				),
+			)
+		).filter((r: any) => r !== null);
 
-		const iacasResponses = (await Promise.all(result.map(async (metadata) => {
-			if (metadata && metadata.mdoc_iacas_uri) {
-				return fetch(metadata.mdoc_iacas_uri)
-					.then((res) => res.ok ? res.json() : null)
-					.catch((e) => { console.error(e); return null; })
-			}
-			return null;
-		}))).filter((r: any) => r !== null);
+		const iacasResponses = (
+			await Promise.all(
+				result.map(async (metadata) => {
+					if (metadata && metadata.mdoc_iacas_uri) {
+						return fetch(metadata.mdoc_iacas_uri)
+							.then((res) => (res.ok ? res.json() : null))
+							.catch((e) => {
+								console.error(e);
+								return null;
+							});
+					}
+					return null;
+				}),
+			)
+		).filter((r: any) => r !== null);
 
 		for (const iacaResponse of iacasResponses) {
 			const pemCertificates = iacaResponse.iacas.map((cert: { certificate?: string }) =>
-				cert.certificate ? `-----BEGIN CERTIFICATE-----\n${cert.certificate}\n-----END CERTIFICATE-----\n` : null
-			)
+				cert.certificate
+					? `-----BEGIN CERTIFICATE-----\n${cert.certificate}\n-----END CERTIFICATE-----\n`
+					: null,
+			);
 			for (const pem of pemCertificates) {
 				if (pem) {
 					ctx.trustedCertificates.push(pem);
@@ -47,9 +73,9 @@ export async function initializeCredentialEngine() {
 
 	const credentialParsingEngine = ParsingEngine();
 	credentialParsingEngine.register(SDJWTVCParser({ context: ctx, httpClient: defaultHttpClient }));
-	console.log("Registered SDJWTVCParser...");
+	console.log('Registered SDJWTVCParser...');
 	credentialParsingEngine.register(MsoMdocParser({ context: ctx, httpClient: defaultHttpClient }));
-	console.log("Registered MsoMdocParser...");
+	console.log('Registered MsoMdocParser...');
 
 	const pkResolverEngine = PublicKeyResolverEngine();
 	const openid4vcRendering = CustomCredentialSvg({ httpClient: defaultHttpClient });
@@ -57,7 +83,11 @@ export async function initializeCredentialEngine() {
 	return {
 		credentialParsingEngine,
 		msoMdocVerifier: MsoMdocVerifier({ context: ctx, pkResolverEngine: pkResolverEngine }),
-		sdJwtVerifier: SDJWTVCVerifier({ context: ctx, pkResolverEngine: pkResolverEngine, httpClient: defaultHttpClient }),
+		sdJwtVerifier: SDJWTVCVerifier({
+			context: ctx,
+			pkResolverEngine: pkResolverEngine,
+			httpClient: defaultHttpClient,
+		}),
 		openid4vcRendering,
 		credentialRendering,
 	};

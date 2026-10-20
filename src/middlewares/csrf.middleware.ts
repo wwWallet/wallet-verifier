@@ -5,24 +5,23 @@ import locale from '../../config/locale';
 export function csrfMiddlewareGenerate(req: Request, res: Response, next: NextFunction) {
 	req.csrfToken = () => {
 		const token = randomUUID();
-		res.cookie("csrf_token", token);
+		res.cookie('csrf_token', token);
 		return token;
-	}
+	};
 	next();
-
 }
 
 export function csrfMiddlewareCheck(req: Request, res: Response, next: NextFunction) {
-	const csrfTokenFromBody = String(req.body["csrf-token"]);
-	const csrfTokenFromCookies = String(req.cookies["csrf_token"]);
+	const csrfTokenFromBody = String(req.body['csrf-token']);
+	const csrfTokenFromCookies = String(req.cookies['csrf_token']);
 
 	if (csrfTokenFromCookies !== csrfTokenFromBody) {
 		res.render('error', {
 			code: 3006,
-			msg: "CSRF token error",
+			msg: 'CSRF token error',
 			lang: req.lang,
-			locale: locale["en"]
-		})
+			locale: locale['en'],
+		});
 		return;
 	}
 	next();

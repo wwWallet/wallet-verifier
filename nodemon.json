@@ -1,12 +1,5 @@
 {
-    "ignore": [
-        "README.md",
-        "dist/",
-        "node_modules/",
-		"samples/"
-    ],
-    "watch": [
-        "."
-    ],
-    "ext": "ts,js,pug"
+  "ignore": ["README.md", "dist/", "node_modules/", "samples/"],
+  "watch": ["."],
+  "ext": "ts,js,pug"
 }
