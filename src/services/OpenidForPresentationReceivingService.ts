@@ -23,8 +23,7 @@ const x5c = [
 
 const ResponseModeSchema = z.nativeEnum(OpenID4VPResponseMode);
 
-// @ts-ignore
-const response_mode: ResponseMode = config?.presentationFlow?.response_mode ? ResponseModeSchema.parse(config?.presentationFlow?.response_mode) : ResponseMode.DIRECT_POST_JWT;
+const response_mode: OpenID4VPResponseMode = config?.presentationFlow?.response_mode ? ResponseModeSchema.parse(config?.presentationFlow?.response_mode) : OpenID4VPResponseMode.DIRECT_POST_JWT;
 
 export class OpenidForPresentationsReceivingService implements OpenidForPresentationsReceivingInterface {
 	private static rpStateKV: MemoryStore<string, RPState | string> = new MemoryStore();
