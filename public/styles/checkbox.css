@@ -14,7 +14,7 @@
 }
 
 /* Hide the native checkbox */
-.checkbox-wrapper input[type="checkbox"] {
+.checkbox-wrapper input[type='checkbox'] {
 	position: absolute;
 	opacity: 0;
 	pointer-events: none;
@@ -36,7 +36,7 @@
 
 /* Draw the box */
 .checkbox-wrapper label::before {
-	content: "";
+	content: '';
 	position: absolute;
 	left: 0;
 	top: 0rem;
@@ -46,12 +46,14 @@
 	border-radius: 4px;
 	background: #fff;
 	box-sizing: border-box;
-	transition: background-color 0.15s ease, border-color 0.15s ease;
+	transition:
+		background-color 0.15s ease,
+		border-color 0.15s ease;
 }
 
 /* Draw the checkmark (hidden by default) */
 .checkbox-wrapper label::after {
-	content: "";
+	content: '';
 	position: absolute;
 	left: 6px;
 	top: 1px;
@@ -65,28 +67,28 @@
 }
 
 /* Checked state */
-.checkbox-wrapper input[type="checkbox"]:checked+label::before {
+.checkbox-wrapper input[type='checkbox']:checked + label::before {
 	background: var(--primary-main-color);
 	border-color: var(--primary-main-color);
 }
 
-.checkbox-wrapper input[type="checkbox"]:checked+label::after {
+.checkbox-wrapper input[type='checkbox']:checked + label::after {
 	opacity: 1;
 }
 
 /* Disabled state */
-.checkbox-wrapper input[type="checkbox"]:disabled+label {
+.checkbox-wrapper input[type='checkbox']:disabled + label {
 	color: #9ca3af;
 	cursor: not-allowed;
 }
 
-.checkbox-wrapper input[type="checkbox"]:disabled+label::before {
+.checkbox-wrapper input[type='checkbox']:disabled + label::before {
 	background: #d1d5db;
 	border-color: #9ca3af;
 }
 
 /* Keyboard focus (since input is hidden) */
-.checkbox-wrapper input[type="checkbox"]:focus-visible+label::before {
+.checkbox-wrapper input[type='checkbox']:focus-visible + label::before {
 	outline: 3px solid color-mix(in srgb, var(--primary-main-color) 40%, transparent);
 	outline-offset: 2px;
 }

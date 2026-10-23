@@ -1,14 +1,14 @@
 (function () {
 	const path = window.location.pathname;
-	const segments = path.split("/").filter(Boolean);
+	const segments = path.split('/').filter(Boolean);
 	const presentationRequestId = segments[segments.length - 1];
 	if (!presentationRequestId) return;
 
 	setInterval(() => {
 		fetch(
-			"/verifier/public/definitions/presentation-request/status/" +
-			encodeURIComponent(presentationRequestId),
-			{ method: "GET" }
+			'/verifier/public/definitions/presentation-request/status/' +
+				encodeURIComponent(presentationRequestId),
+			{ method: 'GET' },
 		)
 			.then((response) => {
 				if (!response.ok) throw new Error(`HTTP error with status ${response.status}`);

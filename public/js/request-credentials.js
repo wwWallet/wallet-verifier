@@ -1,13 +1,16 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
 	const typeRadios = document.querySelectorAll('input[name="type"]');
-	const attributesContainer = document.getElementById("attributes-container");
-	const scriptEl = document.currentScript || document.querySelector('script[src^="/js/request-credentials.js"]');
+	const attributesContainer = document.getElementById('attributes-container');
+	const scriptEl =
+		document.currentScript || document.querySelector('script[src^="/js/request-credentials.js"]');
 	const dcqlQuery = JSON.parse(scriptEl.dataset.dcqlQuery);
-	const selectAllLabel = scriptEl.dataset.selectAllLabel || "Select all";
+	const selectAllLabel = scriptEl.dataset.selectAllLabel || 'Select all';
 
-	const form = document.querySelector("form");
-	const dcqlQueryInput = document.getElementById("dcql-query-input");
-	const typeToFormat = new Map(Array.from(typeRadios).map((radio) => [radio.value, radio.dataset.format]));
+	const form = document.querySelector('form');
+	const dcqlQueryInput = document.getElementById('dcql-query-input');
+	const typeToFormat = new Map(
+		Array.from(typeRadios).map((radio) => [radio.value, radio.dataset.format]),
+	);
 
 	function getCredentialByType(type) {
 		const format = typeToFormat.get(type);
@@ -25,18 +28,18 @@ document.addEventListener("DOMContentLoaded", () => {
 		const credential = getCredentialByType(type);
 		if (!credential) return;
 
-		const masterWrapper = document.createElement("div");
-		masterWrapper.classList.add("checkbox-wrapper", "checkbox-wrapper--master");
+		const masterWrapper = document.createElement('div');
+		masterWrapper.classList.add('checkbox-wrapper', 'checkbox-wrapper--master');
 
-		const masterCheckbox = document.createElement("input");
-		masterCheckbox.type = "checkbox";
-		masterCheckbox.id = "select-all-attributes";
+		const masterCheckbox = document.createElement('input');
+		masterCheckbox.type = 'checkbox';
+		masterCheckbox.id = 'select-all-attributes';
 
-		const masterLabel = document.createElement("label");
+		const masterLabel = document.createElement('label');
 		masterLabel.htmlFor = masterCheckbox.id;
 		masterLabel.textContent = selectAllLabel;
 
-		masterCheckbox.addEventListener("change", () => {
+		masterCheckbox.addEventListener('change', () => {
 			const attributeCheckboxes = getAttributeCheckboxes();
 			attributeCheckboxes.forEach((checkbox) => {
 				checkbox.checked = masterCheckbox.checked;
@@ -49,21 +52,21 @@ document.addEventListener("DOMContentLoaded", () => {
 		attributesContainer.appendChild(masterWrapper);
 
 		(credential.claims || []).forEach((claim, idx) => {
-			const label = claim.path.join(".");
-			const value = claim.path.join(".");
-			const fieldWrapper = document.createElement("div");
-			fieldWrapper.classList.add("checkbox-wrapper");
+			const label = claim.path.join('.');
+			const value = claim.path.join('.');
+			const fieldWrapper = document.createElement('div');
+			fieldWrapper.classList.add('checkbox-wrapper');
 
-			const input = document.createElement("input");
-			input.type = "checkbox";
-			input.name = "attributes[]";
+			const input = document.createElement('input');
+			input.type = 'checkbox';
+			input.name = 'attributes[]';
 			input.value = value;
 			input.id = `attr-${idx}`;
 
-			const labelElement = document.createElement("label");
+			const labelElement = document.createElement('label');
 			labelElement.htmlFor = input.id;
 			labelElement.textContent = label;
-			input.addEventListener("change", updateSelectionState);
+			input.addEventListener('change', updateSelectionState);
 			fieldWrapper.appendChild(input);
 			fieldWrapper.appendChild(labelElement);
 			attributesContainer.appendChild(fieldWrapper);
@@ -78,28 +81,34 @@ document.addEventListener("DOMContentLoaded", () => {
 	function updateSelectionState() {
 		const masterCheckbox = attributesContainer.querySelector('#select-all-attributes');
 		const attributeCheckboxes = getAttributeCheckboxes();
-		const submitButton = document.querySelector(".request-qr");
-		const checkedCount = Array.from(attributeCheckboxes).filter((checkbox) => checkbox.checked).length;
+		const submitButton = document.querySelector('.request-qr');
+		const checkedCount = Array.from(attributeCheckboxes).filter(
+			(checkbox) => checkbox.checked,
+		).length;
 		const anySelected = checkedCount > 0;
-		const allSelected = attributeCheckboxes.length > 0 && checkedCount === attributeCheckboxes.length;
+		const allSelected =
+			attributeCheckboxes.length > 0 && checkedCount === attributeCheckboxes.length;
 
 		if (masterCheckbox) {
 			masterCheckbox.disabled = attributeCheckboxes.length === 0;
 			masterCheckbox.checked = allSelected;
 			masterCheckbox.indeterminate = !allSelected && anySelected;
-			masterCheckbox.setAttribute("aria-checked", masterCheckbox.indeterminate ? "mixed" : String(masterCheckbox.checked));
+			masterCheckbox.setAttribute(
+				'aria-checked',
+				masterCheckbox.indeterminate ? 'mixed' : String(masterCheckbox.checked),
+			);
 		}
 
 		submitButton.disabled = !anySelected;
 	}
 
 	typeRadios.forEach((radio) => {
-		radio.addEventListener("change", (e) => {
+		radio.addEventListener('change', (e) => {
 			renderFields(e.target.value);
 		});
 	});
 
-	form.addEventListener("submit", (e) => {
+	form.addEventListener('submit', (e) => {
 		e.preventDefault();
 		const selectedType = getSelectedType();
 		if (!selectedType) return;
@@ -107,11 +116,12 @@ document.addEventListener("DOMContentLoaded", () => {
 		const credential = getCredentialByType(selectedType);
 		if (!credential) return;
 
-		const selectedClaims = Array.from(attributesContainer.querySelectorAll('input[type="checkbox"]:checked'))
-			.map(cb => cb.value);
+		const selectedClaims = Array.from(
+			attributesContainer.querySelectorAll('input[type="checkbox"]:checked'),
+		).map((cb) => cb.value);
 
-		const filteredClaims = (credential.claims || []).filter(claim =>
-			selectedClaims.includes(claim.path.join("."))
+		const filteredClaims = (credential.claims || []).filter((claim) =>
+			selectedClaims.includes(claim.path.join('.')),
 		);
 
 		const filteredCredential = { ...credential, claims: filteredClaims };

@@ -213,7 +213,7 @@
 }
 
 .details-toggle summary::before {
-	content: "▸";
+	content: '▸';
 	font-size: 22px;
 	transition: transform 0.2s ease;
 }

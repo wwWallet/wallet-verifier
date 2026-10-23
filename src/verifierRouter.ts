@@ -1,116 +1,117 @@
-import { Router } from "express";
+import { Router } from 'express';
 import * as qrcode from 'qrcode';
-import { config } from "./../config";
-import { OpenidForPresentationsReceivingService } from "./services/OpenidForPresentationReceivingService";
-import { VerifierConfigurationService } from "./services/VerifierConfigurationService";
-import { generateRandomIdentifier } from "./util/generateRandomIdentifier";
-import { addSessionIdCookieToResponse } from "../config/sessionIdCookieConfig";
-import { initializeCredentialEngine } from "./util/initializeCredentialEngine";
+import { config } from './../config';
+import { OpenidForPresentationsReceivingService } from './services/OpenidForPresentationReceivingService';
+import { VerifierConfigurationService } from './services/VerifierConfigurationService';
+import { generateRandomIdentifier } from './util/generateRandomIdentifier';
+import { addSessionIdCookieToResponse } from '../config/sessionIdCookieConfig';
+import { initializeCredentialEngine } from './util/initializeCredentialEngine';
 
 import Ajv from 'ajv';
-import { titleWithSiteName } from "../config/titles";
+import { titleWithSiteName } from '../config/titles';
 const ajv = new Ajv();
 
 const dcqlQuerySchema = {
-	type: "object",
-	required: ["credentials"],
+	type: 'object',
+	required: ['credentials'],
 	properties: {
 		credentials: {
-			type: "array",
+			type: 'array',
 			items: {
-				type: "object",
-				required: ["id", "format"],
+				type: 'object',
+				required: ['id', 'format'],
 				properties: {
-					id: { type: "string" },
-					format: { type: "string" },
+					id: { type: 'string' },
+					format: { type: 'string' },
 					meta: {
-						type: "object",
+						type: 'object',
 						properties: {
-							doctype_value: { type: "string" },
-							"sd-jwt_alg_values": {
-								type: "array",
-								items: { type: "string" }
+							doctype_value: { type: 'string' },
+							'sd-jwt_alg_values': {
+								type: 'array',
+								items: { type: 'string' },
 							},
-							"kb-jwt_alg_values": {
-								type: "array",
-								items: { type: "string" }
-							}
+							'kb-jwt_alg_values': {
+								type: 'array',
+								items: { type: 'string' },
+							},
 						},
-						additionalProperties: true
+						additionalProperties: true,
 					},
 					claims: {
-						type: "array",
+						type: 'array',
 						items: {
-							type: "object",
-							required: ["path"],
+							type: 'object',
+							required: ['path'],
 							properties: {
-								id: { type: "string" },
+								id: { type: 'string' },
 								path: {
-									type: "array",
-									items: { type: "string" }
+									type: 'array',
+									items: { type: 'string' },
 								},
-								intent_to_retain: { type: "boolean" },
-								filter: { type: "object" }
-							}
-						}
-					}
-				}
-			}
+								intent_to_retain: { type: 'boolean' },
+								filter: { type: 'object' },
+							},
+						},
+					},
+				},
+			},
 		},
 		credential_sets: {
-			type: "array",
+			type: 'array',
 			items: {
-				type: "object",
-				required: ["options", "purpose"],
+				type: 'object',
+				required: ['options', 'purpose'],
 				properties: {
 					options: {
-						type: "array",
+						type: 'array',
 						items: {
-							type: "array",
-							items: { type: "string" }
-						}
+							type: 'array',
+							items: { type: 'string' },
+						},
 					},
-					purpose: { type: "string" }
-				}
-			}
-		}
-	}
+					purpose: { type: 'string' },
+				},
+			},
+		},
+	},
 };
 
-export const sanitizeInput = (input: string): string =>
-	input.replace(/[^\x20-\x7E\n]/g, '');
+export const sanitizeInput = (input: string): string => input.replace(/[^\x20-\x7E\n]/g, '');
 
-type InferredClaimType = "text" | "imageUri" | "jsonObject" | "jsonArray";
+type InferredClaimType = 'text' | 'imageUri' | 'jsonObject' | 'jsonArray';
 
 const IMAGE_URI_PATTERN = /^data:image\/[a-zA-Z0-9.+-]+;base64,/i;
 
-const inferClaimValueType = (value: unknown): { inferredType: InferredClaimType, parsedJsonValue?: unknown } => {
-	if (typeof value !== "string") {
-		return { inferredType: "text" };
+const inferClaimValueType = (
+	value: unknown,
+): { inferredType: InferredClaimType; parsedJsonValue?: unknown } => {
+	if (typeof value !== 'string') {
+		return { inferredType: 'text' };
 	}
 
 	const trimmed = value.trim();
 	if (!trimmed) {
-		return { inferredType: "text" };
+		return { inferredType: 'text' };
 	}
 
 	if (IMAGE_URI_PATTERN.test(trimmed)) {
-		return { inferredType: "imageUri" };
+		return { inferredType: 'imageUri' };
 	}
 
 	try {
 		const parsedJson = JSON.parse(trimmed);
 		if (Array.isArray(parsedJson)) {
-			return { inferredType: "jsonArray", parsedJsonValue: parsedJson };
+			return { inferredType: 'jsonArray', parsedJsonValue: parsedJson };
 		}
-		if (parsedJson !== null && typeof parsedJson === "object") {
-			return { inferredType: "jsonObject", parsedJsonValue: parsedJson };
+		if (parsedJson !== null && typeof parsedJson === 'object') {
+			return { inferredType: 'jsonObject', parsedJsonValue: parsedJson };
 		}
 	} catch {
 		// Not JSON content.
 	}
 
-	return { inferredType: "text" };
+	return { inferredType: 'text' };
 };
 
 const enrichClaimsWithInferredTypes = (claims: Record<string, any[]>): Record<string, any[]> => {
@@ -130,24 +131,25 @@ const enrichClaimsWithInferredTypes = (claims: Record<string, any[]>): Record<st
 	);
 };
 
-
 const MAX_CERT_LENGTH = 5000;
 
 const verifierRouter = Router();
 const verifierConfiguration = new VerifierConfigurationService();
-const openidForPresentationReceivingService = new OpenidForPresentationsReceivingService(verifierConfiguration);
+const openidForPresentationReceivingService = new OpenidForPresentationsReceivingService(
+	verifierConfiguration,
+);
 
 verifierRouter.post('/public/manage-certificates', async (req, res) => {
 	const { certificate } = req.body;
 	try {
 		if (!certificate) {
-			throw new Error("No certificate provided");
+			throw new Error('No certificate provided');
 		}
 		if (certificate.length > MAX_CERT_LENGTH) {
-			throw new Error("Certificate too large");
+			throw new Error('Certificate too large');
 		}
 		if (!/^([A-Za-z0-9+/=\s-]+)$/.test(certificate)) {
-			throw new Error("Invalid characters in certificate input");
+			throw new Error('Invalid characters in certificate input');
 		}
 		const sanitizedCert = sanitizeInput(certificate);
 		const pem = sanitizedCert.includes('-----BEGIN CERTIFICATE-----')
@@ -162,69 +164,83 @@ verifierRouter.post('/public/manage-certificates', async (req, res) => {
 			title: titleWithSiteName('manage-certificates'),
 			trustedRootCertificates: config.trustedRootCertificates,
 			error: {
-				errorMessage: 'error adding x509 certificate'
-			}
+				errorMessage: 'error adding x509 certificate',
+			},
 		});
 	}
 });
 
 verifierRouter.get('/public/manage-certificates', async (_req, res) => {
-	return res.render('manage-certificates.pug',{
+	return res.render('manage-certificates.pug', {
 		title: titleWithSiteName('manage-certificates'),
-		trustedRootCertificates: config.trustedRootCertificates
+		trustedRootCertificates: config.trustedRootCertificates,
 	});
-})
+});
 
 verifierRouter.get('/public/definitions', async (_req, res) => {
 	return res.render('public-definitions.pug', {
 		title: titleWithSiteName('public-definitions'),
 		presentationRequests: verifierConfiguration.getPresentationRequests(),
 	});
-})
+});
 
-
-verifierRouter.get('/callback/status', async (req, res) => { // response with the status of the presentation (this endpoint should be protected)
+verifierRouter.get('/callback/status', async (req, res) => {
+	// response with the status of the presentation (this endpoint should be protected)
 	if (!req.cookies['session_id']) {
-		return res.send({ status: false, error: "Missing session_id from cookies" });
+		return res.send({ status: false, error: 'Missing session_id from cookies' });
 	}
-	const result = await openidForPresentationReceivingService.openid4vp.getPresentationBySessionId(req.cookies['session_id'], false);
+	const result = await openidForPresentationReceivingService.openid4vp.getPresentationBySessionId(
+		req.cookies['session_id'],
+		false,
+	);
 	if (!result.status) {
-		return res.send({ status: false, error: "Presentation not received" });
+		return res.send({ status: false, error: 'Presentation not received' });
 	}
-	return res.send({ status: result.status, presentationClaims: result.rpState.claims, presentation: result.rpState.vp_token });
-})
-
+	return res.send({
+		status: result.status,
+		presentationClaims: result.rpState.claims,
+		presentation: result.rpState.vp_token,
+	});
+});
 
 verifierRouter.get('/callback', async (_req, res) => {
 	res.render('handle-response-code', {
 		title: titleWithSiteName('handle-response-code'),
 	});
-})
+});
 
 verifierRouter.post('/callback', async (req, res) => {
 	// this request includes the response code
 	let session_id = req.cookies['session_id'];
-	if (req.body.response_code) { // response_code is considered more stable than session_id
-		const s = await openidForPresentationReceivingService.openid4vp.getRPStateByResponseCode(req.body.response_code);
+	if (req.body.response_code) {
+		// response_code is considered more stable than session_id
+		const s = await openidForPresentationReceivingService.openid4vp.getRPStateByResponseCode(
+			req.body.response_code,
+		);
 		if (s) {
 			session_id = s.session_id;
 		}
 	}
 
 	if (!session_id) {
-		console.error("Problem with the verification flow")
-		return res.status(400).send({ error: "Problem with the verification flow" })
+		console.error('Problem with the verification flow');
+		return res.status(400).send({ error: 'Problem with the verification flow' });
 	}
 
-	const result = await openidForPresentationReceivingService.openid4vp.getPresentationBySessionId(session_id, true);
+	const result = await openidForPresentationReceivingService.openid4vp.getPresentationBySessionId(
+		session_id,
+		true,
+	);
 
-	if (result.status == false ||
+	if (
+		result.status == false ||
 		result.rpState.vp_token == null ||
 		result.rpState.claims == null ||
-		result.rpState.date_created == null) {
+		result.rpState.date_created == null
+	) {
 		return res.render('error.pug', {
 			title: titleWithSiteName('error'),
-			msg: result.status == false ? result.error.message : "Unknown error",
+			msg: result.status == false ? result.error.message : 'Unknown error',
 			code: 0,
 		});
 	}
@@ -253,7 +269,8 @@ verifierRouter.post('/callback', async (req, res) => {
 	}
 
 	const verificationTimestamp = new Date(date_created).toISOString();
-	const descriptorFriendlyNames = res.locals.locale?.presentationSuccess?.claims?.descriptorFriendlyNames || {};
+	const descriptorFriendlyNames =
+		res.locals.locale?.presentationSuccess?.claims?.descriptorFriendlyNames || {};
 	return res.render('presentation-success.pug', {
 		title: titleWithSiteName('presentation-success'),
 		status: status,
@@ -264,98 +281,115 @@ verifierRouter.post('/callback', async (req, res) => {
 		credentialImages: credentialImages,
 		descriptorFriendlyNames: descriptorFriendlyNames,
 	});
-})
+});
 
-verifierRouter.use('/public/definitions/request-credentials/:presentation_request_id', async (req, res) => {
-	const presentation_request_id = req.params.presentation_request_id;
-	if (!presentation_request_id) {
-		return res.render('error', {
-			title: titleWithSiteName('error'),
-			msg: "No presentation request was selected",
-			code: 0,
+verifierRouter.use(
+	'/public/definitions/request-credentials/:presentation_request_id',
+	async (req, res) => {
+		const presentation_request_id = req.params.presentation_request_id;
+		if (!presentation_request_id) {
+			return res.render('error', {
+				title: titleWithSiteName('error'),
+				msg: 'No presentation request was selected',
+				code: 0,
+			});
+		}
+		const presentationRequest = verifierConfiguration
+			.getPresentationRequests()
+			.filter((pd) => pd.id == presentation_request_id)[0];
+		if (!presentationRequest) {
+			return res.render('error', {
+				title: titleWithSiteName('error'),
+				msg: 'No presentation request was found',
+				code: 0,
+			});
+		}
+		const selectableFields = presentationRequest.dcql_query.credentials
+			.flatMap((credential: any) => credential.claims)
+			.map((claim: any) => {
+				const label = claim.path.join('.');
+				return [label, claim.path[0]];
+			});
+		return res.render('request-credentials', {
+			title: titleWithSiteName('request-credentials'),
+			presentationRequestId: presentationRequest.id,
+			dcqlQuery: presentationRequest.dcql_query,
+			selectableFields,
 		});
-	}
-	const presentationRequest = verifierConfiguration.getPresentationRequests().filter(pd => pd.id == presentation_request_id)[0];
-	if (!presentationRequest) {
-		return res.render('error', {
-			title: titleWithSiteName('error'),
-			msg: "No presentation request was found",
-			code: 0,
-		});
-	}
-	const selectableFields = presentationRequest.dcql_query.credentials
-		.flatMap((credential: any) => credential.claims)
-		.map((claim: any) => {
-			const label = claim.path.join(".");
-			return [label, claim.path[0]];
-		});
-	return res.render('request-credentials', {
-		title: titleWithSiteName('request-credentials'),
-		presentationRequestId: presentationRequest.id,
-		dcqlQuery: presentationRequest.dcql_query,
-		selectableFields,
-	});
-})
+	},
+);
 
 verifierRouter.get('/public/definitions/request-custom-credential', async (_req, res) => {
 	return res.render('request-custom-credential', {
 		title: titleWithSiteName('request-custom-credential'),
-		schema: dcqlQuerySchema
+		schema: dcqlQuerySchema,
 	});
-})
+});
 
 verifierRouter.post('/public/definitions/request-custom-credential', async (req, res) => {
-	if (req.method === "POST" && req.body.action && req.cookies.session_id) {
+	if (req.method === 'POST' && req.body.action && req.cookies.session_id) {
 		// update is_cross_device --> false since the button was pressed
-		const rpState = await openidForPresentationReceivingService.openid4vp.getRPStateBySessionId(req.cookies.session_id);
+		const rpState = await openidForPresentationReceivingService.openid4vp.getRPStateBySessionId(
+			req.cookies.session_id,
+		);
 		if (rpState) {
 			rpState.is_cross_device = false;
-			await openidForPresentationReceivingService.openid4vp.saveRPState(rpState.session_id, rpState);
+			await openidForPresentationReceivingService.openid4vp.saveRPState(
+				rpState.session_id,
+				rpState,
+			);
 			await openidForPresentationReceivingService.setAuditCrossDevice(rpState.session_id, false);
 		}
 		return res.redirect(req.body.action);
 	}
 	let query;
-	let presentationRequest = {}
+	let presentationRequest = {};
 	try {
 		query = JSON.parse(req.body.dcqlQuery);
 		const validate = ajv.compile(dcqlQuerySchema);
 		if (!validate(query)) {
 			return res.render('error.pug', {
 				title: titleWithSiteName('error'),
-				msg: "Invalid DCQL query format",
+				msg: 'Invalid DCQL query format',
 				code: 0,
 			});
 		}
 		presentationRequest = {
-			id: "EditableDcqlQuery",
-			title: "Editable DCQL Query",
-			dcql_query: query
-		}
+			id: 'EditableDcqlQuery',
+			title: 'Editable DCQL Query',
+			dcql_query: query,
+		};
 	} catch (error) {
 		return res.render('error.pug', {
 			title: titleWithSiteName('error'),
-			msg: "Error while parsing the DCQL query",
+			msg: 'Error while parsing the DCQL query',
 			code: 0,
 		});
 	}
-	const scheme = req.body.scheme
+	const scheme = req.body.scheme;
 
 	const newSessionId = generateRandomIdentifier(12);
 	addSessionIdCookieToResponse(res, newSessionId);
-	const { url } = await openidForPresentationReceivingService.generateAuthorizationRequestURL(presentationRequest, newSessionId, config.url + "/verifier/callback");
-	const modifiedUrl = url.toString().replace("openid4vp://cb", scheme)
-	let authorizationRequestQR = await new Promise((resolve) => {
-		qrcode.toDataURL(modifiedUrl.toString(), {
-			margin: 1,
-			errorCorrectionLevel: 'L',
-			type: 'image/png'
-		},
+	const { url } = await openidForPresentationReceivingService.generateAuthorizationRequestURL(
+		presentationRequest,
+		newSessionId,
+		config.url + '/verifier/callback',
+	);
+	const modifiedUrl = url.toString().replace('openid4vp://cb', scheme);
+	let authorizationRequestQR = (await new Promise((resolve) => {
+		qrcode.toDataURL(
+			modifiedUrl.toString(),
+			{
+				margin: 1,
+				errorCorrectionLevel: 'L',
+				type: 'image/png',
+			},
 			(err, data) => {
-				if (err) return resolve("NO_QR");
+				if (err) return resolve('NO_QR');
 				return resolve(data);
-			});
-	}) as string;
+			},
+		);
+	})) as string;
 
 	return res.render('presentation-request.pug', {
 		title: titleWithSiteName('presentation-request'),
@@ -365,91 +399,118 @@ verifierRouter.post('/public/definitions/request-custom-credential', async (req,
 		presentationRequest: JSON.stringify(JSON.parse(req.body.dcqlQuery)),
 		state: url.searchParams.get('state'),
 	});
-})
+});
 
-verifierRouter.get('/public/definitions/presentation-request/status/:presentation_request_id', async (req, res) => {
-	console.log("session_id : ", req.cookies['session_id'])
-	if (req.cookies['session_id'] && req.method == "GET") {
-		const { status } = await openidForPresentationReceivingService.openid4vp.getPresentationBySessionId(req.cookies['session_id'], false);
-		if (status == true) {
-			return res.send({ url: `/verifier/callback` });
-		}
-		else {
+verifierRouter.get(
+	'/public/definitions/presentation-request/status/:presentation_request_id',
+	async (req, res) => {
+		console.log('session_id : ', req.cookies['session_id']);
+		if (req.cookies['session_id'] && req.method == 'GET') {
+			const { status } =
+				await openidForPresentationReceivingService.openid4vp.getPresentationBySessionId(
+					req.cookies['session_id'],
+					false,
+				);
+			if (status == true) {
+				return res.send({ url: `/verifier/callback` });
+			} else {
+				return res.send({});
+			}
+		} else {
 			return res.send({});
 		}
-	}
-	else {
-		return res.send({})
-	}
-})
+	},
+);
 
-verifierRouter.use('/public/definitions/presentation-request/:presentation_request_id', async (req, res) => {
-	const presentation_request_id = req.params.presentation_request_id;
-	if (!presentation_request_id) {
-		return res.render('error', {
-			title: titleWithSiteName('error'),
-			msg: "No presentation request was selected",
-			code: 0,
-		});
-	}
-
-
-	let presentationRequest;
-	if (req.method === "POST" && req.body.dcql_query) {
-		// Use the filtered query
-		presentationRequest = { dcql_query: JSON.parse(req.body.dcql_query) };
-	} else {
-		presentationRequest = JSON.parse(JSON.stringify(verifierConfiguration.getPresentationRequests().filter(pd => pd.id == presentation_request_id)[0])) as any;
-	}
-	if (!presentationRequest) {
-		return res.render('error', {
-			title: titleWithSiteName('error'),
-			msg: "No presentation request was found",
-			code: 0,
-		});
-	}
-
-	let scheme = "openid4vp://cb";
-	if (req.method === "POST" && req.body.scheme) {
-		scheme = req.body.scheme;
-	}
-
-	if (req.method === "POST" && req.body.action && req.cookies.session_id) { // handle click of "open with..." button
-		console.log("Cookie = ", req.cookies)
-		// update is_cross_device --> false since the button was pressed
-		const rpState = await openidForPresentationReceivingService.openid4vp.getRPStateBySessionId(req.cookies.session_id);
-		if (rpState) {
-			rpState.is_cross_device = false;
-			await openidForPresentationReceivingService.openid4vp.saveRPState(rpState.session_id, rpState);
-			await openidForPresentationReceivingService.setAuditCrossDevice(rpState.session_id, false);
-		}
-		return res.redirect(req.body.action);
-	}
-	const newSessionId = generateRandomIdentifier(12);
-	addSessionIdCookieToResponse(res, newSessionId); // start session here
-	const clientIdPrefix = req.body.clientIdPrefix;
-	const { url } = await openidForPresentationReceivingService.generateAuthorizationRequestURL(presentationRequest, newSessionId, config.url + "/verifier/callback", clientIdPrefix);
-	const modifiedUrl = url.toString().replace("openid4vp://cb", scheme)
-	let authorizationRequestQR = await new Promise((resolve) => {
-		qrcode.toDataURL(modifiedUrl.toString(), {
-			margin: 1,
-			errorCorrectionLevel: 'L',
-			type: 'image/png'
-		},
-			(err, data) => {
-				if (err) return resolve("NO_QR");
-				return resolve(data);
+verifierRouter.use(
+	'/public/definitions/presentation-request/:presentation_request_id',
+	async (req, res) => {
+		const presentation_request_id = req.params.presentation_request_id;
+		if (!presentation_request_id) {
+			return res.render('error', {
+				title: titleWithSiteName('error'),
+				msg: 'No presentation request was selected',
+				code: 0,
 			});
-	}) as string;
+		}
 
-	return res.render('presentation-request.pug', {
-		title: titleWithSiteName('presentation-request'),
-		wwwalletURL: config.wwwalletURL,
-		authorizationRequestURL: modifiedUrl,
-		authorizationRequestQR,
-		presentationRequest: JSON.stringify(presentationRequest.dcql_query),
-		state: url.searchParams.get('state'),
-	});
-})
+		let presentationRequest;
+		if (req.method === 'POST' && req.body.dcql_query) {
+			// Use the filtered query
+			presentationRequest = { dcql_query: JSON.parse(req.body.dcql_query) };
+		} else {
+			presentationRequest = JSON.parse(
+				JSON.stringify(
+					verifierConfiguration
+						.getPresentationRequests()
+						.filter((pd) => pd.id == presentation_request_id)[0],
+				),
+			) as any;
+		}
+		if (!presentationRequest) {
+			return res.render('error', {
+				title: titleWithSiteName('error'),
+				msg: 'No presentation request was found',
+				code: 0,
+			});
+		}
+
+		let scheme = 'openid4vp://cb';
+		if (req.method === 'POST' && req.body.scheme) {
+			scheme = req.body.scheme;
+		}
+
+		if (req.method === 'POST' && req.body.action && req.cookies.session_id) {
+			// handle click of "open with..." button
+			console.log('Cookie = ', req.cookies);
+			// update is_cross_device --> false since the button was pressed
+			const rpState = await openidForPresentationReceivingService.openid4vp.getRPStateBySessionId(
+				req.cookies.session_id,
+			);
+			if (rpState) {
+				rpState.is_cross_device = false;
+				await openidForPresentationReceivingService.openid4vp.saveRPState(
+					rpState.session_id,
+					rpState,
+				);
+				await openidForPresentationReceivingService.setAuditCrossDevice(rpState.session_id, false);
+			}
+			return res.redirect(req.body.action);
+		}
+		const newSessionId = generateRandomIdentifier(12);
+		addSessionIdCookieToResponse(res, newSessionId); // start session here
+		const clientIdPrefix = req.body.clientIdPrefix;
+		const { url } = await openidForPresentationReceivingService.generateAuthorizationRequestURL(
+			presentationRequest,
+			newSessionId,
+			config.url + '/verifier/callback',
+			clientIdPrefix,
+		);
+		const modifiedUrl = url.toString().replace('openid4vp://cb', scheme);
+		let authorizationRequestQR = (await new Promise((resolve) => {
+			qrcode.toDataURL(
+				modifiedUrl.toString(),
+				{
+					margin: 1,
+					errorCorrectionLevel: 'L',
+					type: 'image/png',
+				},
+				(err, data) => {
+					if (err) return resolve('NO_QR');
+					return resolve(data);
+				},
+			);
+		})) as string;
+
+		return res.render('presentation-request.pug', {
+			title: titleWithSiteName('presentation-request'),
+			wwwalletURL: config.wwwalletURL,
+			authorizationRequestURL: modifiedUrl,
+			authorizationRequestQR,
+			presentationRequest: JSON.stringify(presentationRequest.dcql_query),
+			state: url.searchParams.get('state'),
+		});
+	},
+);
 
 export { verifierRouter };

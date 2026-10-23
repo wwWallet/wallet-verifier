@@ -88,7 +88,7 @@ h4 {
 }
 
 p {
-	margin: 0 0 0.50em;
+	margin: 0 0 0.5em;
 	font-size: 1rem;
 	color: #444;
 }
@@ -135,7 +135,10 @@ a {
 	font-weight: 700;
 	text-decoration: none;
 
-	transition: background-color 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
+	transition:
+		background-color 0.2s ease,
+		transform 0.1s ease,
+		opacity 0.2s ease;
 }
 
 .Btn:hover {
@@ -306,7 +309,7 @@ textarea.form-control {
 		transform 180ms ease;
 }
 
-.form-field .radio-field:has(input[type="radio"]:checked) {
+.form-field .radio-field:has(input[type='radio']:checked) {
 	border-color: var(--primary-main-color);
 	box-shadow:
 		0 0 0 1px color-mix(in srgb, var(--primary-main-color) 30%, transparent) inset,
@@ -314,11 +317,11 @@ textarea.form-control {
 	font-weight: 600;
 }
 
-.form-field .radio-field:has(input[type="radio"]:checked) .format-radio-subtitle {
+.form-field .radio-field:has(input[type='radio']:checked) .format-radio-subtitle {
 	font-weight: 400;
 }
 
-.form-field .radio-field input[type="radio"] {
+.form-field .radio-field input[type='radio'] {
 	position: absolute;
 	opacity: 0;
 	pointer-events: none;
@@ -338,7 +341,6 @@ textarea.form-control {
 	font-size: 0.85em;
 	opacity: 0.75;
 }
-
 
 /* Mobile */
 @media (max-width: 768px) {

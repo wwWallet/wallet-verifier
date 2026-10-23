@@ -23,9 +23,8 @@ async function main() {
 	const app: Express = express();
 
 	initDataSource().then(() => {
-		console.log("Data source initialized");
+		console.log('Data source initialized');
 	});
-
 
 	app.use(cors({ credentials: true, origin: true }));
 
@@ -34,21 +33,22 @@ async function main() {
 		express.static(path.join(__dirname, '../../public/images'), {
 			maxAge: '30d',
 			immutable: true,
-		})
+		}),
 	);
 
 	// __dirname is "/path/to/dist/src"
 	app.use(express.static(path.join(__dirname, '../../public')));
 
 	app.use(cookieParser());
-	app.use(session({
-		secret: config.appSecret,
-		cookie: {
-			expires: null,
-			maxAge: config.sessionIdCookieConfiguration.maxAge,
-		},
-	}))
-
+	app.use(
+		session({
+			secret: config.appSecret,
+			cookie: {
+				expires: null,
+				maxAge: config.sessionIdCookieConfiguration.maxAge,
+			},
+		}),
+	);
 
 	app.use(bodyParser.urlencoded({ extended: true })); // support url encoded bodies
 	app.use(bodyParser.json()); // support json encoded bodies
@@ -61,7 +61,9 @@ async function main() {
 
 	// Instantiate dependencies
 	const verifierConfigurationService = new VerifierConfigurationService();
-	const openidForPresentationReceivingService = new OpenidForPresentationsReceivingService(verifierConfigurationService);
+	const openidForPresentationReceivingService = new OpenidForPresentationsReceivingService(
+		verifierConfigurationService,
+	);
 	const expressAppService = new ExpressAppService(openidForPresentationReceivingService);
 
 	await expressAppService.configure(app);
@@ -69,24 +71,23 @@ async function main() {
 
 	app.use((req, res, next) => {
 		res.locals.lang = req.lang;
-		res.locals.locale = locale["en"];
+		res.locals.locale = locale['en'];
 		next();
 	});
 
 	app.use('/verifier', morgan('combined'), verifierRouter);
 
-
 	app.get('/', async (_req: Request, res: Response) => {
-		return res.render("index", {
-			title: titleWithSiteName("index"),
+		return res.render('index', {
+			title: titleWithSiteName('index'),
 		});
 	});
 
 	app.post('/', async (req, res) => {
-		if (req.body.verifier == "true") {
+		if (req.body.verifier == 'true') {
 			return res.redirect('/verifier/public/definitions');
 		}
-	})
+	});
 
 	app.get('/metadata/:filename', (req, res) => {
 		if (req.params.filename !== 'site.webmanifest') {
@@ -95,22 +96,22 @@ async function main() {
 		const manifest = {
 			name: config.siteConfig.name,
 			short_name: config.siteConfig.short_name,
-			start_url: "/",
-			display: "standalone",
+			start_url: '/',
+			display: 'standalone',
 			background_color: config.siteConfig.background_color,
 			theme_color: config.siteConfig.theme_color,
 			icons: [
 				{
-					src: "/images/favicon-192x192.png",
-					sizes: "192x192",
-					type: "image/png"
+					src: '/images/favicon-192x192.png',
+					sizes: '192x192',
+					type: 'image/png',
 				},
 				{
-					src: "/images/favicon-512x512.png",
-					sizes: "512x512",
-					type: "image/png"
-				}
-			]
+					src: '/images/favicon-512x512.png',
+					sizes: '512x512',
+					type: 'image/png',
+				},
+			],
 		};
 
 		res.setHeader('Content-Type', 'application/manifest+json');
@@ -119,7 +120,7 @@ async function main() {
 
 	// catch 404 and forward to error handler
 	app.use((req, _res, next) => {
-		console.error("URL path not found: ", req.url)
+		console.error('URL path not found: ', req.url);
 		next(createHttpError(404));
 	});
 
@@ -134,8 +135,8 @@ async function main() {
 	});
 
 	app.listen(config.port, () => {
-		console.log(`Wallet enterprise app listening at ${config.url}`)
+		console.log(`Wallet enterprise app listening at ${config.url}`);
 	});
 }
 
-main()
+main();

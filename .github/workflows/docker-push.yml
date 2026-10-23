@@ -6,13 +6,11 @@ on:
       - v1.*
       - v2.*
 
-
 jobs:
   build:
-
     # Permissions for GITHUB_TOKEN
     permissions:
-      contents: read  # To check out repo
+      contents: read # To check out repo
       packages: write # To read NPM registry and push Docker image
 
     uses: wwwallet/wwwallet/.github/workflows/docker-build-push.yml@master
