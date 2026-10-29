@@ -8,7 +8,9 @@
     ".devcontainer",
     "public",
     "cli/",
-    "lib/"
+    "lib/",
+    "**/*.test.ts",
+    "vitest.config.ts"
   ],
   "compilerOptions": {
     "experimentalDecorators": true,
