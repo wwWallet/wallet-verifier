@@ -47,7 +47,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 				credentialEngineOptions: {
 					// @ts-ignore
 					clockTolerance: config.clockTolerance ?? 60,
-					subtle: webcrypto.subtle as SubtleCrypto,
+					subtle: webcrypto.subtle,
 					lang: 'en-US',
 					trustedCertificates: [...config.trustedRootCertificates] as string[],
 					trustedCredentialIssuerIdentifiers: trustedCredentialIssuerIdentifiers,
