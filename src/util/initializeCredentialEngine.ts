@@ -60,7 +60,7 @@ export async function initializeCredentialEngine() {
 		).filter((response): response is IacasResponse => response !== null);
 
 		for (const iacaResponse of iacasResponses) {
-			const pemCertificates = (iacaResponse.iacas ?? []).map((cert: { certificate?: string }) =>
+			const pemCertificates = iacaResponse.iacas!.map((cert: { certificate?: string }) =>
 				cert.certificate
 					? `-----BEGIN CERTIFICATE-----\n${cert.certificate}\n-----END CERTIFICATE-----\n`
 					: null,
