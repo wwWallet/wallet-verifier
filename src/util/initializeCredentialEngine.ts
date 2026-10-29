@@ -6,6 +6,8 @@ import {
 	PublicKeyResolverEngine,
 	SDJWTVCParser,
 	SDJWTVCVerifier,
+	type CredentialIssuerMetadata,
+	type IacasResponse,
 } from 'wallet-common';
 import { config } from '../../config';
 import { webcrypto } from 'node:crypto';
@@ -20,7 +22,7 @@ export async function initializeCredentialEngine() {
 	const ctx = {
 		// @ts-ignore
 		clockTolerance: config.clockTolerance ?? 60,
-		subtle: webcrypto.subtle as SubtleCrypto,
+		subtle: webcrypto.subtle,
 		lang: 'en-US',
 		trustedCertificates: [...config.trustedRootCertificates] as string[],
 	};
@@ -39,7 +41,7 @@ export async function initializeCredentialEngine() {
 						}),
 				),
 			)
-		).filter((r: any) => r !== null);
+		).filter((response): response is CredentialIssuerMetadata => response !== null);
 
 		const iacasResponses = (
 			await Promise.all(
@@ -55,10 +57,10 @@ export async function initializeCredentialEngine() {
 					return null;
 				}),
 			)
-		).filter((r: any) => r !== null);
+		).filter((response): response is IacasResponse => response !== null);
 
 		for (const iacaResponse of iacasResponses) {
-			const pemCertificates = iacaResponse.iacas.map((cert: { certificate?: string }) =>
+			const pemCertificates = iacaResponse.iacas!.map((cert: { certificate?: string }) =>
 				cert.certificate
 					? `-----BEGIN CERTIFICATE-----\n${cert.certificate}\n-----END CERTIFICATE-----\n`
 					: null,
