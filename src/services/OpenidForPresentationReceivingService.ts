@@ -28,7 +28,7 @@ const leafCert = fs.readFileSync(path.join(__dirname, '../../../keys/pem.crt'), 
 
 const x5c = [pemToBase64(leafCert)];
 
-const ResponseModeSchema = z.nativeEnum(OpenID4VPResponseMode);
+const ResponseModeSchema = z.enum(OpenID4VPResponseMode);
 
 const response_mode: OpenID4VPResponseMode = config?.presentationFlow?.response_mode
 	? ResponseModeSchema.parse(config?.presentationFlow?.response_mode)

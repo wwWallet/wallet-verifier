@@ -37,8 +37,8 @@
     "pug": "^3.0.2",
     "qrcode": "^1.5.1",
     "typeorm": "^0.3.31",
-    "wallet-common": "git+https://github.com/wwWallet/wallet-common.git#v1.0.0",
-    "zod": "^3.20.6"
+    "wallet-common": "git+https://github.com/wwWallet/wallet-common.git#v2.0.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
