@@ -1,5 +1,8 @@
 import { DataSource } from 'typeorm';
 import { config } from '../config';
+import { logger } from './logger';
+
+const log = logger.child({ module: 'DB' });
 
 // Initialize DB connection
 const AppDataSource: DataSource = new DataSource({
@@ -17,14 +20,14 @@ const AppDataSource: DataSource = new DataSource({
 export async function initDataSource() {
 	let connected = false;
 
-	console.log('Connecting with DB...');
+	log.info('Connecting to database');
 	await AppDataSource.initialize()
 		.then(() => {
-			console.log('App Data Source has been initialized!');
+			log.info('Data source initialized');
 			connected = true;
 		})
 		.catch((err) => {
-			console.error('Error during Data Source initialization', err);
+			log.error({ err }, 'Data source initialization failed, retrying in 3s');
 		});
 
 	// if not connected, then retry in loop
@@ -32,11 +35,11 @@ export async function initDataSource() {
 		await new Promise((resolve) => setTimeout(resolve, 3000)).then(async () => {
 			await AppDataSource.initialize()
 				.then(() => {
-					console.log('App Data Source has been initialized!');
+					log.info('Data source initialized');
 					connected = true;
 				})
 				.catch((err) => {
-					console.error('Error during Data Source initialization', err);
+					log.error({ err }, 'Data source initialization failed, retrying in 3s');
 				});
 		});
 	}

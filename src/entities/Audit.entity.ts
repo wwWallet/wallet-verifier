@@ -5,6 +5,9 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
+import { logger } from '../logger';
+
+const log = logger.child({ module: 'Audit' });
 
 @Entity({ name: 'audit' })
 export class Audit {
@@ -45,7 +48,7 @@ export class Audit {
 				try {
 					return JSON.parse(value) as Record<string, unknown>;
 				} catch (error) {
-					console.warn('Audit.dcqlQuery: failed to parse stored value as JSON', error);
+					log.warn({ err: error }, 'Audit.dcqlQuery: failed to parse stored value as JSON');
 					return null;
 				}
 			},

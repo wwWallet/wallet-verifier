@@ -1,10 +1,9 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express, NextFunction, Request, Response } from 'express';
 import { config } from '../config';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import cors from 'cors';
-import morgan from 'morgan';
 import { LanguageMiddleware } from './middlewares/language.middleware';
 import { initDataSource } from './AppDataSource';
 import createHttpError, { HttpError } from 'http-errors';
@@ -18,13 +17,19 @@ import locale from '../config/locale';
 import { verifierRouter } from './verifierRouter';
 import _ from 'lodash';
 import { titleWithSiteName } from '../config/titles';
+import { logger } from './logger';
+import { HttpLoggerMiddleware } from './middlewares/httpLogger.middleware';
+
+const log = logger.child({ module: 'App' });
 
 async function main() {
 	const app: Express = express();
 
-	initDataSource().then(() => {
-		console.log('Data source initialized');
-	});
+	if (config.logHttp) {
+		app.use(HttpLoggerMiddleware);
+	}
+
+	initDataSource();
 
 	app.use(cors({ credentials: true, origin: true }));
 
@@ -75,7 +80,7 @@ async function main() {
 		next();
 	});
 
-	app.use('/verifier', morgan('combined'), verifierRouter);
+	app.use('/verifier', verifierRouter);
 
 	app.get('/', async (_req: Request, res: Response) => {
 		return res.render('index', {
@@ -120,23 +125,43 @@ async function main() {
 
 	// catch 404 and forward to error handler
 	app.use((req, _res, next) => {
-		console.error('URL path not found: ', req.url);
+		log.debug({ method: req.method, url: req.path }, 'Route not found');
 		next(createHttpError(404));
 	});
 
-	// error handler
-	app.use((err: HttpError, req: Request, res: Response) => {
+	// error handler: must declare all 4 parameters, or Express treats it as normal middleware
+	app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
+		if (res.headersSent) {
+			return next(err);
+		}
+		const status = err.status || 500;
+		if (status >= 500) {
+			// pino-http (LOG_HTTP=true) picks this up and logs the real error instead of a generic 500
+			res.err = err;
+			log.error({ err, method: req.method, url: req.path }, 'Unhandled error in request handler');
+		}
 		// set locals, only providing error in development
 		res.locals.message = err.message;
+		res.locals.title = titleWithSiteName('error');
+		res.locals.msg = err.expose ? err.message : 'Something went wrong';
 		res.locals.error = req.app.get('env') === 'development' ? err : {};
 		// render the error page
-		res.status(err.status || 500);
+		res.status(status);
 		res.render('error');
 	});
 
 	app.listen(config.port, () => {
-		console.log(`Wallet enterprise app listening at ${config.url}`);
+		log.info({ url: config.url, port: config.port }, 'Verifier listening');
 	});
 }
+
+process.on('unhandledRejection', (reason) => {
+	log.error({ err: reason }, 'Unhandled promise rejection');
+});
+
+process.on('uncaughtException', (err) => {
+	log.fatal({ err }, 'Uncaught exception, exiting');
+	logger.flush(() => process.exit(1));
+});
 
 main();
