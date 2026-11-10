@@ -15,6 +15,13 @@ const STATIC_PREFIXES = [
 // this gets asked once a second by every open QR page so we ignore it later to prevent spam
 const STATUS_POLL_PREFIX = '/verifier/public/definitions/presentation-request/status/';
 
+// keep only the target's origin and path
+export function serializeRes<T extends { headers?: Record<string, unknown> }>(res: T): T {
+	const location = res.headers?.location;
+	if (typeof location !== 'string') return res;
+	return { ...res, headers: { ...res.headers, location: location.split(/[?#]/)[0] } };
+}
+
 export const HttpLoggerMiddleware = pinoHttp({
 	logger: logger.child({ module: 'HTTP' }),
 
@@ -43,6 +50,7 @@ export const HttpLoggerMiddleware = pinoHttp({
 			headers: req.headers,
 			remoteAddress: req.remoteAddress,
 		}),
+		res: serializeRes,
 	},
 
 	redact: {
