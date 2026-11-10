@@ -47,7 +47,9 @@ const dcqlQuerySchema = {
 								id: { type: 'string' },
 								path: {
 									type: 'array',
-									items: { type: 'string' },
+									items: {
+										anyOf: [{ type: 'string' }, { type: 'null' }, { type: 'integer', minimum: 0 }],
+									},
 								},
 								intent_to_retain: { type: 'boolean' },
 								filter: { type: 'object' },
@@ -61,7 +63,7 @@ const dcqlQuerySchema = {
 			type: 'array',
 			items: {
 				type: 'object',
-				required: ['options', 'purpose'],
+				required: ['options'],
 				properties: {
 					options: {
 						type: 'array',
