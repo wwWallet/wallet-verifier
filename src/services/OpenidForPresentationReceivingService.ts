@@ -231,8 +231,8 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		}
 
 		// non E2EE scenario
-		if (!state) {
-			log.warn('direct_post without state');
+		if (!state || typeof state !== 'string') {
+			log.warn('direct_post without valid state');
 			ctx.res.status(401).send({ error: 'Missing state param' });
 			return;
 		}
