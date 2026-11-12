@@ -156,7 +156,8 @@ async function main() {
 }
 
 process.on('unhandledRejection', (reason) => {
-	log.error({ err: reason }, 'Unhandled promise rejection');
+	log.fatal({ err: reason }, 'Unhandled promise rejection, exiting');
+	logger.flush(() => process.exit(1));
 });
 
 process.on('uncaughtException', (err) => {
