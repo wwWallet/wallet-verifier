@@ -20,6 +20,10 @@ import { defaultHttpClient } from 'wallet-common/dist/defaultHttpClient';
 import { webcrypto } from 'node:crypto';
 import AppDataSource from '../AppDataSource';
 import { Audit } from '../entities/Audit.entity';
+import { logger } from '../logger';
+import { flowId } from '../util/flowId';
+
+const log = logger.child({ module: 'OpenID4VP' });
 
 const privateKeyPem = fs
 	.readFileSync(path.join(__dirname, '../../../keys/pem.key'), 'utf-8')
@@ -63,7 +67,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		dcqlQuery: Record<string, unknown> | null;
 	}): Promise<void> {
 		if (!AppDataSource.isInitialized) {
-			console.warn('Audit skipped: data source not initialized');
+			log.warn('Audit skipped: data source not initialized');
 			return;
 		}
 		const auditRepository = AppDataSource.getRepository(Audit);
@@ -79,7 +83,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 
 	private async updateAuditEntry(sessionId: string, update: Partial<Audit>): Promise<void> {
 		if (!AppDataSource.isInitialized) {
-			console.warn('Audit update skipped: data source not initialized');
+			log.warn('Audit update skipped: data source not initialized');
 			return;
 		}
 		const auditRepository = AppDataSource.getRepository(Audit);
@@ -100,10 +104,12 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			return ctx.res.status(500).send({ error: 'id does not exist on query params' });
 		}
 
+		const flow = flowId(ctx.req.query['id']);
 		const signedRequestResult = await this.openid4vp.getSignedRequestObject(ctx.req.query['id']);
 
 		if (!signedRequestResult.ok) {
 			const { error, error_description } = signedRequestResult;
+			log.warn({ flow, error }, 'Request object not served');
 			if (error === OpenID4VPClientErrors.MissingRPState) {
 				return ctx.res.status(500).send({ error, error_description });
 			}
@@ -113,6 +119,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			return ctx.res.status(500).send({ error: 'unknown error' });
 		}
 		const signedRequest = signedRequestResult.value;
+		log.info({ flow }, 'Request object fetched by wallet');
 		return ctx.res.send(signedRequest.toString());
 	}
 
@@ -140,6 +147,18 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			crossDevice: generated.rpState.is_cross_device,
 			dcqlQuery: presentationRequest?.dcql_query ?? null,
 		});
+		const requestedCredentials = presentationRequest?.dcql_query?.credentials;
+		log.info(
+			{
+				flow: flowId(sessionId),
+				response_mode,
+				client_id_prefix: clientIdPrefix ?? 'x509_san_dns',
+				credentials: Array.isArray(requestedCredentials)
+					? requestedCredentials.map((c: { id?: string }) => c.id)
+					: undefined,
+			},
+			'Presentation request created',
+		);
 		return { url: generated.url, stateId: generated.stateId };
 	}
 
@@ -171,6 +190,15 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 				if (rpStateFromKid) {
 					await this.updateAuditEntry(rpStateFromKid.session_id, { errorCode: error });
 				}
+				log.warn(
+					{
+						flow: rpStateFromKid ? flowId(rpStateFromKid.session_id) : undefined,
+						encrypted: true,
+						error,
+						error_description,
+					},
+					'Presentation response rejected',
+				);
 
 				if (error === OpenID4VPClientErrors.JWEDecryptionFailure) {
 					ctx.res.status(500).send({ error, error_description });
@@ -182,6 +210,14 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 
 			const rpState = rpStateResult.value;
 			await this.updateAuditEntry(rpState.session_id, { completed: true, errorCode: null });
+			log.info(
+				{
+					flow: flowId(rpState.session_id),
+					encrypted: true,
+					cross_device: rpState.is_cross_device,
+				},
+				'Presentation response received',
+			);
 			if (!rpState.is_cross_device) {
 				ctx.res.send({
 					redirect_uri: rpState.callback_endpoint + '#response_code=' + rpState.response_code,
@@ -196,13 +232,13 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 
 		// non E2EE scenario
 		if (!state) {
-			console.log('Missing state param');
+			log.warn('direct_post without state');
 			ctx.res.status(401).send({ error: 'Missing state param' });
 			return;
 		}
 
 		if (!vp_token) {
-			console.log('Missing state param');
+			log.warn({ flow: flowId(state) }, 'direct_post without vp_token');
 			await this.updateAuditEntry(state, { errorCode: 'Missing vp_token' });
 			ctx.res.status(401).send({ error: 'Missing vp_token' });
 			return;
@@ -217,11 +253,24 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		if (!rpStateResult.ok) {
 			const { error, error_description } = rpStateResult;
 			await this.updateAuditEntry(state, { errorCode: error });
+			log.warn(
+				{ flow: flowId(state), encrypted: false, error, error_description },
+				'Presentation response rejected',
+			);
 			throw new Error(error_description ?? error);
 		}
 
 		const rpState = rpStateResult.value;
 		await this.updateAuditEntry(rpState.session_id, { completed: true, errorCode: null });
+		// stored only: the vp_token is validated later, when the result is fetched (see /verifier/callback)
+		log.info(
+			{
+				flow: flowId(rpState.session_id),
+				encrypted: false,
+				cross_device: rpState.is_cross_device,
+			},
+			'Presentation response received',
+		);
 		ctx.res.send({
 			redirect_uri: rpState.callback_endpoint + '#response_code=' + rpState.response_code,
 		});

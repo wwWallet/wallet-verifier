@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import { logger } from './logger';
+import { flowId } from './util/flowId';
 import * as qrcode from 'qrcode';
 import { config } from './../config';
 import { OpenidForPresentationsReceivingService } from './services/OpenidForPresentationReceivingService';
@@ -133,6 +135,8 @@ const enrichClaimsWithInferredTypes = (claims: Record<string, any[]>): Record<st
 
 const MAX_CERT_LENGTH = 5000;
 
+const log = logger.child({ module: 'Verifier' });
+
 const verifierRouter = Router();
 const verifierConfiguration = new VerifierConfigurationService();
 const openidForPresentationReceivingService = new OpenidForPresentationsReceivingService(
@@ -223,7 +227,7 @@ verifierRouter.post('/callback', async (req, res) => {
 	}
 
 	if (!session_id) {
-		console.error('Problem with the verification flow');
+		log.warn('Callback without a session_id or a known response_code');
 		return res.status(400).send({ error: 'Problem with the verification flow' });
 	}
 
@@ -238,6 +242,13 @@ verifierRouter.post('/callback', async (req, res) => {
 		result.rpState.claims == null ||
 		result.rpState.date_created == null
 	) {
+		log.warn(
+			{
+				flow: flowId(session_id),
+				error: result.status == false ? result.error.message : 'incomplete presentation state',
+			},
+			'Presentation result unavailable',
+		);
 		return res.render('error.pug', {
 			title: titleWithSiteName('error'),
 			msg: result.status == false ? result.error.message : 'Unknown error',
@@ -261,12 +272,22 @@ verifierRouter.post('/callback', async (req, res) => {
 				const dataUriFn = result.value.metadata.credential.image?.dataUri;
 				imageUri = dataUriFn ? await dataUriFn() : undefined;
 			} catch (err) {
-				console.warn('Failed to load credential image:', err);
+				log.warn({ err }, 'Failed to load credential image');
 			}
 			credentialImages.push(imageUri);
 			credentialPayloads.push(result.value.signedClaims);
+		} else {
+			log.warn(
+				{ flow: flowId(session_id), error: result.error },
+				'Could not parse presented credential',
+			);
 		}
 	}
+
+	log.info(
+		{ flow: flowId(session_id), credentials: presentations.length },
+		'Presentation verified and shown',
+	);
 
 	const verificationTimestamp = new Date(date_created).toISOString();
 	const descriptorFriendlyNames =
@@ -404,7 +425,6 @@ verifierRouter.post('/public/definitions/request-custom-credential', async (req,
 verifierRouter.get(
 	'/public/definitions/presentation-request/status/:presentation_request_id',
 	async (req, res) => {
-		console.log('session_id : ', req.cookies['session_id']);
 		if (req.cookies['session_id'] && req.method == 'GET') {
 			const { status } =
 				await openidForPresentationReceivingService.openid4vp.getPresentationBySessionId(
@@ -462,7 +482,6 @@ verifierRouter.use(
 
 		if (req.method === 'POST' && req.body.action && req.cookies.session_id) {
 			// handle click of "open with..." button
-			console.log('Cookie = ', req.cookies);
 			// update is_cross_device --> false since the button was pressed
 			const rpState = await openidForPresentationReceivingService.openid4vp.getRPStateBySessionId(
 				req.cookies.session_id,

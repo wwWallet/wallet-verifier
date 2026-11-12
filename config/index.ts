@@ -32,6 +32,7 @@ export const config = {
 		secure: process.env.SESSION_ID_COOKIE_SECURE === 'true' ? true : false,
 	},
 	clockTolerance: parseInt(process.env.CLOCK_TOLERANCE || '60', 10),
+	logHttp: process.env.LOG_HTTP?.trim().toLowerCase() === 'true',
 	siteConfig: {
 		name: process.env.SITE_NAME || 'wwWallet Verifier',
 		short_name: process.env.SITE_SHORT_NAME || 'wwWallet Verifier',

@@ -10,6 +10,9 @@ import {
 	type IacasResponse,
 } from 'wallet-common';
 import { config } from '../../config';
+import { logger } from '../logger';
+
+const log = logger.child({ module: 'CredentialEngine' });
 import { webcrypto } from 'node:crypto';
 import { CustomCredentialSvg, defaultHttpClient, CredentialRenderingService } from 'wallet-common';
 
@@ -17,8 +20,6 @@ import { CustomCredentialSvg, defaultHttpClient, CredentialRenderingService } fr
 const trustedCredentialIssuerIdentifiers = config.trustedIssuers as string[] | undefined;
 
 export async function initializeCredentialEngine() {
-	console.log('Initializing credential engine...');
-
 	const ctx = {
 		// @ts-ignore
 		clockTolerance: config.clockTolerance ?? 60,
@@ -35,8 +36,11 @@ export async function initializeCredentialEngine() {
 						prependToPath(credentialIssuerIdentifier, '.well-known/openid-credential-issuer') ?? '',
 					)
 						.then((res) => (res.ok ? res.json() : null))
-						.catch((e) => {
-							console.error(e);
+						.catch((err) => {
+							log.warn(
+								{ err, issuer: credentialIssuerIdentifier },
+								'Failed to fetch trusted issuer metadata',
+							);
 							return null;
 						}),
 				),
@@ -49,8 +53,11 @@ export async function initializeCredentialEngine() {
 					if (metadata && metadata.mdoc_iacas_uri) {
 						return fetch(metadata.mdoc_iacas_uri)
 							.then((res) => (res.ok ? res.json() : null))
-							.catch((e) => {
-								console.error(e);
+							.catch((err) => {
+								log.warn(
+									{ err, url: metadata.mdoc_iacas_uri },
+									'Failed to fetch IACA certificates',
+								);
 								return null;
 							});
 					}
@@ -75,9 +82,7 @@ export async function initializeCredentialEngine() {
 
 	const credentialParsingEngine = ParsingEngine();
 	credentialParsingEngine.register(SDJWTVCParser({ context: ctx, httpClient: defaultHttpClient }));
-	console.log('Registered SDJWTVCParser...');
 	credentialParsingEngine.register(MsoMdocParser({ context: ctx, httpClient: defaultHttpClient }));
-	console.log('Registered MsoMdocParser...');
 
 	const pkResolverEngine = PublicKeyResolverEngine();
 	const openid4vcRendering = CustomCredentialSvg({ httpClient: defaultHttpClient });
