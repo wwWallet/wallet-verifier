@@ -101,7 +101,7 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 
 	public async getSignedRequestObject(ctx: { req: Request; res: Response }): Promise<any> {
 		if (!ctx.req.query['id'] || typeof ctx.req.query['id'] != 'string') {
-			return ctx.res.status(500).send({ error: 'id does not exist on query params' });
+			return ctx.res.status(400).send({ error: 'id does not exist on query params' });
 		}
 
 		const flow = flowId(ctx.req.query['id']);
@@ -111,10 +111,10 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 			const { error, error_description } = signedRequestResult;
 			log.warn({ flow, error }, 'Request object not served');
 			if (error === OpenID4VPClientErrors.MissingRPState) {
-				return ctx.res.status(500).send({ error, error_description });
+				return ctx.res.status(404).send({ error, error_description });
 			}
 			if (error === OpenID4VPClientErrors.SignedRequestObjectInvalidated) {
-				return ctx.res.status(500).send({ error, error_description });
+				return ctx.res.status(400).send({ error, error_description });
 			}
 			return ctx.res.status(500).send({ error: 'unknown error' });
 		}
@@ -166,21 +166,35 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 		// let presentationSubmissionObject: PresentationSubmission | null = qs.parse(decodeURI(presentation_submission)) as any;
 		let vp_token = ctx.req.body?.vp_token;
 		let state = ctx.req.body?.state;
-		let presentation_submission = ctx.req.body.presentation_submission
-			? (JSON.parse(decodeURI(ctx.req.body.presentation_submission)) as any)
-			: null;
+		let presentation_submission;
+		try {
+			presentation_submission = ctx.req.body?.presentation_submission
+				? (JSON.parse(decodeURI(ctx.req.body?.presentation_submission)) as any)
+				: null;
+		} catch {
+			log.warn('direct_post with malformed presentation_submission');
+			ctx.res.status(400).send({ error: 'Malformed presentation_submission' });
+			return;
+		}
 
-		if (ctx.req.body.response) {
+		if (ctx.req.body?.response) {
 			// E2EE
-			const { kid } = JSON.parse(base64url.decode(ctx.req.body.response.split('.')[0])) as {
-				kid: string | undefined;
-			};
+			let kid: string | undefined;
+			try {
+				({ kid } = JSON.parse(base64url.decode(ctx.req.body?.response.split('.')[0])) as {
+					kid: string | undefined;
+				});
+			} catch {
+				// not a compact JWE with a JSON header
+			}
 			if (!kid) {
-				throw new Error('Could not extract kid');
+				log.warn({ encrypted: true }, 'direct_post response without a kid');
+				ctx.res.status(400).send({ error: 'Could not extract kid' });
+				return;
 			}
 
 			const rpStateResult = await this.openid4vp.handleEncryptedAuthorizationResponse(
-				ctx.req.body.response,
+				ctx.req.body?.response,
 				kid,
 			);
 
@@ -200,12 +214,8 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 					'Presentation response rejected',
 				);
 
-				if (error === OpenID4VPClientErrors.JWEDecryptionFailure) {
-					ctx.res.status(500).send({ error, error_description });
-					return;
-				}
-
-				throw new Error(error_description ?? error);
+				ctx.res.status(400).send({ error, error_description });
+				return;
 			}
 
 			const rpState = rpStateResult.value;
@@ -257,7 +267,8 @@ export class OpenidForPresentationsReceivingService implements OpenidForPresenta
 				{ flow: flowId(state), encrypted: false, error, error_description },
 				'Presentation response rejected',
 			);
-			throw new Error(error_description ?? error);
+			ctx.res.status(400).send({ error, error_description });
+			return;
 		}
 
 		const rpState = rpStateResult.value;

@@ -70,8 +70,55 @@ describe('OpenidForPresentationsReceivingService.responseHandler', () => {
 			.mockResolvedValue({ ok: false, error: 'invalid_request' } as any);
 		const ctx = createContext({ state: 'some-state', vp_token: 'token' });
 
-		await expect(service.responseHandler(ctx)).rejects.toThrow('invalid_request');
+		await service.responseHandler(ctx);
+
+		expect(ctx.res.status).toHaveBeenCalledWith(400);
+		expect(ctx.res.send).toHaveBeenCalledWith(
+			expect.objectContaining({ error: 'invalid_request' }),
+		);
 
 		expect(handleResponseDirectPost).toHaveBeenCalledWith('some-state', 'token', null);
+	});
+});
+
+describe('OpenidForPresentationsReceivingService.responseHandler on invalid input', () => {
+	function expectClientError(res: { status: ReturnType<typeof vi.fn> }) {
+		expect(res.status).toHaveBeenCalledTimes(1);
+		const [code] = res.status.mock.calls[0];
+		expect(code).toBeGreaterThanOrEqual(400);
+		expect(code).toBeLessThan(500);
+	}
+
+	it('answers a direct_post with an unknown state with a 4xx instead of rejecting', async () => {
+		const service = createService();
+		const ctx = createContext({ state: 'unknown-state', vp_token: 'token' });
+
+		await expect(service.responseHandler(ctx)).resolves.toBeUndefined();
+
+		expectClientError(ctx.res);
+	});
+
+	it('answers a replayed direct_post for a completed flow with a 4xx instead of rejecting', async () => {
+		const service = createService();
+		// what a successful first direct_post leaves behind; a wallet retry hits this
+		await service.openid4vp.saveRPState('completed-state', {
+			session_id: 'completed-state',
+			completed: true,
+		} as any);
+		const ctx = createContext({ state: 'completed-state', vp_token: 'token' });
+
+		await expect(service.responseHandler(ctx)).resolves.toBeUndefined();
+
+		expectClientError(ctx.res);
+	});
+
+	it('answers an encrypted response with an unknown kid with a 4xx instead of rejecting', async () => {
+		const service = createService();
+		const header = Buffer.from(JSON.stringify({ kid: 'unknown-kid' })).toString('base64url');
+		const ctx = createContext({ response: `${header}.a.b.c.d` });
+
+		await expect(service.responseHandler(ctx)).resolves.toBeUndefined();
+
+		expectClientError(ctx.res);
 	});
 });

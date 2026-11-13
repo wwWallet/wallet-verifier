@@ -1,6 +1,5 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
 import { config } from '../config';
-import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import cors from 'cors';
@@ -55,8 +54,8 @@ async function main() {
 		}),
 	);
 
-	app.use(bodyParser.urlencoded({ extended: true })); // support url encoded bodies
-	app.use(bodyParser.json()); // support json encoded bodies
+	app.use(express.urlencoded({ extended: true }));
+	app.use(express.json());
 
 	app.set('view engine', 'pug');
 
@@ -89,7 +88,7 @@ async function main() {
 	});
 
 	app.post('/', async (req, res) => {
-		if (req.body.verifier == 'true') {
+		if (req.body?.verifier == 'true') {
 			return res.redirect('/verifier/public/definitions');
 		}
 	});
@@ -150,7 +149,12 @@ async function main() {
 		res.render('error');
 	});
 
-	app.listen(config.port, () => {
+	app.listen(config.port, (err) => {
+		if (err) {
+			log.fatal({ err, port: config.port }, 'Verifier failed to listen, exiting');
+			logger.flush(() => process.exit(1));
+			return;
+		}
 		log.info({ url: config.url, port: config.port }, 'Verifier listening');
 	});
 }
