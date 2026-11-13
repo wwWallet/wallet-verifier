@@ -6,10 +6,10 @@ export class ExpressAppService {
 
 	public async configure(app: Application): Promise<void> {
 		app.get('/verification/request-object', async (req, res) => {
-			this.presentationsReceivingService.getSignedRequestObject({ req, res });
+			await this.presentationsReceivingService.getSignedRequestObject({ req, res });
 		});
 		app.post('/verification/direct_post', async (req, res) => {
-			this.presentationsReceivingService.responseHandler({ req, res });
+			await this.presentationsReceivingService.responseHandler({ req, res });
 		});
 	}
 }

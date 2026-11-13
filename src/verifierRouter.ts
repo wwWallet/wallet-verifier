@@ -146,7 +146,7 @@ const openidForPresentationReceivingService = new OpenidForPresentationsReceivin
 );
 
 verifierRouter.post('/public/manage-certificates', async (req, res) => {
-	const { certificate } = req.body;
+	const { certificate } = req.body ?? {};
 	try {
 		if (!certificate) {
 			throw new Error('No certificate provided');
@@ -218,10 +218,10 @@ verifierRouter.get('/callback', async (_req, res) => {
 verifierRouter.post('/callback', async (req, res) => {
 	// this request includes the response code
 	let session_id = req.cookies['session_id'];
-	if (req.body.response_code) {
+	if (req.body?.response_code) {
 		// response_code is considered more stable than session_id
 		const s = await openidForPresentationReceivingService.openid4vp.getRPStateByResponseCode(
-			req.body.response_code,
+			req.body?.response_code,
 		);
 		if (s) {
 			session_id = s.session_id;
@@ -350,7 +350,7 @@ verifierRouter.get('/public/definitions/request-custom-credential', async (_req,
 });
 
 verifierRouter.post('/public/definitions/request-custom-credential', async (req, res) => {
-	if (req.method === 'POST' && req.body.action && req.cookies.session_id) {
+	if (req.method === 'POST' && req.body?.action && req.cookies.session_id) {
 		// update is_cross_device --> false since the button was pressed
 		const rpState = await openidForPresentationReceivingService.openid4vp.getRPStateBySessionId(
 			req.cookies.session_id,
@@ -363,12 +363,12 @@ verifierRouter.post('/public/definitions/request-custom-credential', async (req,
 			);
 			await openidForPresentationReceivingService.setAuditCrossDevice(rpState.session_id, false);
 		}
-		return res.redirect(req.body.action);
+		return res.redirect(req.body?.action);
 	}
 	let query;
 	let presentationRequest = {};
 	try {
-		query = JSON.parse(req.body.dcqlQuery);
+		query = JSON.parse(req.body?.dcqlQuery);
 		const validate = ajv.compile(dcqlQuerySchema);
 		if (!validate(query)) {
 			return res.render('error.pug', {
@@ -389,7 +389,7 @@ verifierRouter.post('/public/definitions/request-custom-credential', async (req,
 			code: 0,
 		});
 	}
-	const scheme = req.body.scheme;
+	const scheme = req.body?.scheme;
 
 	const newSessionId = generateRandomIdentifier(12);
 	addSessionIdCookieToResponse(res, newSessionId);
@@ -419,7 +419,7 @@ verifierRouter.post('/public/definitions/request-custom-credential', async (req,
 		wwwalletURL: config.wwwalletURL,
 		authorizationRequestURL: modifiedUrl,
 		authorizationRequestQR,
-		presentationRequest: JSON.stringify(JSON.parse(req.body.dcqlQuery)),
+		presentationRequest: JSON.stringify(JSON.parse(req.body?.dcqlQuery)),
 		state: url.searchParams.get('state'),
 	});
 });
@@ -457,20 +457,32 @@ verifierRouter.use(
 		}
 
 		let presentationRequest;
-		if (req.method === 'POST' && req.body.dcql_query) {
+		if (req.method === 'POST' && req.body?.dcql_query) {
 			// Use the filtered query
-			presentationRequest = { dcql_query: JSON.parse(req.body.dcql_query) };
+			try {
+				presentationRequest = { dcql_query: JSON.parse(req.body?.dcql_query) };
+			} catch {
+				return res.status(400).render('error', {
+					title: titleWithSiteName('error'),
+					msg: 'Error while parsing the DCQL query',
+					code: 0,
+				});
+			}
+			if (!ajv.compile(dcqlQuerySchema)(presentationRequest.dcql_query)) {
+				return res.status(400).render('error', {
+					title: titleWithSiteName('error'),
+					msg: 'Invalid DCQL query format',
+					code: 0,
+				});
+			}
 		} else {
-			presentationRequest = JSON.parse(
-				JSON.stringify(
-					verifierConfiguration
-						.getPresentationRequests()
-						.filter((pd) => pd.id == presentation_request_id)[0],
-				),
-			) as any;
+			const configured = verifierConfiguration
+				.getPresentationRequests()
+				.filter((pd) => pd.id == presentation_request_id)[0];
+			presentationRequest = configured ? (JSON.parse(JSON.stringify(configured)) as any) : null;
 		}
 		if (!presentationRequest) {
-			return res.render('error', {
+			return res.status(404).render('error', {
 				title: titleWithSiteName('error'),
 				msg: 'No presentation request was found',
 				code: 0,
@@ -478,11 +490,11 @@ verifierRouter.use(
 		}
 
 		let scheme = 'openid4vp://cb';
-		if (req.method === 'POST' && req.body.scheme) {
-			scheme = req.body.scheme;
+		if (req.method === 'POST' && req.body?.scheme) {
+			scheme = req.body?.scheme;
 		}
 
-		if (req.method === 'POST' && req.body.action && req.cookies.session_id) {
+		if (req.method === 'POST' && req.body?.action && req.cookies.session_id) {
 			// handle click of "open with..." button
 			// update is_cross_device --> false since the button was pressed
 			const rpState = await openidForPresentationReceivingService.openid4vp.getRPStateBySessionId(
@@ -496,11 +508,11 @@ verifierRouter.use(
 				);
 				await openidForPresentationReceivingService.setAuditCrossDevice(rpState.session_id, false);
 			}
-			return res.redirect(req.body.action);
+			return res.redirect(req.body?.action);
 		}
 		const newSessionId = generateRandomIdentifier(12);
 		addSessionIdCookieToResponse(res, newSessionId); // start session here
-		const clientIdPrefix = req.body.clientIdPrefix;
+		const clientIdPrefix = req.body?.clientIdPrefix;
 		const { url } = await openidForPresentationReceivingService.generateAuthorizationRequestURL(
 			presentationRequest,
 			newSessionId,
